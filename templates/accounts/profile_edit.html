@@ -1,1 +1,202 @@
 
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-pencil-square me-3"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Actualiza tu información personal
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver al Perfil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="mb-0">Editar Información Personal</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <h6><i class="bi bi-exclamation-triangle-fill me-2"></i>Errores en el formulario:</h6>
+                                <ul class="mb-0">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field|capfirst }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Información Personal -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-person me-2"></i>
+                                        Información Personal
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-person me-2"></i>Nombre
+                                    </label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.first_name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-person me-2"></i>Apellidos
+                                    </label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.last_name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-envelope me-2"></i>Correo Electrónico
+                                    </label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.email.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Este email se utilizará para comunicaciones importantes
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información de Solo Lectura -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-secondary mb-3">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Información de la Cuenta
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold text-muted">
+                                        <i class="bi bi-at me-2"></i>Nombre de Usuario
+                                    </label>
+                                    <div class="form-control-plaintext bg-light border rounded p-2">
+                                        {{ user.username }}
+                                        <small class="text-muted ms-2">No se puede modificar</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold text-muted">
+                                        <i class="bi bi-shield me-2"></i>Tipo de Usuario
+                                    </label>
+                                    <div class="form-control-plaintext bg-light border rounded p-2">
+                                        {% if user.user_type == 'admin' %}
+                                            <span class="badge bg-danger">Administrador</span>
+                                        {% else %}
+                                            <span class="badge bg-primary">Estudiante</span>
+                                        {% endif %}
+                                        <small class="text-muted ms-2">No se puede modificar</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold text-muted">
+                                        <i class="bi bi-calendar me-2"></i>Miembro desde
+                                    </label>
+                                    <div class="form-control-plaintext bg-light border rounded p-2">
+                                        {{ user.date_joined|date:"d de F de Y" }}
+                                        <small class="text-muted ms-2">({{ user.date_joined|timesince }} ago)</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">
+                                            <i class="bi bi-x-circle me-2"></i>
+                                            Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            Guardar Cambios
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Acciones Adicionales -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="border-top pt-4">
+                                    <h6 class="text-secondary mb-3">
+                                        <i class="bi bi-gear me-2"></i>
+                                        Configuración de Seguridad
+                                    </h6>
+                                    <div class="d-grid gap-2 d-md-flex">
+                                        <a href="{% url 'accounts:password_change' %}" class="btn btn-outline-warning">
+                                            <i class="bi bi-lock me-2"></i>
+                                            Cambiar Contraseña
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus {
+    border-color: #7f1d1d;
+    box-shadow: 0 0 0 0.2rem rgba(127, 29, 29, 0.25);
+}
+
+.form-control-plaintext {
+    color: #6c757d;
+    font-size: 0.95rem;
+}
+
+.border-top {
+    border-color: #e9ecef !important;
+}
+</style>
+{% endblock %}

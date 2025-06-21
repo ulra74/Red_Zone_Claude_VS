@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-person-circle me-3"></i>
+                        Mi Perfil
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Información de tu cuenta en Red Zone Academy
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'accounts:profile_edit' %}" class="btn btn-light">
+                        <i class="bi bi-pencil me-2"></i>
+                        Editar Perfil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        <div class="row">
+            <!-- Información Personal -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person-fill text-primary me-2"></i>
+                            Información Personal
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                 style="width: 100px; height: 100px;">
+                                {% if user.user_type == 'admin' %}
+                                    <i class="bi bi-shield-fill-check text-danger" style="font-size: 3rem;"></i>
+                                {% else %}
+                                    <i class="bi bi-person-fill text-primary" style="font-size: 3rem;"></i>
+                                {% endif %}
+                            </div>
+                            <h4 class="mt-3 mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                            <p class="text-muted mb-2">@{{ user.username }}</p>
+                            {% if user.user_type == 'admin' %}
+                                <span class="badge bg-danger">Administrador</span>
+                            {% else %}
+                                <span class="badge bg-primary">Estudiante</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="border-top pt-3">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <small class="text-muted d-block">Registrado</small>
+                                        <span class="fw-bold">{{ user.date_joined|date:"d/m/Y" }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Último acceso</small>
+                                    <span class="fw-bold">{{ user.last_login|date:"d/m/Y"|default:"Nunca" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalles de la Cuenta -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-gear-fill text-secondary me-2"></i>
+                            Detalles de la Cuenta
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Nombre completo</label>
+                            <p class="mb-0 fw-semibold">{{ user.get_full_name|default:"No especificado" }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Correo electrónico</label>
+                            <p class="mb-0 fw-semibold">{{ user.email|default:"No especificado" }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Nombre de usuario</label>
+                            <p class="mb-0 fw-semibold">{{ user.username }}</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Estado de la cuenta</label>
+                            <p class="mb-0">
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>Activa
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-x-circle me-1"></i>Inactiva
+                                    </span>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-primary">
+                                <i class="bi bi-pencil me-2"></i>
+                                Editar Información
+                            </a>
+                            <a href="{% url 'accounts:password_change' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-lock me-2"></i>
+                                Cambiar Contraseña
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas de Acceso -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-graph-up text-success me-2"></i>
+                            Mis Estadísticas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if user.is_student %}
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted">Oposiciones</span>
+                                    <span class="badge bg-primary">{{ oposiciones_count }}</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" style="width: {% if oposiciones_count > 0 %}75%{% else %}0%{% endif %}"></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted">Temas</span>
+                                    <span class="badge bg-info">{{ temas_count }}</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-info" style="width: {% if temas_count > 0 %}60%{% else %}0%{% endif %}"></div>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <p class="text-muted small mb-3">Acceso total a contenido</p>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <a href="{% url 'core:oposicion_list' %}" class="btn btn-sm btn-outline-primary w-100">
+                                            <i class="bi bi-fire me-1"></i>
+                                            Oposiciones
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="{% url 'core:tema_list' %}" class="btn btn-sm btn-outline-info w-100">
+                                            <i class="bi bi-journals me-1"></i>
+                                            Temas
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="text-center">
+                                <i class="bi bi-shield-check text-danger mb-3" style="font-size: 3rem;"></i>
+                                <h6 class="fw-bold">Administrador del Sistema</h6>
+                                <p class="text-muted small mb-4">
+                                    Tienes acceso completo a todas las funciones administrativas
+                                </p>
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'core:admin_user_list' %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-people me-1"></i>
+                                        Gestionar Usuarios
+                                    </a>
+                                    <a href="{% url 'core:admin_oposicion_list' %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-fire me-1"></i>
+                                        Gestionar Oposiciones
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease-in-out;
+}
+</style>
+{% endblock %}

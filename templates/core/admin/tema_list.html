@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-journals me-3"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Administra los temas de estudio del sistema
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'core:admin_tema_create' %}" class="btn btn-light">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Nuevo Tema
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        {% if temas %}
+            <!-- Grid de Temas -->
+            <div class="row">
+                {% for tema in temas %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card border-0 shadow-sm h-100 tema-card">
+                            <div class="card-body d-flex flex-column">
+                                <!-- Header de la tarjeta -->
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                                        <i class="bi bi-journal-text text-info fs-4"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-1 fw-bold">
+                                            {{ tema.nombre }}
+                                        </h5>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock me-1"></i>
+                                            Actualizado {{ tema.updated_at|naturaltime }}
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Información adicional -->
+                                <div class="mb-3 flex-grow-1">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <div class="border-end">
+                                                <small class="text-muted d-block">Estudiantes</small>
+                                                <span class="fw-bold text-info">
+                                                    {{ tema.alumnos_con_acceso.count }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Estado</small>
+                                            <span class="badge bg-success">Disponible</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Acciones -->
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'core:tema_detail' tema.pk %}" 
+                                       class="btn btn-info">
+                                        <i class="bi bi-eye me-2"></i>
+                                        Ver Detalles
+                                    </a>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'core:admin_tema_update' tema.pk %}" 
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'core:admin_tema_delete' tema.pk %}" 
+                                           class="btn btn-outline-danger btn-sm"
+                                           onclick="return confirm('¿Estás seguro de que quieres eliminar este tema?')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="Navegación de páginas">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">
+                                            <i class="bi bi-chevron-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                            <i class="bi bi-chevron-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Estado vacío -->
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-journals text-muted" style="font-size: 5rem;"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">No hay temas disponibles</h3>
+                        <p class="text-muted mb-4">
+                            Crea el primer tema de estudio para comenzar.
+                        </p>
+                        <a href="{% url 'core:admin_tema_create' %}" class="btn btn-info btn-lg">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Crear Primer Tema
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.tema-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.tema-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(23, 162, 184, 0.15) !important;
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    border: none;
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, #138496 0%, #117a8b 100%);
+}
+
+.page-link {
+    color: var(--rza-primary);
+    border-color: #dee2e6;
+}
+
+.page-link:hover {
+    color: var(--rza-secondary);
+    background-color: #fef2f2;
+    border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+    background: var(--rza-gradient);
+    border-color: var(--rza-primary);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,330 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-cloud-upload me-3"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Subir material de estudio para {{ oposicion.nombre }}
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'core:oposicion_detail' oposicion.pk %}" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver a Oposición
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-file-earmark-plus text-primary me-2"></i>
+                            Subir Nuevo Archivo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <h6><i class="bi bi-exclamation-triangle-fill me-2"></i>Errores en el formulario:</h6>
+                                <ul class="mb-0">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field|capfirst }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <!-- Información de la Oposición -->
+                        <div class="alert alert-info">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                                <div>
+                                    <h6 class="mb-1">Subiendo archivo para:</h6>
+                                    <strong>{{ oposicion.nombre }}</strong>
+                                    <small class="d-block text-muted">
+                                        {{ oposicion.alumnos_con_acceso.count }} estudiantes tienen acceso a esta oposición
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="post" enctype="multipart/form-data" novalidate id="uploadForm">
+                            {% csrf_token %}
+                            
+                            <!-- Información del Archivo -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-file-text me-2"></i>
+                                        Información del Archivo
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.nombre.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-card-text me-2"></i>Nombre del Archivo
+                                    </label>
+                                    {{ form.nombre }}
+                                    {% if form.nombre.errors %}
+                                        <div class="text-danger small mt-1">{{ form.nombre.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.nombre.help_text }}</div>
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-file-text me-2"></i>Descripción
+                                    </label>
+                                    {{ form.descripcion }}
+                                    {% if form.descripcion.errors %}
+                                        <div class="text-danger small mt-1">{{ form.descripcion.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.descripcion.help_text }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Archivo y Configuración -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-upload me-2"></i>
+                                        Archivo y Configuración
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-8 mb-3">
+                                    <label for="{{ form.archivo.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-file-earmark me-2"></i>Seleccionar Archivo
+                                    </label>
+                                    {{ form.archivo }}
+                                    {% if form.archivo.errors %}
+                                        <div class="text-danger small mt-1">{{ form.archivo.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.archivo.help_text }}</div>
+                                    
+                                    <!-- Información de progreso -->
+                                    <div class="mt-3" id="uploadProgress" style="display: none;">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <small class="text-muted">Subiendo archivo...</small>
+                                            <small class="text-muted" id="progressPercent">0%</small>
+                                        </div>
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-primary" id="progressBar" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.tipo.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-tag me-2"></i>Tipo de Archivo
+                                    </label>
+                                    {{ form.tipo }}
+                                    {% if form.tipo.errors %}
+                                        <div class="text-danger small mt-1">{{ form.tipo.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <div class="form-check form-switch">
+                                        {{ form.es_publico }}
+                                        <label class="form-check-label fw-semibold" for="{{ form.es_publico.id_for_label }}">
+                                            <i class="bi bi-eye me-2"></i>Archivo Público
+                                        </label>
+                                        {% if form.es_publico.errors %}
+                                            <div class="text-danger small mt-1">{{ form.es_publico.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">{{ form.es_publico.help_text }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tipos de archivo soportados -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-muted mb-3">
+                                        <i class="bi bi-file-earmark-check me-2"></i>
+                                        Tipos de Archivo Soportados
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-3 mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-file-pdf text-danger me-2"></i>
+                                                <small>PDF</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-file-word text-primary me-2"></i>
+                                                <small>DOC, DOCX</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-file-ppt text-warning me-2"></i>
+                                                <small>PPT, PPTX</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-file-excel text-success me-2"></i>
+                                                <small>XLS, XLSX</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-file-play text-info me-2"></i>
+                                                <small>MP4, AVI, MOV</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-file-music text-purple me-2"></i>
+                                                <small>MP3, WAV</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-file-image text-secondary me-2"></i>
+                                                <small>JPG, PNG, GIF</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-file-earmark text-muted me-2"></i>
+                                                <small>Otros</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{% url 'core:oposicion_detail' oposicion.pk %}" class="btn btn-outline-secondary">
+                                            <i class="bi bi-x-circle me-2"></i>
+                                            Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                                            <i class="bi bi-cloud-upload me-2"></i>
+                                            Subir Archivo
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus {
+    border-color: #7f1d1d;
+    box-shadow: 0 0 0 0.2rem rgba(127, 29, 29, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: #7f1d1d;
+    border-color: #7f1d1d;
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.text-purple {
+    color: #6f42c1 !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.querySelector('input[type="file"]');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressDiv = document.getElementById('uploadProgress');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+    
+    // Auto-detectar tipo de archivo
+    fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const tipoSelect = document.getElementById('{{ form.tipo.id_for_label }}');
+            const extension = file.name.split('.').pop().toLowerCase();
+            
+            // Auto-seleccionar tipo basado en extensión
+            const tipoMap = {
+                'pdf': 'pdf',
+                'doc': 'documento', 'docx': 'documento',
+                'ppt': 'presentacion', 'pptx': 'presentacion',
+                'mp4': 'video', 'avi': 'video', 'mov': 'video',
+                'mp3': 'audio', 'wav': 'audio',
+                'jpg': 'imagen', 'jpeg': 'imagen', 'png': 'imagen', 'gif': 'imagen'
+            };
+            
+            if (tipoMap[extension]) {
+                tipoSelect.value = tipoMap[extension];
+            }
+            
+            // Auto-rellenar nombre si está vacío
+            const nombreInput = document.getElementById('{{ form.nombre.id_for_label }}');
+            if (!nombreInput.value.trim()) {
+                const fileName = file.name.split('.').slice(0, -1).join('.');
+                nombreInput.value = fileName;
+            }
+        }
+    });
+    
+    // Mostrar progreso durante la subida (simulado)
+    form.addEventListener('submit', function() {
+        if (fileInput.files.length > 0) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-clock me-2"></i>Subiendo...';
+            progressDiv.style.display = 'block';
+            
+            // Simular progreso (en una implementación real usarías AJAX)
+            let progress = 0;
+            const interval = setInterval(function() {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+                
+                progressBar.style.width = progress + '%';
+                progressPercent.textContent = Math.round(progress) + '%';
+                
+                if (progress >= 90) {
+                    clearInterval(interval);
+                    progressPercent.textContent = 'Procesando...';
+                }
+            }, 200);
+        }
+    });
+});
+</script>
+{% endblock %}

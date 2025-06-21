@@ -1,5 +1,11 @@
 from django.urls import path
 from . import views
+from .views_files import (
+    SubirArchivoOposicionView, SubirArchivoTemaView,
+    ArchivosOposicionListView, ArchivosTemaListView,
+    descargar_archivo_oposicion, descargar_archivo_tema,
+    EliminarArchivoOposicionView, EliminarArchivoTemaView
+)
 
 app_name = 'core'
 
@@ -31,4 +37,16 @@ urlpatterns = [
     path('admin/users/create/', views.AdminUserCreateView.as_view(), name='admin_user_create'),
     path('admin/users/<int:pk>/edit/', views.AdminUserUpdateView.as_view(), name='admin_user_update'),
     path('admin/users/<int:pk>/delete/', views.AdminUserDeleteView.as_view(), name='admin_user_delete'),
+    
+    # Sistema de Archivos - Oposiciones
+    path('oposiciones/<int:oposicion_id>/archivos/', ArchivosOposicionListView.as_view(), name='archivos_oposicion_list'),
+    path('oposiciones/<int:oposicion_id>/archivos/subir/', SubirArchivoOposicionView.as_view(), name='subir_archivo_oposicion'),
+    path('archivos/oposicion/<int:archivo_id>/descargar/', descargar_archivo_oposicion, name='descargar_archivo_oposicion'),
+    path('archivos/oposicion/<int:pk>/eliminar/', EliminarArchivoOposicionView.as_view(), name='eliminar_archivo_oposicion'),
+    
+    # Sistema de Archivos - Temas
+    path('temas/<int:tema_id>/archivos/', ArchivosTemaListView.as_view(), name='archivos_tema_list'),
+    path('temas/<int:tema_id>/archivos/subir/', SubirArchivoTemaView.as_view(), name='subir_archivo_tema'),
+    path('archivos/tema/<int:archivo_id>/descargar/', descargar_archivo_tema, name='descargar_archivo_tema'),
+    path('archivos/tema/<int:pk>/eliminar/', EliminarArchivoTemaView.as_view(), name='eliminar_archivo_tema'),
 ]
