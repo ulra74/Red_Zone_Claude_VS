@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ title|default:"Red Zone Academy" }}{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --rza-primary: #dc2626;
+            --rza-secondary: #f97316;
+            --rza-success: #059669;
+            --rza-danger: #b91c1c;
+            --rza-warning: #ea580c;
+            --rza-info: #f59e0b;
+            --rza-dark: #1f2937;
+            --rza-light: #fef2f2;
+            --rza-gradient: linear-gradient(135deg, #dc2626 0%, #f97316 50%, #eab308 100%);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: url('/static/img/fondo.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #b91c1c 100%) !important;
+            box-shadow: 0 2px 8px rgba(127, 29, 29, 0.3);
+        }
+        
+        .navbar .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .nav-link:hover {
+            color: #fbbf24 !important;
+            transform: translateY(-1px);
+        }
+        
+        .navbar .dropdown-menu {
+            background-color: #7f1d1d;
+            border: none;
+            box-shadow: 0 4px 12px rgba(127, 29, 29, 0.3);
+        }
+        
+        .navbar .dropdown-item {
+            color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .dropdown-item:hover {
+            background-color: #991b1b;
+            color: #fbbf24;
+        }
+        
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        .btn-primary {
+            background: var(--rza-gradient);
+            border: none;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #ea580c 50%, #d97706 100%);
+            border: none;
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 4px 12px rgba(127, 29, 29, 0.15), 0 2px 4px rgba(127, 29, 29, 0.25);
+            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            box-shadow: 0 16px 32px rgba(127, 29, 29, 0.25), 0 8px 16px rgba(127, 29, 29, 0.22);
+            transform: translateY(-2px);
+        }
+        
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(127, 29, 29, 0.1);
+        }
+        
+        .btn-outline-primary {
+            color: var(--rza-primary);
+            border-color: var(--rza-primary);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--rza-primary);
+            border-color: var(--rza-primary);
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(127, 29, 29, 0.1);
+        }
+        
+        .text-primary {
+            color: var(--rza-primary) !important;
+        }
+        
+        .fire-icon {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .main-wrapper {
+            flex: 1 0 auto;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            position: relative;
+        }
+        
+        /* ELIMINAR CUALQUIER FONDO DE PAGE-HEADER */
+        .page-header {
+            background: none !important;
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        /* Asegurar que NADA tenga fondo */
+        .container, .container-fluid {
+            background: none !important;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container">
+            {% if user.is_authenticated %}
+                <a class="navbar-brand" href="{% url 'core:dashboard' %}">
+                    <i class="bi bi-fire fire-icon me-2"></i>
+                    Red Zone Academy
+                </a>
+            {% else %}
+                <a class="navbar-brand" href="#">
+                    <i class="bi bi-fire fire-icon me-2"></i>
+                    Red Zone Academy
+                </a>
+            {% endif %}
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if user.is_authenticated %}
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:dashboard' %}">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:oposicion_list' %}">
+                            <i class="bi bi-fire me-1"></i>Oposiciones
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:tema_list' %}">
+                            <i class="bi bi-journals me-1"></i>Temas
+                        </a>
+                    </li>
+                    {% if user.is_admin %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear me-1"></i>Administración
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'core:admin_oposicion_list' %}">Gestionar Oposiciones</a></li>
+                                <li><a class="dropdown-item" href="{% url 'core:admin_tema_list' %}">Gestionar Temas</a></li>
+                                <li><a class="dropdown-item" href="{% url 'core:admin_user_list' %}">Gestionar Usuarios</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/admin/">Panel Admin Django</a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>
+                            {{ user.get_full_name|default:user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Mi Perfil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile_edit' %}">Editar Perfil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:password_change' %}">Cambiar Contraseña</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Cerrar Sesión</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {% if message.tags == 'success' %}
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                    {% elif message.tags == 'danger' %}
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    {% else %}
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                    {% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <small>&copy; 2025 Red Zone Academy. Todos los derechos reservados.</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

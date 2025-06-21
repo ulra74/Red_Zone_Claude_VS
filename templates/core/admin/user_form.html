@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-person-plus me-3"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Complete el formulario para {{ form_title|lower }}
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'core:admin_user_list' %}" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver a la Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="mb-0">{{ form_title }}</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <h6><i class="bi bi-exclamation-triangle-fill me-2"></i>Errores en el formulario:</h6>
+                                <ul class="mb-0">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field|capfirst }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Información Personal -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-person me-2"></i>
+                                        Información Personal
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-person me-2"></i>Nombre
+                                    </label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.first_name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-person me-2"></i>Apellidos
+                                    </label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.last_name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-at me-2"></i>Nombre de Usuario
+                                    </label>
+                                    {{ form.username }}
+                                    {% if form.username.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.username.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Debe ser único y sin espacios
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-envelope me-2"></i>Correo Electrónico
+                                    </label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.email.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                {% if not object %}
+                                <div class="col-md-12 mb-3">
+                                    <label for="{{ form.user_type.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-shield me-2"></i>Tipo de Usuario
+                                    </label>
+                                    {{ form.user_type }}
+                                    {% if form.user_type.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.user_type.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Define los permisos del usuario en el sistema
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" 
+                                               class="form-check-input" 
+                                               id="{{ form.is_active.id_for_label }}" 
+                                               name="{{ form.is_active.name }}"
+                                               {% if form.is_active.value %}checked{% endif %}
+                                               role="switch">
+                                        <label class="form-check-label fw-semibold" for="{{ form.is_active.id_for_label }}">
+                                            <i class="bi bi-toggle-on me-2"></i>Usuario Activo
+                                        </label>
+                                        {% if form.is_active.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.is_active.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            Los usuarios inactivos no pueden iniciar sesión
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="bi bi-shield me-2"></i>Tipo de Usuario
+                                    </label>
+                                    <div class="form-control-plaintext">
+                                        <span class="badge {% if object.user_type == 'admin' %}bg-danger{% else %}bg-primary{% endif %}">
+                                            {{ object.get_user_type_display }}
+                                        </span>
+                                        <small class="text-muted ms-2">No se puede modificar</small>
+                                    </div>
+                                </div>
+
+                                                                
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" 
+                                               class="form-check-input" 
+                                               id="{{ form.is_active.id_for_label }}" 
+                                               name="{{ form.is_active.name }}"
+                                               {% if form.is_active.value %}checked{% endif %}
+                                               role="switch">
+                                        <label class="form-check-label fw-semibold" for="{{ form.is_active.id_for_label }}">
+                                            <i class="bi bi-toggle-on me-2"></i>Usuario Activo
+                                        </label>
+                                        {% if form.is_active.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.is_active.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            Los usuarios inactivos no pueden iniciar sesión
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Contraseñas (solo para crear nuevo usuario) -->
+                            {% if not object %}
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-lock me-2"></i>
+                                        Contraseña
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.password1.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-key me-2"></i>Contraseña
+                                    </label>
+                                    {{ form.password1 }}
+                                    {% if form.password1.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.password1.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Mínimo 8 caracteres
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.password2.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-key-fill me-2"></i>Confirmar Contraseña
+                                    </label>
+                                    {{ form.password2 }}
+                                    {% if form.password2.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.password2.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Botones de Acción -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{% url 'core:admin_user_list' %}" class="btn btn-outline-secondary">
+                                            <i class="bi bi-x-circle me-2"></i>
+                                            Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            {% if object %}Actualizar{% else %}Crear{% endif %} Usuario
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus {
+    border-color: #7f1d1d;
+    box-shadow: 0 0 0 0.2rem rgba(127, 29, 29, 0.25);
+}
+
+.form-select:focus {
+    border-color: #7f1d1d;
+    box-shadow: 0 0 0 0.2rem rgba(127, 29, 29, 0.25);
+}
+
+.form-check-input {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+.form-check-input:checked {
+    background-color: #7f1d1d;
+    border-color: #7f1d1d;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(127, 29, 29, 0.25);
+    border-color: #7f1d1d;
+}
+
+.form-switch .form-check-input {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280,0,0,.25%29'/%3e%3c/svg%3e");
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.form-switch .form-check-input:checked {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+    background-color: #7f1d1d;
+    border-color: #7f1d1d;
+    background-position: right center;
+}
+
+.badge {
+    font-size: 0.875rem;
+}
+
+.form-check-label {
+    cursor: pointer;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Asegurar que el checkbox is_active funcione correctamente
+    const isActiveCheckbox = document.getElementById('{{ form.is_active.id_for_label }}');
+    
+    if (isActiveCheckbox) {
+        // Si el formulario tiene errores, mantener el valor enviado
+        {% if form.is_active.value %}
+            isActiveCheckbox.checked = {{ form.is_active.value|yesno:"true,false" }};
+        {% elif object %}
+            // Si estamos editando un usuario existente, usar su valor actual
+            isActiveCheckbox.checked = {{ object.is_active|yesno:"true,false" }};
+        {% else %}
+            // Para usuarios nuevos, activo por defecto
+            isActiveCheckbox.checked = true;
+        {% endif %}
+        
+        console.log('Checkbox is_active configurado:', isActiveCheckbox.checked);
+    }
+});
+</script>
+{% endblock %}

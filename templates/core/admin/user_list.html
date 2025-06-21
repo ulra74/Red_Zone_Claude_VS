@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-people me-3"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Administra los usuarios del sistema
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'core:admin_user_create' %}" class="btn btn-light">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Nuevo Usuario
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        {% if users %}
+            <!-- Grid de Usuarios -->
+            <div class="row">
+                {% for user in users %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card border-0 shadow-sm h-100 user-card">
+                            <div class="card-body d-flex flex-column">
+                                <!-- Header de la tarjeta -->
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                        {% if user.user_type == 'admin' %}
+                                            <i class="bi bi-shield-fill-check text-danger fs-4"></i>
+                                        {% else %}
+                                            <i class="bi bi-person-fill text-primary fs-4"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-1 fw-bold">
+                                            {{ user.get_full_name|default:user.username }}
+                                        </h5>
+                                        <small class="text-muted">@{{ user.username }}</small>
+                                    </div>
+                                    <div>
+                                        {% if user.user_type == 'admin' %}
+                                            <span class="badge bg-danger">Admin</span>
+                                        {% else %}
+                                            <span class="badge bg-primary">Estudiante</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Información del usuario -->
+                                <div class="mb-3 flex-grow-1">
+                                    <div class="mb-2">
+                                        <i class="bi bi-envelope text-muted me-2"></i>
+                                        <small>{{ user.email|default:"Sin email" }}</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <i class="bi bi-calendar text-muted me-2"></i>
+                                        <small>Registrado {{ user.date_joined|date:"d/m/Y" }}</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <i class="bi bi-clock text-muted me-2"></i>
+                                        <small>Último acceso: {{ user.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</small>
+                                    </div>
+                                </div>
+
+                                <!-- Estadísticas -->
+                                {% if user.user_type == 'student' %}
+                                <div class="mb-3">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <div class="border-end">
+                                                <small class="text-muted d-block">Oposiciones</small>
+                                                <span class="fw-bold text-primary">
+                                                    {{ user.oposiciones_acceso.count }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Temas</small>
+                                            <span class="fw-bold text-warning">
+                                                {{ user.temas_acceso.count }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Estado -->
+                                <div class="mb-3">
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            Activo
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-x-circle me-1"></i>
+                                            Inactivo
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Acciones -->
+                                <div class="d-grid gap-2">
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'core:admin_user_update' user.pk %}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-pencil me-1"></i>
+                                            Editar
+                                        </a>
+                                        {% if user != request.user %}
+                                            <a href="{% url 'core:admin_user_delete' user.pk %}" 
+                                               class="btn btn-outline-danger btn-sm"
+                                               onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">
+                                                <i class="bi bi-trash me-1"></i>
+                                                Eliminar
+                                            </a>
+                                        {% else %}
+                                            <span class="btn btn-outline-secondary btn-sm disabled">
+                                                <i class="bi bi-shield me-1"></i>
+                                                Tu cuenta
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="Navegación de páginas">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">
+                                            <i class="bi bi-chevron-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                            <i class="bi bi-chevron-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Estado vacío -->
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-people text-muted" style="font-size: 5rem;"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">No hay usuarios registrados</h3>
+                        <p class="text-muted mb-4">
+                            Crea el primer usuario del sistema para comenzar.
+                        </p>
+                        <a href="{% url 'core:admin_user_create' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>
+                            Crear Primer Usuario
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.user-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(220,38,38,0.15) !important;
+}
+
+.page-link {
+    color: var(--rza-primary);
+    border-color: #dee2e6;
+}
+
+.page-link:hover {
+    color: var(--rza-secondary);
+    background-color: #fef2f2;
+    border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+    background: var(--rza-gradient);
+    border-color: var(--rza-primary);
+}
+</style>
+{% endblock %}
