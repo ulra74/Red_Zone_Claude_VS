@@ -1,4 +1,6 @@
-from django.urls import path
+# Archivo: core/urls.py
+
+from django.urls import path, include
 from . import views
 from .views_files import (
     SubirArchivoOposicionView, SubirArchivoTemaView,
@@ -20,6 +22,9 @@ urlpatterns = [
     # Temas
     path('temas/', views.TemaListView.as_view(), name='tema_list'),
     path('temas/<int:pk>/', views.TemaDetailView.as_view(), name='tema_detail'),
+    
+    # Sistema de exámenes
+    path('examenes/', include('core.urls_evaluaciones')),
     
     # Admin URLs (solo para administradores)
     path('admin/oposiciones/', views.AdminOposicionListView.as_view(), name='admin_oposicion_list'),

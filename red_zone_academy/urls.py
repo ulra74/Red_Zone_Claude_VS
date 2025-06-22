@@ -1,28 +1,29 @@
-from django.urls import path
-from django.contrib.auth import views as auth_views
-from . import views
-
-app_name = 'accounts'
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from core.views import HomeView
 
 urlpatterns = [
+    # Admin
+    path('admin/', admin.site.urls),
+    
+    # Página principal
+    path('', HomeView.as_view(), name='home'),
+    
     # Autenticación
-    path('login/', views.CustomLoginView.as_view(), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+    path('auth/', include('accounts.urls')),
     
-    # Gestión de perfil
-    path('profile/', views.ProfileView.as_view(), name='profile'),
-    path('profile/edit/', views.ProfileEditView.as_view(), name='profile_edit'),
+    # Core de la aplicación
+    path('dashboard/', include('core.urls')),
     
-    # Cambio de contraseña
-    path('password-change/', 
-         auth_views.PasswordChangeView.as_view(
-             template_name='accounts/password_change.html',
-             success_url='/auth/password-change/done/'
-         ), 
-         name='password_change'),
-    path('password-change/done/', 
-         auth_views.PasswordChangeDoneView.as_view(
-             template_name='accounts/password_change_done.html'
-         ), 
-         name='password_change_done'),
+    # Sistema de exámenes
+    path('examenes/', include('core.urls_evaluaciones')),
+    
+    # Sistema de archivos
+    path('archivos/', include('core.urls_archivos')),
 ]
+
+# Servir archivos media en desarrollo
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
