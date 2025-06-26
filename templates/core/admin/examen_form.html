@@ -1,0 +1,476 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-clipboard-plus me-3"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Configure todos los parámetros del examen
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'evaluaciones:admin_examen_list' %}" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver a la Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="mb-0">{{ form_title }}</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <h6><i class="bi bi-exclamation-triangle-fill me-2"></i>Errores en el formulario:</h6>
+                                <ul class="mb-0">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field|capfirst }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Información General -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Información General
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.titulo.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-card-text me-2"></i>Título del Examen
+                                    </label>
+                                    {{ form.titulo }}
+                                    {% if form.titulo.errors %}
+                                        <div class="text-danger small mt-1">{{ form.titulo.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-file-text me-2"></i>Descripción
+                                    </label>
+                                    {{ form.descripcion }}
+                                    {% if form.descripcion.errors %}
+                                        <div class="text-danger small mt-1">{{ form.descripcion.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Descripción detallada que verán los estudiantes
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.tipo.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-tag me-2"></i>Tipo de Examen
+                                    </label>
+                                    {{ form.tipo }}
+                                    {% if form.tipo.errors %}
+                                        <div class="text-danger small mt-1">{{ form.tipo.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="form-check form-switch">
+                                                {{ form.activo }}
+                                                <label class="form-check-label fw-semibold" for="{{ form.activo.id_for_label }}">
+                                                    <i class="bi bi-power me-2"></i>Activo
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-check form-switch">
+                                                {{ form.publicado }}
+                                                <label class="form-check-label fw-semibold" for="{{ form.publicado.id_for_label }}">
+                                                    <i class="bi bi-eye me-2"></i>Publicado
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-text mt-2">
+                                        El examen debe estar activo y publicado para que los estudiantes puedan realizarlo
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contexto y Categorías -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-bookmarks me-2"></i>
+                                        Contexto y Categorías
+                                    </h6>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.oposicion.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-fire me-2"></i>Oposición (Opcional)
+                                    </label>
+                                    {{ form.oposicion }}
+                                    {% if form.oposicion.errors %}
+                                        <div class="text-danger small mt-1">{{ form.oposicion.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Solo estudiantes con acceso a esta oposición podrán realizar el examen
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.tema.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-journal me-2"></i>Tema (Opcional)
+                                    </label>
+                                    {{ form.tema }}
+                                    {% if form.tema.errors %}
+                                        <div class="text-danger small mt-1">{{ form.tema.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Solo estudiantes con acceso a este tema podrán realizar el examen
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="bi bi-tags me-2"></i>Categorías de Preguntas
+                                    </label>
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body">
+                                            <div class="categories-selection">
+                                                {% for choice in form.categorias %}
+                                                    <div class="form-check mb-2">
+                                                        {{ choice.tag }}
+                                                        <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                                                    <i class="bi bi-tag text-info"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="fw-semibold">{{ choice.choice_label }}</div>
+                                                                    <small class="text-muted">Categoría activa</small>
+                                                                </div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="form-text mt-3">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                Las preguntas se seleccionarán de estas categorías. Si no seleccionas ninguna, se usarán todas las disponibles.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Configuración del Examen -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-gear me-2"></i>
+                                        Configuración del Examen
+                                    </h6>
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="{{ form.numero_preguntas.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-hash me-2"></i>Número de Preguntas
+                                    </label>
+                                    {{ form.numero_preguntas }}
+                                    {% if form.numero_preguntas.errors %}
+                                        <div class="text-danger small mt-1">{{ form.numero_preguntas.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="{{ form.tiempo_limite.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-clock me-2"></i>Tiempo Límite (min)
+                                    </label>
+                                    {{ form.tiempo_limite }}
+                                    {% if form.tiempo_limite.errors %}
+                                        <div class="text-danger small mt-1">{{ form.tiempo_limite.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="{{ form.puntuacion_maxima.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-trophy me-2"></i>Puntuación Máxima
+                                    </label>
+                                    {{ form.puntuacion_maxima }}
+                                    {% if form.puntuacion_maxima.errors %}
+                                        <div class="text-danger small mt-1">{{ form.puntuacion_maxima.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="{{ form.nota_minima_aprobado.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-check-circle me-2"></i>Nota Mínima (0-10)
+                                    </label>
+                                    {{ form.nota_minima_aprobado }}
+                                    {% if form.nota_minima_aprobado.errors %}
+                                        <div class="text-danger small mt-1">{{ form.nota_minima_aprobado.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.intentos_maximos.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-arrow-repeat me-2"></i>Intentos Máximos
+                                    </label>
+                                    {{ form.intentos_maximos }}
+                                    {% if form.intentos_maximos.errors %}
+                                        <div class="text-danger small mt-1">{{ form.intentos_maximos.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Número de veces que un estudiante puede realizar el examen
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Opciones Avanzadas -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-sliders me-2"></i>
+                                        Opciones Avanzadas
+                                    </h6>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Randomización</h6>
+                                            <div class="form-check form-switch mb-2">
+                                                {{ form.preguntas_aleatorias }}
+                                                <label class="form-check-label" for="{{ form.preguntas_aleatorias.id_for_label }}">
+                                                    Preguntas aleatorias
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                {{ form.respuestas_aleatorias }}
+                                                <label class="form-check-label" for="{{ form.respuestas_aleatorias.id_for_label }}">
+                                                    Respuestas aleatorias
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Resultados y Revisión</h6>
+                                            <div class="form-check form-switch mb-2">
+                                                {{ form.mostrar_resultados_inmediatos }}
+                                                <label class="form-check-label" for="{{ form.mostrar_resultados_inmediatos.id_for_label }}">
+                                                    Mostrar resultados inmediatos
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                {{ form.permitir_revision }}
+                                                <label class="form-check-label" for="{{ form.permitir_revision.id_for_label }}">
+                                                    Permitir revisión de respuestas
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fechas de Disponibilidad -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-calendar me-2"></i>
+                                        Fechas de Disponibilidad (Opcional)
+                                    </h6>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-calendar-check me-2"></i>Fecha de Inicio
+                                    </label>
+                                    {{ form.fecha_inicio }}
+                                    {% if form.fecha_inicio.errors %}
+                                        <div class="text-danger small mt-1">{{ form.fecha_inicio.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        El examen estará disponible a partir de esta fecha
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.fecha_fin.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-calendar-x me-2"></i>Fecha de Fin
+                                    </label>
+                                    {{ form.fecha_fin }}
+                                    {% if form.fecha_fin.errors %}
+                                        <div class="text-danger small mt-1">{{ form.fecha_fin.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        El examen dejará de estar disponible después de esta fecha
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{% url 'evaluaciones:admin_examen_list' %}" class="btn btn-outline-secondary">
+                                            <i class="bi bi-x-circle me-2"></i>
+                                            Cancelar
+                                        </a>
+                                        <div>
+                                            <button type="submit" name="save_and_continue" class="btn btn-outline-primary me-2">
+                                                <i class="bi bi-check me-2"></i>
+                                                Guardar y Continuar
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-check-circle me-2"></i>
+                                                {% if object %}Actualizar{% else %}Crear{% endif %} Examen
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.categories-selection {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+.form-check {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s;
+}
+
+.form-check:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.form-check-input:checked ~ .form-check-label {
+    color: var(--rza-primary);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--rza-primary);
+    box-shadow: 0 0 0 0.2rem rgba(127, 29, 29, 0.25);
+}
+
+.form-check-input:checked {
+    background-color: var(--rza-primary);
+    border-color: var(--rza-primary);
+}
+
+.card .card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validación en tiempo real
+    const form = document.querySelector('form');
+    const numeroPreguntas = document.getElementById('{{ form.numero_preguntas.id_for_label }}');
+    const tiempoLimite = document.getElementById('{{ form.tiempo_limite.id_for_label }}');
+    const notaMinima = document.getElementById('{{ form.nota_minima_aprobado.id_for_label }}');
+    
+    // Validar número de preguntas
+    if (numeroPreguntas) {
+        numeroPreguntas.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 1 || value > 200) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+    
+    // Validar tiempo límite
+    if (tiempoLimite) {
+        tiempoLimite.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 1 || value > 600) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+    
+    // Validar nota mínima
+    if (notaMinima) {
+        notaMinima.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            if (value < 0 || value > 10) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+    
+    // Agregar funcionalidad de seleccionar todas las categorías
+    const categoriesContainer = document.querySelector('.categories-selection');
+    if (categoriesContainer) {
+        const controlDiv = document.createElement('div');
+        controlDiv.className = 'mb-3 d-flex gap-2';
+        controlDiv.innerHTML = `
+            <button type="button" class="btn btn-sm btn-outline-info" id="selectAllCategories">
+                <i class="bi bi-check-all me-1"></i>Seleccionar Todas
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="selectNoCategories">
+                <i class="bi bi-x me-1"></i>Quitar Todas
+            </button>
+        `;
+        
+        categoriesContainer.parentNode.insertBefore(controlDiv, categoriesContainer);
+        
+        // Funcionalidad de los botones
+        document.getElementById('selectAllCategories').addEventListener('click', function() {
+            categoriesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+        });
+        
+        document.getElementById('selectNoCategories').addEventListener('click', function() {
+            categoriesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        });
+    }
+});
+</script>
+{% endblock %}

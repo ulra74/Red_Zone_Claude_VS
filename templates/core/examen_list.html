@@ -1,0 +1,422 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-clipboard-check me-3"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Practica y evalúa tus conocimientos
+                    </p>
+                </div>
+                <div class="col-auto">
+                    {% if user.is_admin %}
+                        <a href="{% url 'evaluaciones:admin_examen_create' %}" class="btn btn-light">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Nuevo Examen
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        {% if user.is_student %}
+            <!-- Estadísticas del estudiante -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clipboard-data text-primary mb-3" style="font-size: 2.5rem;"></i>
+                            <h4 class="fw-bold text-primary">{{ mis_intentos }}</h4>
+                            <p class="text-muted mb-0">Exámenes realizados</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-check-circle text-success mb-3" style="font-size: 2.5rem;"></i>
+                            <h4 class="fw-bold text-success">{{ examenes_aprobados }}</h4>
+                            <p class="text-muted mb-0">Exámenes aprobados</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-graph-up text-info mb-3" style="font-size: 2.5rem;"></i>
+                            <h4 class="fw-bold text-info">
+                                {% if mis_intentos > 0 %}
+                                    {{ examenes_aprobados|mul:100|div:mis_intentos|floatformat:0 }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </h4>
+                            <p class="text-muted mb-0">Tasa de éxito</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if examenes %}
+            <!-- Filtros -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="searchExams" 
+                                               placeholder="Buscar exámenes...">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="filterType">
+                                        <option value="">Todos los tipos</option>
+                                        <option value="test">Tests</option>
+                                        <option value="simulacro">Simulacros</option>
+                                        <option value="practica">Prácticas</option>
+                                        <option value="evaluacion">Evaluaciones</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="sortBy">
+                                        <option value="reciente">Más recientes</option>
+                                        <option value="nombre">Por nombre</option>
+                                        <option value="dificultad">Por dificultad</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid de Exámenes -->
+            <div class="row" id="examenesGrid">
+                {% for examen in examenes %}
+                    <div class="col-lg-4 col-md-6 mb-4 examen-item" 
+                         data-tipo="{{ examen.tipo }}" 
+                         data-nombre="{{ examen.titulo|lower }}"
+                         data-fecha="{{ examen.created_at|date:'Y-m-d' }}">
+                        <div class="card border-0 shadow-sm h-100 examen-card">
+                            <div class="card-body d-flex flex-column">
+                                <!-- Header del examen -->
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="exam-icon me-3">
+                                        {% if examen.tipo == 'test' %}
+                                            <i class="bi bi-clipboard-check text-primary fs-1"></i>
+                                        {% elif examen.tipo == 'simulacro' %}
+                                            <i class="bi bi-hourglass-split text-warning fs-1"></i>
+                                        {% elif examen.tipo == 'practica' %}
+                                            <i class="bi bi-book text-info fs-1"></i>
+                                        {% else %}
+                                            <i class="bi bi-award text-success fs-1"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-1 fw-bold">{{ examen.titulo }}</h5>
+                                        <small class="text-muted">
+                                            {% if examen.tipo == 'test' %}
+                                                <span class="badge bg-primary">Test</span>
+                                            {% elif examen.tipo == 'simulacro' %}
+                                                <span class="badge bg-warning">Simulacro</span>
+                                            {% elif examen.tipo == 'practica' %}
+                                                <span class="badge bg-info">Práctica</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Evaluación</span>
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    {% if user.is_admin %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                                    data-bs-toggle="dropdown">
+                                                <i class="bi bi-three-dots"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" 
+                                                       href="{% url 'evaluaciones:admin_examen_update' examen.pk %}">
+                                                        <i class="bi bi-pencil me-2"></i>Editar
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" 
+                                                       href="{% url 'evaluaciones:admin_estadisticas_examen' examen.pk %}">
+                                                        <i class="bi bi-graph-up me-2"></i>Estadísticas
+                                                    </a>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item text-danger" 
+                                                       href="{% url 'evaluaciones:admin_examen_delete' examen.pk %}"
+                                                       onclick="return confirm('¿Estás seguro?')">
+                                                        <i class="bi bi-trash me-2"></i>Eliminar
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Descripción -->
+                                {% if examen.descripcion %}
+                                <div class="mb-3 flex-grow-1">
+                                    <p class="text-muted small mb-0">
+                                        {{ examen.descripcion|truncatechars:120 }}
+                                    </p>
+                                </div>
+                                {% endif %}
+
+                                <!-- Información del examen -->
+                                <div class="mb-3">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Preguntas</small>
+                                            <span class="fw-bold text-primary">{{ examen.numero_preguntas }}</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Tiempo</small>
+                                            <span class="fw-bold text-warning">{{ examen.tiempo_limite }}min</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Intentos</small>
+                                            <span class="fw-bold text-info">{{ examen.intentos_maximos }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Estado y disponibilidad -->
+                                <div class="mb-3">
+                                    {% if examen.esta_disponible %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle me-1"></i>Disponible
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-clock me-1"></i>No disponible
+                                        </span>
+                                    {% endif %}
+                                    
+                                    {% if examen.fecha_inicio %}
+                                        <small class="text-muted d-block mt-1">
+                                            <i class="bi bi-calendar me-1"></i>
+                                            Desde: {{ examen.fecha_inicio|date:"d/m/Y H:i" }}
+                                        </small>
+                                    {% endif %}
+                                    
+                                    {% if examen.fecha_fin %}
+                                        <small class="text-muted d-block">
+                                            <i class="bi bi-calendar-x me-1"></i>
+                                            Hasta: {{ examen.fecha_fin|date:"d/m/Y H:i" }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Botones de acción -->
+                                <div class="d-grid">
+                                    <a href="{% url 'evaluaciones:examen_detail' examen.pk %}" 
+                                       class="btn btn-primary">
+                                        <i class="bi bi-eye me-2"></i>
+                                        Ver Detalles
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="Navegación de páginas">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">
+                                            <i class="bi bi-chevron-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                            <i class="bi bi-chevron-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Estado vacío -->
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-clipboard-check text-muted" style="font-size: 5rem;"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">No hay exámenes disponibles</h3>
+                        <p class="text-muted mb-4">
+                            {% if user.is_admin %}
+                                Crea el primer examen para comenzar.
+                            {% else %}
+                                Los exámenes aparecerán aquí cuando estén disponibles.
+                            {% endif %}
+                        </p>
+                        {% if user.is_admin %}
+                            <a href="{% url 'evaluaciones:admin_examen_create' %}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                Crear Primer Examen
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.examen-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.examen-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(220,38,38,0.15) !important;
+}
+
+.exam-icon {
+    opacity: 0.8;
+}
+
+.page-link {
+    color: var(--rza-primary);
+    border-color: #dee2e6;
+}
+
+.page-link:hover {
+    color: var(--rza-secondary);
+    background-color: #fef2f2;
+    border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+    background: var(--rza-gradient);
+    border-color: var(--rza-primary);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchExams');
+    const typeFilter = document.getElementById('filterType');
+    const sortSelect = document.getElementById('sortBy');
+    const examenesGrid = document.getElementById('examenesGrid');
+    const examenItems = Array.from(document.querySelectorAll('.examen-item'));
+    
+    function filterAndSort() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedType = typeFilter.value;
+        const sortBy = sortSelect.value;
+        
+        // Filtrar exámenes
+        let filteredItems = examenItems.filter(item => {
+            const matchesSearch = item.dataset.nombre.includes(searchTerm);
+            const matchesType = !selectedType || item.dataset.tipo === selectedType;
+            return matchesSearch && matchesType;
+        });
+        
+        // Ordenar exámenes
+        filteredItems.sort((a, b) => {
+            switch(sortBy) {
+                case 'nombre':
+                    return a.dataset.nombre.localeCompare(b.dataset.nombre);
+                case 'reciente':
+                    return new Date(b.dataset.fecha) - new Date(a.dataset.fecha);
+                default:
+                    return 0;
+            }
+        });
+        
+        // Mostrar/ocultar elementos
+        examenItems.forEach(item => {
+            item.style.display = 'none';
+        });
+        
+        filteredItems.forEach(item => {
+            item.style.display = 'block';
+        });
+        
+        // Mostrar mensaje si no hay resultados
+        if (filteredItems.length === 0) {
+            if (!document.getElementById('noResults')) {
+                const noResults = document.createElement('div');
+                noResults.id = 'noResults';
+                noResults.className = 'col-12 text-center py-5';
+                noResults.innerHTML = `
+                    <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+                    <h6 class="mt-3 text-muted">No se encontraron exámenes</h6>
+                    <p class="text-muted">Intenta cambiar los filtros de búsqueda</p>
+                `;
+                examenesGrid.appendChild(noResults);
+            }
+        } else {
+            const noResults = document.getElementById('noResults');
+            if (noResults) {
+                noResults.remove();
+            }
+        }
+    }
+    
+    // Event listeners
+    searchInput.addEventListener('input', filterAndSort);
+    typeFilter.addEventListener('change', filterAndSort);
+    sortSelect.addEventListener('change', filterAndSort);
+});
+</script>
+{% endblock %}

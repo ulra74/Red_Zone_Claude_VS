@@ -1,0 +1,593 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="exam-container">
+    <!-- Header fijo con información del examen -->
+    <div class="exam-header fixed-top bg-white shadow-sm">
+        <div class="container-fluid">
+            <div class="row align-items-center py-3">
+                <div class="col-md-6">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clipboard-check text-primary me-2"></i>
+                        {{ intento.examen.titulo }}
+                    </h5>
+                    <small class="text-muted">{{ intento.estudiante.get_full_name|default:intento.estudiante.username }}</small>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="progress-info">
+                        <small class="text-muted">Progreso</small>
+                        <div class="progress mt-1" style="height: 8px;">
+                            <div class="progress-bar bg-primary" id="progressBar" style="width: 0%"></div>
+                        </div>
+                        <small id="progressText">0 / {{ preguntas|length }}</small>
+                    </div>
+                </div>
+                <div class="col-md-3 text-end">
+                    <div class="timer-container">
+                        <div class="d-flex align-items-center justify-content-end">
+                            <i class="bi bi-clock text-warning me-2 fs-5"></i>
+                            <div>
+                                <div id="timer" class="fw-bold fs-5 text-warning">00:00</div>
+                                <small class="text-muted">Tiempo restante</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal del examen -->
+    <div class="exam-content" style="margin-top: 100px; padding-bottom: 100px;">
+        <div class="container">
+            {% for pregunta_data in preguntas %}
+                <div class="question-card" id="question-{{ pregunta_data.orden }}" style="display: none;">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-question-circle me-2"></i>
+                                    Pregunta {{ pregunta_data.orden }} de {{ preguntas|length }}
+                                </h6>
+                                <div class="question-meta">
+                                    {% if pregunta_data.pregunta.dificultad == 'facil' %}
+                                        <span class="badge bg-success">Fácil</span>
+                                    {% elif pregunta_data.pregunta.dificultad == 'medio' %}
+                                        <span class="badge bg-warning">Medio</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Difícil</span>
+                                    {% endif %}
+                                    <span class="badge bg-light text-dark">{{ pregunta_data.pregunta.puntos }} pts</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Enunciado de la pregunta -->
+                            <div class="question-text mb-4">
+                                <p class="fs-5">{{ pregunta_data.pregunta.enunciado|linebreaks }}</p>
+                                {% if pregunta_data.pregunta.imagen %}
+                                    <div class="question-image text-center my-3">
+                                        <img src="{{ pregunta_data.pregunta.imagen.url }}" 
+                                             class="img-fluid rounded shadow-sm" 
+                                             alt="Imagen de la pregunta"
+                                             style="max-height: 300px;">
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Opciones de respuesta -->
+                            <div class="answers-container">
+                                {% for respuesta in pregunta_data.respuestas %}
+                                    <div class="answer-option mb-3">
+                                        <div class="form-check answer-check">
+                                            <input class="form-check-input answer-input" 
+                                                   type="radio" 
+                                                   name="question_{{ pregunta_data.pregunta.id }}" 
+                                                   id="answer_{{ respuesta.id }}"
+                                                   value="{{ respuesta.id }}"
+                                                   data-question="{{ pregunta_data.pregunta.id }}"
+                                                   {% if pregunta_data.respuesta_seleccionada.id == respuesta.id %}checked{% endif %}>
+                                            <label class="form-check-label answer-label w-100" 
+                                                   for="answer_{{ respuesta.id }}">
+                                                <div class="answer-content p-3 border rounded">
+                                                    <div class="d-flex align-items-start">
+                                                        <span class="answer-letter me-3 fw-bold">
+                                                            {{ forloop.counter|add:64|stringformat:"c" }}
+                                                        </span>
+                                                        <span class="answer-text">{{ respuesta.texto }}</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Navegación fija en la parte inferior -->
+    <div class="exam-navigation fixed-bottom bg-white shadow-sm border-top">
+        <div class="container-fluid">
+            <div class="row align-items-center py-3">
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-outline-secondary" id="prevBtn" onclick="changeQuestion(-1)">
+                        <i class="bi bi-chevron-left me-2"></i>Anterior
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <!-- Mini navegador de preguntas -->
+                    <div class="question-navigator text-center">
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            {% for pregunta_data in preguntas %}
+                                <button type="button" 
+                                        class="btn btn-sm question-nav-btn" 
+                                        data-question="{{ pregunta_data.orden }}"
+                                        onclick="goToQuestion({{ pregunta_data.orden }})">
+                                    {{ pregunta_data.orden }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-end">
+                    <button type="button" class="btn btn-outline-primary me-2" id="nextBtn" onclick="changeQuestion(1)">
+                        Siguiente<i class="bi bi-chevron-right ms-2"></i>
+                    </button>
+                    <button type="button" class="btn btn-success" id="finishBtn" onclick="finishExam()" style="display: none;">
+                        <i class="bi bi-check-circle me-2"></i>Finalizar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para finalizar -->
+<div class="modal fade" id="finishModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-question-circle text-warning me-2"></i>
+                    Finalizar Examen
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <h6><i class="bi bi-exclamation-triangle me-2"></i>¿Estás seguro?</h6>
+                    <p class="mb-0">Una vez finalizado el examen no podrás modificar tus respuestas.</p>
+                </div>
+                <div id="examSummary">
+                    <!-- Se llenará con JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Continuar Examen
+                </button>
+                <button type="button" class="btn btn-success" onclick="confirmFinishExam()">
+                    <i class="bi bi-check-circle me-2"></i>Finalizar Definitivamente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de tiempo agotado -->
+<div class="modal fade" id="timeUpModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-clock me-2"></i>
+                    Tiempo Agotado
+                </h5>
+            </div>
+            <div class="modal-body text-center">
+                <i class="bi bi-clock-history text-danger" style="font-size: 4rem;"></i>
+                <h4 class="mt-3">Se ha agotado el tiempo</h4>
+                <p class="text-muted">El examen se finalizará automáticamente con las respuestas actuales.</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-danger" onclick="confirmFinishExam()">
+                    <i class="bi bi-check-circle me-2"></i>Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.exam-container {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.exam-header {
+    z-index: 1030;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.exam-navigation {
+    z-index: 1030;
+}
+
+.question-card {
+    min-height: 400px;
+}
+
+.answer-option .form-check {
+    margin: 0;
+}
+
+.answer-content {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.answer-content:hover {
+    background-color: #f8f9fa;
+    border-color: #007bff !important;
+}
+
+.form-check-input:checked ~ .form-check-label .answer-content {
+    background-color: #e3f2fd;
+    border-color: #007bff !important;
+    box-shadow: 0 2px 4px rgba(0,123,255,0.2);
+}
+
+.answer-letter {
+    background-color: #6c757d;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.form-check-input:checked ~ .form-check-label .answer-letter {
+    background-color: #007bff;
+}
+
+.question-nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+    background-color: white;
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.question-nav-btn.answered {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+}
+
+.question-nav-btn.current {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.timer-container {
+    font-family: 'Courier New', monospace;
+}
+
+#timer.warning {
+    color: #ffc107 !important;
+}
+
+#timer.danger {
+    color: #dc3545 !important;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+</style>
+
+<script>
+// Variables globales
+let currentQuestion = 1;
+let totalQuestions = {{ preguntas|length }};
+let timeLeft = {{ tiempo_restante }}; // En segundos
+let timerInterval;
+let intentoId = {{ intento.id }};
+let answers = {};
+let questionStartTime = Date.now();
+
+// Inicializar al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    showQuestion(1);
+    startTimer();
+    updateProgress();
+    
+    // Agregar event listeners a las respuestas
+    document.querySelectorAll('.answer-input').forEach(input => {
+        input.addEventListener('change', function() {
+            saveAnswer(this);
+        });
+    });
+    
+    // Prevenir que el usuario abandone la página accidentalmente
+    window.addEventListener('beforeunload', function(e) {
+        e.preventDefault();
+        e.returnValue = '';
+    });
+});
+
+function showQuestion(questionNumber) {
+    // Ocultar todas las preguntas
+    document.querySelectorAll('.question-card').forEach(card => {
+        card.style.display = 'none';
+    });
+    
+    // Mostrar la pregunta actual
+    const currentCard = document.getElementById(`question-${questionNumber}`);
+    if (currentCard) {
+        currentCard.style.display = 'block';
+        currentQuestion = questionNumber;
+        
+        // Actualizar navegación
+        updateNavigation();
+        updateQuestionNavigator();
+        
+        // Registrar tiempo de inicio de la pregunta
+        questionStartTime = Date.now();
+    }
+}
+
+function changeQuestion(direction) {
+    const newQuestion = currentQuestion + direction;
+    if (newQuestion >= 1 && newQuestion <= totalQuestions) {
+        showQuestion(newQuestion);
+    }
+}
+
+function goToQuestion(questionNumber) {
+    if (questionNumber >= 1 && questionNumber <= totalQuestions) {
+        showQuestion(questionNumber);
+    }
+}
+
+function updateNavigation() {
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const finishBtn = document.getElementById('finishBtn');
+    
+    // Botón anterior
+    prevBtn.disabled = currentQuestion === 1;
+    
+    // Botón siguiente y finalizar
+    if (currentQuestion === totalQuestions) {
+        nextBtn.style.display = 'none';
+        finishBtn.style.display = 'inline-block';
+    } else {
+        nextBtn.style.display = 'inline-block';
+        finishBtn.style.display = 'none';
+    }
+}
+
+function updateQuestionNavigator() {
+    const navButtons = document.querySelectorAll('.question-nav-btn');
+    navButtons.forEach(btn => {
+        const questionNum = parseInt(btn.dataset.question);
+        
+        // Remover clases anteriores
+        btn.classList.remove('answered', 'current');
+        
+        // Marcar pregunta actual
+        if (questionNum === currentQuestion) {
+            btn.classList.add('current');
+        }
+        // Marcar preguntas respondidas
+        else if (answers[questionNum]) {
+            btn.classList.add('answered');
+        }
+    });
+}
+
+function updateProgress() {
+    const answeredQuestions = Object.keys(answers).length;
+    const percentage = (answeredQuestions / totalQuestions) * 100;
+    
+    document.getElementById('progressBar').style.width = percentage + '%';
+    document.getElementById('progressText').textContent = `${answeredQuestions} / ${totalQuestions}`;
+}
+
+function saveAnswer(input) {
+    const questionId = input.dataset.question;
+    const answerId = input.value;
+    const responseTime = Math.floor((Date.now() - questionStartTime) / 1000);
+    
+    // Guardar respuesta localmente
+    answers[currentQuestion] = {
+        questionId: questionId,
+        answerId: answerId,
+        responseTime: responseTime
+    };
+    
+    // Enviar al servidor
+    fetch('{% url "evaluaciones:guardar_respuesta" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            intento_id: intentoId,
+            pregunta_id: questionId,
+            respuesta_id: answerId,
+            tiempo_respuesta: responseTime
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            console.error('Error al guardar respuesta:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error de red:', error);
+    });
+    
+    // Actualizar interfaz
+    updateProgress();
+    updateQuestionNavigator();
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        
+        // Advertencias de tiempo
+        if (timeLeft <= 300) { // 5 minutos
+            document.getElementById('timer').classList.add('danger');
+        } else if (timeLeft <= 600) { // 10 minutos
+            document.getElementById('timer').classList.add('warning');
+        }
+        
+        // Tiempo agotado
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            showTimeUpModal();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const hours = Math.floor(timeLeft / 3600);
+    const minutes = Math.floor((timeLeft % 3600) / 60);
+    const seconds = timeLeft % 60;
+    
+    let display = '';
+    if (hours > 0) {
+        display = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    } else {
+        display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    
+    document.getElementById('timer').textContent = display;
+}
+
+function showTimeUpModal() {
+    const modal = new bootstrap.Modal(document.getElementById('timeUpModal'));
+    modal.show();
+}
+
+function finishExam() {
+    // Generar resumen del examen
+    const answeredQuestions = Object.keys(answers).length;
+    const unansweredQuestions = totalQuestions - answeredQuestions;
+    
+    document.getElementById('examSummary').innerHTML = `
+        <div class="row text-center">
+            <div class="col-4">
+                <h4 class="text-success">${answeredQuestions}</h4>
+                <small class="text-muted">Respondidas</small>
+            </div>
+            <div class="col-4">
+                <h4 class="text-danger">${unansweredQuestions}</h4>
+                <small class="text-muted">Sin responder</small>
+            </div>
+            <div class="col-4">
+                <h4 class="text-primary">${totalQuestions}</h4>
+                <small class="text-muted">Total</small>
+            </div>
+        </div>
+        ${unansweredQuestions > 0 ? '<div class="alert alert-warning mt-3"><small>Las preguntas sin responder se contarán como incorrectas.</small></div>' : ''}
+    `;
+    
+    // Mostrar modal de confirmación
+    const modal = new bootstrap.Modal(document.getElementById('finishModal'));
+    modal.show();
+}
+
+function confirmFinishExam() {
+    // Deshabilitar timer
+    clearInterval(timerInterval);
+    
+    // Enviar finalización al servidor
+    fetch('{% url "evaluaciones:finalizar_examen" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            intento_id: intentoId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remover el listener de beforeunload
+            window.removeEventListener('beforeunload', function() {});
+            
+            // Redireccionar a resultados
+            window.location.href = data.redirect_url;
+        } else {
+            alert('Error al finalizar el examen: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error de red:', error);
+        alert('Error de conexión. Por favor, intenta nuevamente.');
+    });
+}
+
+// Atajos de teclado
+document.addEventListener('keydown', function(e) {
+    switch(e.key) {
+        case 'ArrowLeft':
+            if (currentQuestion > 1) changeQuestion(-1);
+            break;
+        case 'ArrowRight':
+            if (currentQuestion < totalQuestions) changeQuestion(1);
+            break;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+            // Seleccionar respuesta con número
+            const questionCard = document.getElementById(`question-${currentQuestion}`);
+            const inputs = questionCard.querySelectorAll('.answer-input');
+            const index = parseInt(e.key) - 1;
+            if (inputs[index]) {
+                inputs[index].checked = true;
+                saveAnswer(inputs[index]);
+            }
+            break;
+    }
+});
+
+// Token CSRF para AJAX
+{% csrf_token %}
+</script>
+{% endblock %}

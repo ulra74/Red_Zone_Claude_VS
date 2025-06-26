@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-clipboard-check me-3"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Finalizado el {{ intento.fecha_fin|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'evaluaciones:examen_list' %}" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver a Exámenes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        <!-- Resultado Principal -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <!-- Icono de resultado -->
+                        <div class="mb-4">
+                            {% if intento.aprobado %}
+                                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                                     style="width: 120px; height: 120px;">
+                                    <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+                                </div>
+                            {% else %}
+                                <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                                     style="width: 120px; height: 120px;">
+                                    <i class="bi bi-x-circle text-danger" style="font-size: 4rem;"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Resultado -->
+                        {% if intento.aprobado %}
+                            <h2 class="text-success mb-3">¡Felicitaciones! Has Aprobado</h2>
+                            <p class="lead text-muted mb-4">Excelente trabajo en el examen</p>
+                        {% else %}
+                            <h2 class="text-danger mb-3">No has alcanzado la nota mínima</h2>
+                            <p class="lead text-muted mb-4">Continúa estudiando y vuelve a intentarlo</p>
+                        {% endif %}
+
+                        <!-- Puntuación principal -->
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-md-8">
+                                <div class="row text-center">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="score-item">
+                                            <h1 class="display-4 fw-bold {% if intento.aprobado %}text-success{% else %}text-danger{% endif %} mb-0">
+                                                {{ intento.porcentaje|floatformat:1 }}%
+                                            </h1>
+                                            <p class="text-muted mb-0">Puntuación Final</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="score-item">
+                                            <h2 class="fw-bold text-primary mb-0">{{ intento.preguntas_correctas }}</h2>
+                                            <p class="text-muted mb-0">Correctas</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="score-item">
+                                            <h2 class="fw-bold text-warning mb-0">
+                                                {% with total_preguntas=intento.preguntas_correctas|add:intento.preguntas_incorrectas|add:intento.preguntas_sin_responder %}
+                                                    {{ total_preguntas }}
+                                                {% endwith %}
+                                            </h2>
+                                            <p class="text-muted mb-0">Total</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progreso visual -->
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="progress mb-3" style="height: 25px;">
+                                    <div class="progress-bar {% if intento.aprobado %}bg-success{% else %}bg-danger{% endif %}" 
+                                         style="width: {{ intento.porcentaje }}%">
+                                        {{ intento.porcentaje|floatformat:1 }}%
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    Nota mínima para aprobar: {{ intento.examen.nota_minima_aprobado }}0%
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Estadísticas Detalladas -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-graph-up text-info me-2"></i>
+                            Estadísticas Detalladas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Desglose de respuestas -->
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-3">Desglose de Respuestas</h6>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-success">
+                                        <i class="bi bi-check-circle me-1"></i>Correctas
+                                    </span>
+                                    <span class="fw-bold text-success">{{ intento.preguntas_correctas }}</span>
+                                </div>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    {% with total=intento.preguntas_correctas|add:intento.preguntas_incorrectas|add:intento.preguntas_sin_responder %}
+                                        <div class="progress-bar bg-success" 
+                                             style="width: {% widthratio intento.preguntas_correctas total 100 %}%"></div>
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-danger">
+                                        <i class="bi bi-x-circle me-1"></i>Incorrectas
+                                    </span>
+                                    <span class="fw-bold text-danger">{{ intento.preguntas_incorrectas }}</span>
+                                </div>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    {% with total=intento.preguntas_correctas|add:intento.preguntas_incorrectas|add:intento.preguntas_sin_responder %}
+                                        <div class="progress-bar bg-danger" 
+                                             style="width: {% widthratio intento.preguntas_incorrectas total 100 %}%"></div>
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            
+                            {% if intento.preguntas_sin_responder > 0 %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-warning">
+                                        <i class="bi bi-dash-circle me-1"></i>Sin responder
+                                    </span>
+                                    <span class="fw-bold text-warning">{{ intento.preguntas_sin_responder }}</span>
+                                </div>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    {% with total=intento.preguntas_correctas|add:intento.preguntas_incorrectas|add:intento.preguntas_sin_responder %}
+                                        <div class="progress-bar bg-warning" 
+                                             style="width: {% widthratio intento.preguntas_sin_responder total 100 %}%"></div>
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Información del tiempo -->
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-3">Información de Tiempo</h6>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <small class="text-muted d-block">Tiempo usado</small>
+                                        <span class="fw-bold">
+                                            {% if intento.tiempo_empleado %}
+                                                {{ intento.tiempo_empleado|stringformat:"s"|slice:":-3" }}
+                                            {% else %}
+                                                --
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Tiempo límite</small>
+                                    <span class="fw-bold">{{ intento.examen.tiempo_limite }} min</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información del examen -->
+                        <div>
+                            <h6 class="text-muted mb-3">Información del Examen</h6>
+                            <div class="small">
+                                <div class="mb-2">
+                                    <strong>Tipo:</strong> {{ intento.examen.get_tipo_display }}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Fecha:</strong> {{ intento.fecha_inicio|date:"d/m/Y H:i" }}
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Intento:</strong> 
+                                    {% with intentos_count=intento.estudiante.intentos_examenes.filter:examen=intento.examen.count %}
+                                        {{ intentos_count }} de {{ intento.examen.intentos_maximos }}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparación con otros estudiantes -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-people text-primary me-2"></i>
+                            Comparación
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if promedio_examen %}
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold text-primary mb-1">{{ promedio_examen|floatformat:1 }}%</h3>
+                                <p class="text-muted mb-0">Promedio del examen</p>
+                            </div>
+
+                            <div class="comparison-chart mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="small">Tu resultado</span>
+                                    <span class="fw-bold">{{ intento.porcentaje|floatformat:1 }}%</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 12px;">
+                                    <div class="progress-bar {% if intento.porcentaje >= promedio_examen %}bg-success{% else %}bg-warning{% endif %}" 
+                                         style="width: {{ intento.porcentaje }}%"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="small">Promedio</span>
+                                    <span class="fw-bold">{{ promedio_examen|floatformat:1 }}%</span>
+                                </div>
+                                <div class="progress" style="height: 12px;">
+                                    <div class="progress-bar bg-info" 
+                                         style="width: {{ promedio_examen }}%"></div>
+                                </div>
+                            </div>
+
+                            {% if mejor_que_porcentaje %}
+                                <div class="alert alert-info text-center">
+                                    <h6 class="mb-1">
+                                        <i class="bi bi-trophy me-2"></i>
+                                        ¡Mejor que el {{ mejor_que_porcentaje|floatformat:0 }}% de estudiantes!
+                                    </h6>
+                                    <small>Has superado a la mayoría de participantes</small>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                                <p class="text-muted mt-3 mb-0">
+                                    Eres el primer estudiante en realizar este examen
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-lightning text-warning me-2"></i>
+                            Acciones
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <!-- Revisar respuestas -->
+                            {% if intento.examen.permitir_revision %}
+                                <button class="btn btn-primary" onclick="toggleReview()">
+                                    <i class="bi bi-eye me-2"></i>
+                                    Revisar Respuestas
+                                </button>
+                            {% endif %}
+
+                            <!-- Repetir examen -->
+                            {% with intentos_count=intento.estudiante.intentos_examenes.filter:examen=intento.examen.count %}
+                                {% if intentos_count < intento.examen.intentos_maximos and intento.examen.esta_disponible %}
+                                    <a href="{% url 'evaluaciones:examen_detail' intento.examen.pk %}" 
+                                       class="btn btn-outline-primary">
+                                        <i class="bi bi-arrow-repeat me-2"></i>
+                                        Repetir Examen
+                                    </a>
+                                {% endif %}
+                            {% endwith %}
+
+                            <!-- Otros exámenes -->
+                            <a href="{% url 'evaluaciones:examen_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-list me-2"></i>
+                                Otros Exámenes
+                            </a>
+
+                            <!-- Estudiar más -->
+                            {% if intento.examen.tema %}
+                                <a href="{% url 'core:tema_detail' intento.examen.tema.pk %}" 
+                                   class="btn btn-outline-info">
+                                    <i class="bi bi-book me-2"></i>
+                                    Estudiar Tema
+                                </a>
+                            {% elif intento.examen.oposicion %}
+                                <a href="{% url 'core:oposicion_detail' intento.examen.oposicion.pk %}" 
+                                   class="btn btn-outline-info">
+                                    <i class="bi bi-fire me-2"></i>
+                                    Ver Oposición
+                                </a>
+                            {% endif %}
+                        </div>
+
+                        <!-- Consejo personalizado -->
+                        <div class="mt-4 pt-3 border-top">
+                            {% if intento.aprobado %}
+                                <div class="alert alert-success border-0">
+                                    <h6 class="mb-2">
+                                        <i class="bi bi-lightbulb me-2"></i>¡Excelente trabajo!
+                                    </h6>
+                                    <small>Continúa con esta dedicación para mantener tu alto rendimiento.</small>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info border-0">
+                                    <h6 class="mb-2">
+                                        <i class="bi bi-lightbulb me-2"></i>Sigue adelante
+                                    </h6>
+                                    <small>
+                                        Revisa las respuestas incorrectas y repasa el material. 
+                                        ¡El próximo intento será mejor!
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revisión de Respuestas (inicialmente oculta) -->
+        {% if intento.examen.permitir_revision and respuestas_detalle %}
+            <div id="reviewSection" style="display: none;">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white border-0">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-list-check text-primary me-2"></i>
+                                    Revisión de Respuestas
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {% for respuesta in respuestas_detalle %}
+                                    <div class="question-review mb-4 p-3 border rounded">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <h6 class="fw-bold mb-0">
+                                                Pregunta {{ forloop.counter }}
+                                                {% if respuesta.pregunta.dificultad == 'facil' %}
+                                                    <span class="badge bg-success ms-2">Fácil</span>
+                                                {% elif respuesta.pregunta.dificultad == 'medio' %}
+                                                    <span class="badge bg-warning ms-2">Medio</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger ms-2">Difícil</span>
+                                                {% endif %}
+                                            </h6>
+                                            <div>
+                                                {% if respuesta.es_correcta %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-check-circle me-1"></i>Correcta
+                                                    </span>
+                                                {% elif respuesta.respuesta_seleccionada %}
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-x-circle me-1"></i>Incorrecta
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">
+                                                        <i class="bi bi-dash-circle me-1"></i>Sin responder
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <p class="mb-3">{{ respuesta.pregunta.enunciado }}</p>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6 class="text-muted">Opciones de respuesta:</h6>
+                                                {% for opcion in respuesta.pregunta.respuestas.all %}
+                                                    <div class="mb-2 p-2 rounded
+                                                         {% if opcion.es_correcta %}bg-success bg-opacity-10 border border-success{% endif %}
+                                                         {% if respuesta.respuesta_seleccionada.id == opcion.id and not opcion.es_correcta %}bg-danger bg-opacity-10 border border-danger{% endif %}">
+                                                        <div class="d-flex align-items-center">
+                                                            {% if opcion.es_correcta %}
+                                                                <i class="bi bi-check-circle text-success me-2"></i>
+                                                            {% elif respuesta.respuesta_seleccionada.id == opcion.id %}
+                                                                <i class="bi bi-x-circle text-danger me-2"></i>
+                                                            {% else %}
+                                                                <i class="bi bi-circle text-muted me-2"></i>
+                                                            {% endif %}
+                                                            <span>{{ opcion.texto }}</span>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                            {% if respuesta.pregunta.explicacion %}
+                                                <div class="col-md-6">
+                                                    <h6 class="text-muted">Explicación:</h6>
+                                                    <div class="alert alert-info">
+                                                        <small>{{ respuesta.pregunta.explicacion }}</small>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.score-item {
+    padding: 1rem;
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+.comparison-chart .progress {
+    position: relative;
+}
+
+.question-review {
+    background-color: #f8f9fa;
+}
+
+.question-review:hover {
+    background-color: #e9ecef;
+}
+</style>
+
+<script>
+function toggleReview() {
+    const reviewSection = document.getElementById('reviewSection');
+    const button = event.target;
+    
+    if (reviewSection.style.display === 'none') {
+        reviewSection.style.display = 'block';
+        button.innerHTML = '<i class="bi bi-eye-slash me-2"></i>Ocultar Respuestas';
+        button.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        reviewSection.style.display = 'none';
+        button.innerHTML = '<i class="bi bi-eye me-2"></i>Revisar Respuestas';
+    }
+}
+</script>
+{% endblock %}
