@@ -21,7 +21,7 @@ urlpatterns = [
     path('examenes/', include('core.urls_evaluaciones')),
     
     # Sistema de archivos
-    path('archivos/', include('core.urls_archivos')),
+    #path('archivos/', include('core.urls_archivos')),
 ]
 
 # Servir archivos media en desarrollo
