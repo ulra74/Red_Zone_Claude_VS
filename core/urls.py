@@ -1,4 +1,4 @@
-# Archivo: core/urls.py
+# core/urls.py - CORREGIDO
 
 from django.urls import path, include
 from . import views
@@ -23,7 +23,7 @@ urlpatterns = [
     path('temas/', views.TemaListView.as_view(), name='tema_list'),
     path('temas/<int:pk>/', views.TemaDetailView.as_view(), name='tema_detail'),
     
-    # Sistema de exámenes
+    # Sistema de exámenes - CORREGIDO: urls_evaluaciones en lugar de urls_evaluciones
     path('examenes/', include('core.urls_evaluaciones')),
     
     # Admin URLs (solo para administradores)

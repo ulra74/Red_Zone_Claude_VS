@@ -1,3 +1,5 @@
+# core/views_evaluaciones.py - ARCHIVO RENOMBRADO Y CORREGIDO
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (
@@ -18,11 +20,12 @@ import json
 from datetime import timedelta
 
 from core.views import AdminRequiredMixin
-from .models_evaluaciones import (
+# CORREGIDO: Importar desde el módulo models principal
+from core.models import (
     Categoria, BancoPregunta, RespuestaPregunta, Examen, 
-    IntentosExamen, PreguntaExamen, RespuestaEstudiante, EstadisticasExamen
+    IntentosExamen, PreguntaExamen, RespuestaEstudiante, EstadisticasExamen,
+    Oposicion, Tema
 )
-from core.models import Oposicion, Tema
 
 
 # ============================================================================

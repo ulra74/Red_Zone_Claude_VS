@@ -1,3 +1,5 @@
+# core/models.py - ARCHIVO CORREGIDO
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
@@ -265,3 +267,47 @@ class ProgresoEstudiante(models.Model):
     def __str__(self):
         contenido = self.oposicion or self.tema
         return f"{self.estudiante.username} - {contenido.nombre if contenido else 'Contenido eliminado'} ({self.porcentaje_completado}%)"
+
+
+# ============================================================================
+# IMPORTAR TODOS LOS MODELOS DE LOS OTROS ARCHIVOS
+# ============================================================================
+
+# Importar modelos de evaluaciones
+from .models_evaluaciones import (
+    TipoEvaluacion, DificultadPregunta, Categoria, BancoPregunta, 
+    RespuestaPregunta, Examen, IntentosExamen, PreguntaExamen, 
+    RespuestaEstudiante, EstadisticasExamen
+)
+
+# Importar modelos de gamificación
+from .models_gamificacion import (
+    TipoLogro, Logro, LogroUsuario, DesafioSemanal, 
+    ParticipacionDesafio, PuntuacionUsuario
+)
+
+# Importar modelos de preparación física
+from .models_preparacion_fisica import (
+    TipoEjercicio, EjercicioFisico, PlanEntrenamiento, 
+    SesionEntrenamiento, EjercicioSesion, RegistroMarcas
+)
+
+# Hacer que todos los modelos estén disponibles en este módulo
+__all__ = [
+    # Modelos base
+    'Oposicion', 'Tema', 'TipoArchivo', 'ArchivoOposicion', 'ArchivoTema', 
+    'DescargaArchivo', 'ProgresoEstudiante',
+    
+    # Modelos de evaluaciones
+    'TipoEvaluacion', 'DificultadPregunta', 'Categoria', 'BancoPregunta', 
+    'RespuestaPregunta', 'Examen', 'IntentosExamen', 'PreguntaExamen', 
+    'RespuestaEstudiante', 'EstadisticasExamen',
+    
+    # Modelos de gamificación
+    'TipoLogro', 'Logro', 'LogroUsuario', 'DesafioSemanal', 
+    'ParticipacionDesafio', 'PuntuacionUsuario',
+    
+    # Modelos de preparación física
+    'TipoEjercicio', 'EjercicioFisico', 'PlanEntrenamiento', 
+    'SesionEntrenamiento', 'EjercicioSesion', 'RegistroMarcas'
+]

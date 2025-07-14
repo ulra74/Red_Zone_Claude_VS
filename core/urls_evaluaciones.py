@@ -1,4 +1,4 @@
-# core/urls_evaluaciones.py
+# core/urls_evaluaciones.py - ARCHIVO RENOMBRADO Y CORREGIDO
 
 from django.urls import path
 from . import views_evaluaciones

@@ -2120,3 +2120,347 @@ Not Found: /.well-known/appspecific/com.chrome.devtools.json
 "GET /dashboard/ HTTP/1.1" 200 18521
 Watching for file changes with StatReloader
 Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 16042
+"GET /static/img/fondo.jpeg HTTP/1.1" 304 0
+"GET /auth/login/ HTTP/1.1" 200 10787
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 17665
+"GET /dashboard/admin/oposiciones/create/ HTTP/1.1" 200 18605
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 12480
+"GET /dashboard/ HTTP/1.1" 200 17195
+"GET /dashboard/admin/temas/create/ HTTP/1.1" 200 17479
+"GET /dashboard/ HTTP/1.1" 200 17195
+"GET /dashboard/admin/users/create/ HTTP/1.1" 200 20661
+"GET /dashboard/admin/users/ HTTP/1.1" 200 12390
+"GET /dashboard/admin/users/create/ HTTP/1.1" 200 20661
+"GET /dashboard/admin/users/ HTTP/1.1" 200 12390
+"GET /dashboard/ HTTP/1.1" 200 17195
+"GET /dashboard/admin/temas/create/ HTTP/1.1" 200 17479
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 12572
+"GET /dashboard/ HTTP/1.1" 200 17195
+"GET /auth/profile/ HTTP/1.1" 200 17543
+"GET /dashboard/ HTTP/1.1" 200 17195
+"GET /dashboard/ HTTP/1.1" 200 21562
+"GET /dashboard/ HTTP/1.1" 200 21562
+Internal Server Error: /dashboard/oposiciones/
+Traceback (most recent call last):
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 90, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 72, in resolve_template
+    return select_template(template, using=self.using)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader.py", line 42, in select_template
+    return engine.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 961, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 861, in do_for
+    nodelist_loop = parser.parse(
+        (
+    ...<2 lines>...
+        )
+    )
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 515, in parse
+    self.unclosed_block_tag(parse_until)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 578, in unclosed_block_tag
+    raise self.error(token, msg)
+django.template.exceptions.TemplateSyntaxError: Unclosed tag on line 35: 'for'. Looking for one of: empty, endfor.
+"GET /dashboard/oposiciones/ HTTP/1.1" 500 200059
+Internal Server Error: /dashboard/temas/
+Traceback (most recent call last):
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 90, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 72, in resolve_template
+    return select_template(template, using=self.using)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader.py", line 47, in select_template
+    raise TemplateDoesNotExist(", ".join(template_name_list), chain=chain)
+django.template.exceptions.TemplateDoesNotExist: core/tema_list.html, core/tema_list.html
+"GET /dashboard/temas/ HTTP/1.1" 500 80734
+"GET /dashboard/ HTTP/1.1" 200 17195
+"GET /dashboard/ HTTP/1.1" 200 17204
+Internal Server Error: /dashboard/oposiciones/
+Traceback (most recent call last):
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 90, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 72, in resolve_template
+    return select_template(template, using=self.using)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader.py", line 42, in select_template
+    return engine.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 961, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 861, in do_for
+    nodelist_loop = parser.parse(
+        (
+    ...<2 lines>...
+        )
+    )
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 515, in parse
+    self.unclosed_block_tag(parse_until)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 578, in unclosed_block_tag
+    raise self.error(token, msg)
+django.template.exceptions.TemplateSyntaxError: Unclosed tag on line 35: 'for'. Looking for one of: empty, endfor.
+"GET /dashboard/oposiciones/ HTTP/1.1" 500 200059
+"GET /dashboard/admin/oposiciones/create/ HTTP/1.1" 200 18614
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 12489
+"GET /dashboard/admin/oposiciones/create/ HTTP/1.1" 200 18614
+"POST /dashboard/admin/oposiciones/create/ HTTP/1.1" 302 0
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 16185
+Internal Server Error: /dashboard/oposiciones/
+Traceback (most recent call last):
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 90, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 72, in resolve_template
+    return select_template(template, using=self.using)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader.py", line 42, in select_template
+    return engine.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 961, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 861, in do_for
+    nodelist_loop = parser.parse(
+        (
+    ...<2 lines>...
+        )
+    )
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 515, in parse
+    self.unclosed_block_tag(parse_until)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 578, in unclosed_block_tag
+    raise self.error(token, msg)
+django.template.exceptions.TemplateSyntaxError: Unclosed tag on line 35: 'for'. Looking for one of: empty, endfor.
+"GET /dashboard/oposiciones/ HTTP/1.1" 500 200077
+"GET / HTTP/1.1" 200 18106
+"GET /dashboard/ HTTP/1.1" 200 18590
+"GET /dashboard/admin/users/create/ HTTP/1.1" 200 20670
+"POST /dashboard/admin/users/create/ HTTP/1.1" 302 0
+"GET /dashboard/admin/users/ HTTP/1.1" 200 17357
+"GET /dashboard/ HTTP/1.1" 200 18590
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 15731
+Internal Server Error: /dashboard/oposiciones/1/
+Traceback (most recent call last):
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 1059, in render
+    output = self.filter_expression.resolve(context)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/base.py", line 737, in resolve
+    new_obj = func(obj, *arg_vals)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/template/defaultfilters.py", line 800, in date
+    return formats.date_format(value, arg)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/utils/formats.py", line 155, in date_format
+    return dateformat.format(
+           ~~~~~~~~~~~~~~~~~^
+        value, get_format(format or "DATE_FORMAT", use_l10n=use_l10n)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/utils/dateformat.py", line 325, in format
+    return df.format(format_string)
+           ~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/utils/dateformat.py", line 45, in format
+    raise TypeError(
+    ...<2 lines>...
+    )
+TypeError: The format for date objects may not contain time-related format specifiers (found 'e').
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 500 157473
