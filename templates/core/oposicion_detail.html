@@ -2,365 +2,261 @@
 {% load humanize %}
 
 {% block content %}
-<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+<div class="container">
     <!-- Page Header -->
-    <div class="page-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h1 class="h2 mb-0">
-                        <i class="bi bi-fire me-3"></i>
-                        {{ oposicion.nombre }}
-                    </h1>
-                    <p class="mb-0 opacity-75">
-                        <i class="bi bi-calendar me-2"></i>
-                        Convocatoria: {{ oposicion.fecha_convocatoria|date:"d de F de Y" }}
-                    </p>
+    <div class="page-header text-center mb-4">
+        <h1 class="text-white mb-3">
+            <i class="bi bi-fire me-2"></i>{{ oposicion.nombre }}
+        </h1>
+        <p class="text-white-50 mb-0">
+            <i class="bi bi-calendar3 me-2"></i>
+            Convocatoria: {{ oposicion.fecha_convocatoria|date:"d M Y" }}
+        </p>
+    </div>
+
+    <div class="row">
+        <!-- Información Principal -->
+        <div class="col-lg-8">
+            <div class="main-content">
+                <h3 class="mb-4">
+                    <i class="bi bi-info-circle text-primary me-2"></i>
+                    Información General
+                </h3>
+                
+                <div class="mb-4">
+                    <p class="lead">{{ oposicion.descripcion }}</p>
                 </div>
-                <div class="col-auto">
-                    <a href="{% url 'core:oposicion_list' %}" class="btn btn-light">
-                        <i class="bi bi-arrow-left me-2"></i>
-                        Volver a Oposiciones
-                    </a>
+
+                <!-- Lista de Temas -->
+                <h4 class="mb-3">
+                    <i class="bi bi-journals text-primary me-2"></i>
+                    Temas del Programa ({{ temas.count }})
+                </h4>
+
+                {% if temas %}
+                    <div class="row">
+                        {% for tema in temas %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-0">
+                                            <a href="{% url 'core:tema_detail' tema.pk %}" class="text-decoration-none">
+                                                {{ tema.nombre }}
+                                            </a>
+                                        </h5>
+                                        <span class="badge bg-secondary">{{ tema.orden }}</span>
+                                    </div>
+                                    
+                                    {% if tema.descripcion %}
+                                        <p class="card-text text-muted small">
+                                            {{ tema.descripcion|truncatewords:15 }}
+                                        </p>
+                                    {% endif %}
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            {% if tema.es_obligatorio %}
+                                                <span class="badge bg-danger">Obligatorio</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Opcional</span>
+                                            {% endif %}
+                                            <span class="badge bg-info">Peso: {{ tema.peso_evaluacion }}</span>
+                                        </div>
+                                        
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{% url 'core:tema_detail' tema.pk %}" class="btn btn-outline-primary">
+                                                <i class="bi bi-eye me-1"></i>Ver
+                                            </a>
+                                            <a href="{% url 'core:archivos_tema_list' tema.pk %}" class="btn btn-outline-secondary">
+                                                <i class="bi bi-files me-1"></i>
+                                                Archivos ({{ tema.archivos.count }})
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Progreso del estudiante -->
+                                    {% if request.user.is_student and progreso_temas %}
+                                        {% with progreso=progreso_temas|dict_key:tema.id %}
+                                        <div class="mt-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <small class="text-muted">Tu progreso:</small>
+                                                <small class="text-muted">{{ progreso.porcentaje }}%</small>
+                                            </div>
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar {% if progreso.completado %}bg-success{% else %}bg-primary{% endif %}" 
+                                                     style="width: {{ progreso.porcentaje }}%"></div>
+                                            </div>
+                                        </div>
+                                        {% endwith %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Aún no se han asignado temas a esta oposición.
+                    </div>
+                {% endif %}
+
+                <!-- Archivos de la Oposición -->
+                <div class="mt-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>
+                            <i class="bi bi-files text-primary me-2"></i>
+                            Archivos Generales
+                        </h4>
+                        {% if request.user.is_admin %}
+                            <a href="{% url 'core:subir_archivo_oposicion' oposicion.pk %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-circle me-1"></i>Subir Archivo
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% if oposicion.archivos.all %}
+                        <div class="row">
+                            {% for archivo in oposicion.archivos.all|slice:":6" %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="bi bi-file-earmark-{{ archivo.tipo }} text-primary me-2"></i>
+                                            {{ archivo.nombre }}
+                                        </h6>
+                                        <p class="card-text small text-muted">
+                                            {{ archivo.tamaño_legible }} • {{ archivo.descargas }} descargas
+                                        </p>
+                                        <a href="{% url 'core:descargar_archivo_oposicion' archivo.pk %}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-download me-1"></i>Descargar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if oposicion.archivos.count > 6 %}
+                            <div class="text-center mt-3">
+                                <a href="{% url 'core:archivos_oposicion_list' oposicion.pk %}" 
+                                   class="btn btn-outline-primary">
+                                    Ver todos los archivos ({{ oposicion.archivos.count }})
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-secondary">
+                            <i class="bi bi-folder2-open me-2"></i>
+                            No hay archivos disponibles todavía.
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="container flex-grow-1">
-        <div class="row">
-            <!-- Información Principal -->
-            <div class="col-lg-8 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-white border-0">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">
-                                <i class="bi bi-info-circle text-primary me-2"></i>
-                                Información de la Oposición
-                            </h5>
-                            {% if user.is_admin %}
-                                <div class="btn-group" role="group">
-                                    <a href="{% url 'core:admin_oposicion_update' oposicion.pk %}" 
-                                       class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a href="{% url 'core:admin_oposicion_delete' oposicion.pk %}" 
-                                       class="btn btn-sm btn-outline-danger"
-                                       onclick="return confirm('¿Estás seguro de que quieres eliminar esta oposición?')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <!-- Estado y Badges -->
-                        <div class="mb-4">
-                            <div class="d-flex flex-wrap gap-2">
-                                <span class="badge bg-success fs-6">
-                                    <i class="bi bi-check-circle me-1"></i>Activa
-                                </span>
-                                {% if oposicion.fecha_convocatoria > "now"|date:"Y-m-d"|date:"Y-m-d" %}
-                                    <span class="badge bg-info fs-6">
-                                        <i class="bi bi-calendar-event me-1"></i>Próxima
-                                    </span>
-                                {% endif %}
-                                <span class="badge bg-primary fs-6">
-                                    <i class="bi bi-people me-1"></i>{{ oposicion.alumnos_con_acceso.count }} estudiantes
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Descripción -->
-                        <div class="mb-4">
-                            <h6 class="text-muted mb-3">Descripción</h6>
-                            <div class="bg-light rounded p-3">
-                                <p class="mb-0">{{ oposicion.descripcion|linebreaks }}</p>
-                            </div>
-                        </div>
-
-                        <!-- Fechas Importantes -->
-                        <div class="mb-4">
-                            <h6 class="text-muted mb-3">Fechas Importantes</h6>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <div class="border rounded p-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-calendar-check text-primary me-3 fs-4"></i>
-                                            <div>
-                                                <small class="text-muted">Fecha de Convocatoria</small>
-                                                <div class="fw-bold">{{ oposicion.fecha_convocatoria|date:"d/m/Y" }}</div>
-                                                <small class="text-muted">{{ oposicion.fecha_convocatoria|naturalday|capfirst }}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="border rounded p-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-clock text-info me-3 fs-4"></i>
-                                            <div>
-                                                <small class="text-muted">Tiempo Restante</small>
-                                                <div class="fw-bold">
-                                                    {% if oposicion.fecha_convocatoria > "now"|date:"Y-m-d"|date:"Y-m-d" %}
-                                                        {{ oposicion.fecha_convocatoria|timeuntil }}
-                                                    {% else %}
-                                                        <span class="text-warning">Convocatoria pasada</span>
-                                                    {% endif %}
-                                                </div>
-                                                <small class="text-muted">Para la convocatoria</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Materiales de Estudio -->
-                        <div class="mb-4">
-                            <h6 class="text-muted mb-3">Materiales de Estudio</h6>
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <div class="card bg-primary bg-opacity-10 border-primary border-opacity-25">
-                                        <div class="card-body text-center">
-                                            <i class="bi bi-file-pdf text-primary fs-1 mb-2"></i>
-                                            <h6 class="card-title">Temarios</h6>
-                                            <p class="card-text small text-muted">PDFs con todo el contenido</p>
-                                            <button class="btn btn-sm btn-primary" disabled>
-                                                Próximamente
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="card bg-info bg-opacity-10 border-info border-opacity-25">
-                                        <div class="card-body text-center">
-                                            <i class="bi bi-question-circle text-info fs-1 mb-2"></i>
-                                            <h6 class="card-title">Tests</h6>
-                                            <p class="card-text small text-muted">Exámenes de práctica</p>
-                                            <button class="btn btn-sm btn-info" disabled>
-                                                Próximamente
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="card bg-success bg-opacity-10 border-success border-opacity-25">
-                                        <div class="card-body text-center">
-                                            <i class="bi bi-play-circle text-success fs-1 mb-2"></i>
-                                            <h6 class="card-title">Videos</h6>
-                                            <p class="card-text small text-muted">Clases grabadas</p>
-                                            <button class="btn btn-sm btn-success" disabled>
-                                                Próximamente
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Mi Progreso (solo para estudiantes) -->
-                        {% if user.is_student %}
-                        <div class="mb-4">
-                            <h6 class="text-muted mb-3">Mi Progreso</h6>
-                            <div class="card bg-light border-0">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="fw-semibold">Progreso General</span>
-                                        <span class="badge bg-warning">25%</span>
-                                    </div>
-                                    <div class="progress mb-3" style="height: 10px;">
-                                        <div class="progress-bar bg-warning" style="width: 25%"></div>
-                                    </div>
-                                    <div class="row text-center">
-                                        <div class="col-4">
-                                            <small class="text-muted d-block">Temas</small>
-                                            <span class="fw-bold text-primary">2/8</span>
-                                        </div>
-                                        <div class="col-4">
-                                            <small class="text-muted d-block">Tests</small>
-                                            <span class="fw-bold text-info">1/5</span>
-                                        </div>
-                                        <div class="col-4">
-                                            <small class="text-muted d-block">Horas</small>
-                                            <span class="fw-bold text-success">12h</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="col-lg-4 mb-4">
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="main-content">
                 <!-- Estadísticas -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-0">
-                        <h6 class="mb-0">
-                            <i class="bi bi-graph-up text-success me-2"></i>
-                            Estadísticas
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-6 mb-3">
-                                <div class="border-end">
-                                    <h4 class="text-primary mb-1">{{ oposicion.alumnos_con_acceso.count }}</h4>
-                                    <small class="text-muted">Estudiantes</small>
-                                </div>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <h4 class="text-info mb-1">8</h4>
+                <h5 class="mb-3">
+                    <i class="bi bi-graph-up text-primary me-2"></i>
+                    Estadísticas
+                </h5>
+                
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4 class="text-primary">{{ temas.count }}</h4>
                                 <small class="text-muted">Temas</small>
                             </div>
-                            <div class="col-6">
-                                <div class="border-end">
-                                    <h4 class="text-success mb-1">15</h4>
-                                    <small class="text-muted">Tests</small>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <h4 class="text-warning mb-1">24h</h4>
-                                <small class="text-muted">Contenido</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4 class="text-success">{{ oposicion.archivos.count }}</h4>
+                                <small class="text-muted">Archivos</small>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Estudiantes con Acceso (solo admin) -->
-                {% if user.is_admin %}
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-white border-0">
-                        <h6 class="mb-0">
-                            <i class="bi bi-people text-primary me-2"></i>
-                            Estudiantes con Acceso
-                        </h6>
+                <div class="row text-center mt-2">
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4 class="text-info">{{ oposicion.total_estudiantes }}</h4>
+                                <small class="text-muted">Estudiantes</small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        {% if oposicion.alumnos_con_acceso.all %}
-                            <div class="student-list" style="max-height: 300px; overflow-y: auto;">
-                                {% for student in oposicion.alumnos_con_acceso.all %}
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
-                                            <i class="bi bi-person text-primary"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-semibold">{{ student.get_full_name|default:student.username }}</div>
-                                            <small class="text-muted">@{{ student.username }}</small>
-                                        </div>
-                                        <div>
-                                            {% if student.is_active %}
-                                                <span class="badge bg-success">Activo</span>
-                                            {% else %}
-                                                <span class="badge bg-secondary">Inactivo</span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                {% endfor %}
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4 class="text-warning">0</h4>
+                                <small class="text-muted">Exámenes</small>
                             </div>
-                        {% else %}
-                            <div class="text-center py-3">
-                                <i class="bi bi-people text-muted" style="font-size: 2rem;"></i>
-                                <p class="text-muted small mt-2 mb-0">
-                                    No hay estudiantes asignados a esta oposición
-                                </p>
-                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="mt-4">
+                    <h6 class="mb-3">Acciones Rápidas</h6>
+                    
+                    <div class="d-grid gap-2">
+                        {% if request.user.is_student %}
+                            <a href="#" class="btn btn-primary">
+                                <i class="bi bi-play-circle me-2"></i>
+                                Comenzar Estudio
+                            </a>
+                            <a href="#" class="btn btn-outline-primary">
+                                <i class="bi bi-clipboard-check me-2"></i>
+                                Hacer Test
+                            </a>
+                        {% endif %}
+                        
+                        {% if request.user.is_admin %}
+                            <a href="{% url 'core:admin_oposicion_update' oposicion.pk %}" class="btn btn-warning">
+                                <i class="bi bi-pencil me-2"></i>
+                                Editar Oposición
+                            </a>
+                            <a href="{% url 'core:admin_oposicion_temas' oposicion.pk %}" class="btn btn-info">
+                                <i class="bi bi-journals me-2"></i>
+                                Gestionar Temas
+                            </a>
+                            <a href="{% url 'core:subir_archivo_oposicion' oposicion.pk %}" class="btn btn-secondary">
+                                <i class="bi bi-upload me-2"></i>
+                                Subir Archivos
+                            </a>
                         {% endif %}
                     </div>
                 </div>
-                {% endif %}
 
-                <!-- Acciones Rápidas -->
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white border-0">
-                        <h6 class="mb-0">
-                            <i class="bi bi-lightning text-warning me-2"></i>
-                            Acciones Rápidas
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            {% if user.is_student %}
-                                <button class="btn btn-primary" disabled>
-                                    <i class="bi bi-book me-2"></i>
-                                    Comenzar Estudio
-                                </button>
-                                <button class="btn btn-info" disabled>
-                                    <i class="bi bi-question-circle me-2"></i>
-                                    Hacer Test
-                                </button>
-                                <button class="btn btn-success" disabled>
-                                    <i class="bi bi-download me-2"></i>
-                                    Descargar Material
-                                </button>
-                            {% else %}
-                                <a href="{% url 'core:admin_oposicion_update' oposicion.pk %}" class="btn btn-primary">
-                                    <i class="bi bi-pencil me-2"></i>
-                                    Editar Oposición
-                                </a>
-                                <button class="btn btn-info" disabled>
-                                    <i class="bi bi-upload me-2"></i>
-                                    Subir Material
-                                </button>
-                                <button class="btn btn-success" disabled>
-                                    <i class="bi bi-graph-up me-2"></i>
-                                    Ver Estadísticas
-                                </button>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mt-3 pt-3 border-top">
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Algunas funciones están en desarrollo
-                            </small>
-                        </div>
-                    </div>
+                <!-- Información Adicional -->
+                <div class="mt-4">
+                    <h6 class="mb-3">Información</h6>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="bi bi-calendar3 text-muted me-2"></i>
+                            <strong>Convocatoria:</strong> {{ oposicion.fecha_convocatoria|date:"d/m/Y" }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-clock text-muted me-2"></i>
+                            <strong>Creada:</strong> {{ oposicion.created_at|date:"d/m/Y" }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-arrow-clockwise text-muted me-2"></i>
+                            <strong>Actualizada:</strong> {{ oposicion.updated_at|naturaltime }}
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-.progress {
-    background-color: #e9ecef;
-    border-radius: 10px;
-}
-
-.progress-bar {
-    border-radius: 10px;
-    transition: width 0.6s ease;
-}
-
-.student-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.student-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-.student-list::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 10px;
-}
-
-.student-list::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    transition: transform 0.2s ease-in-out;
-}
-
-.badge.fs-6 {
-    font-size: 0.9rem !important;
-}
-</style>
 {% endblock %}

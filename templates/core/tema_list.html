@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header text-center mb-4">
+        <h1 class="text-white mb-3">
+            <i class="bi bi-journals me-2"></i>
+            {% if request.user.is_admin %}Todos los Temas{% else %}Mis Temas{% endif %}
+        </h1>
+        <p class="text-white-50 mb-0">
+            {% if request.user.is_admin %}
+                Gestiona todos los temas disponibles en la plataforma
+            {% else %}
+                Temas de estudio a los que tienes acceso
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="main-content">
+        <!-- Barra de Herramientas -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-0">Temas de Estudio</h3>
+                <small class="text-muted">{{ temas|length }} tema{{ temas|length|pluralize:",s" }} disponible{{ temas|length|pluralize:",s" }}</small>
+            </div>
+            
+            {% if request.user.is_admin %}
+                <div>
+                    <a href="{% url 'core:admin_tema_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Nuevo Tema
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="buscar" class="form-label">Buscar</label>
+                        <input type="text" class="form-control" id="buscar" name="q" 
+                               value="{{ request.GET.q }}" 
+                               placeholder="Buscar por nombre o descripción...">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="tipo" class="form-label">Tipo</label>
+                        <select class="form-select" id="tipo" name="tipo">
+                            <option value="">Todos</option>
+                            <option value="obligatorio" {% if request.GET.tipo == 'obligatorio' %}selected{% endif %}>Obligatorios</option>
+                            <option value="opcional" {% if request.GET.tipo == 'opcional' %}selected{% endif %}>Opcionales</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="ordenar" class="form-label">Ordenar por</label>
+                        <select class="form-select" id="ordenar" name="orden">
+                            <option value="orden" {% if request.GET.orden == 'orden' %}selected{% endif %}>Orden</option>
+                            <option value="nombre" {% if request.GET.orden == 'nombre' %}selected{% endif %}>Nombre A-Z</option>
+                            <option value="-nombre" {% if request.GET.orden == '-nombre' %}selected{% endif %}>Nombre Z-A</option>
+                            <option value="-peso_evaluacion" {% if request.GET.orden == '-peso_evaluacion' %}selected{% endif %}>Mayor peso</option>
+                            <option value="-created_at" {% if request.GET.orden == '-created_at' %}selected{% endif %}>Más recientes</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-outline-primary me-2">
+                            <i class="bi bi-search me-1"></i>Buscar
+                        </button>
+                        <a href="{% url 'core:tema_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista de Temas -->
+        {% if temas %}
+            <div class="row">
+                {% for tema in temas %}
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <a href="{% url 'core:tema_detail' tema.pk %}" 
+                                   class="text-decoration-none">
+                                    {{ tema.nombre }}
+                                </a>
+                            </h5>
+                            <div>
+                                <span class="badge bg-secondary">{{ tema.orden }}</span>
+                                {% if tema.es_obligatorio %}
+                                    <span class="badge bg-danger">Obligatorio</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Opcional</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            {% if tema.descripcion %}
+                                <p class="card-text text-muted">
+                                    {{ tema.descripcion|truncatewords:15 }}
+                                </p>
+                            {% endif %}
+                            
+                            <!-- Peso del Tema -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">Peso en evaluación:</small>
+                                    <span class="badge bg-info">{{ tema.peso_evaluacion }}/10</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-info" 
+                                         style="width: {{ tema.peso_evaluacion|mul:10 }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Oposiciones Relacionadas -->
+                            <div class="mb-3">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-fire text-primary me-1"></i>
+                                    Oposiciones ({{ tema.oposiciones.count }})
+                                </h6>
+                                
+                                {% if tema.oposiciones.all %}
+                                    <div class="mb-2">
+                                        {% for oposicion in tema.oposiciones.all|slice:":3" %}
+                                            <a href="{% url 'core:oposicion_detail' oposicion.pk %}" 
+                                               class="badge bg-outline-danger text-decoration-none me-1 mb-1">
+                                                {{ oposicion.nombre|truncatewords:3 }}
+                                            </a>
+                                        {% endfor %}
+                                        {% if tema.oposiciones.count > 3 %}
+                                            <span class="badge bg-secondary">+{{ tema.oposiciones.count|add:"-3" }} más</span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <small class="text-muted">Sin oposiciones asignadas</small>
+                                {% endif %}
+                            </div>
+
+                            <!-- Estadísticas -->
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="border rounded p-2">
+                                        <h6 class="text-primary mb-0">{{ tema.oposiciones.count }}</h6>
+                                        <small class="text-muted">Oposiciones</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="border rounded p-2">
+                                        <h6 class="text-success mb-0">{{ tema.archivos.count }}</h6>
+                                        <small class="text-muted">Archivos</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="border rounded p-2">
+                                        <h6 class="text-info mb-0">{{ tema.total_estudiantes }}</h6>
+                                        <small class="text-muted">Estudiantes</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Progreso del Estudiante -->
+                            {% if request.user.is_student %}
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <small class="text-muted">Tu progreso:</small>
+                                        <small class="text-muted">0%</small>
+                                    </div>
+                                    <div class="progress" style="height: 4px;">
+                                        <div class="progress-bar bg-primary" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>
+                                        Actualizado {{ tema.updated_at|naturaltime }}
+                                    </small>
+                                </div>
+                                
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'core:tema_detail' tema.pk %}" 
+                                       class="btn btn-outline-primary">
+                                        <i class="bi bi-eye me-1"></i>Ver
+                                    </a>
+                                    
+                                    <a href="{% url 'core:archivos_tema_list' tema.pk %}" 
+                                       class="btn btn-outline-secondary" 
+                                       title="Ver Archivos">
+                                        <i class="bi bi-files"></i>
+                                    </a>
+                                    
+                                    {% if request.user.is_admin %}
+                                        <a href="{% url 'core:admin_tema_update' tema.pk %}" 
+                                           class="btn btn-outline-warning" 
+                                           title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    {% elif request.user.is_student %}
+                                        <a href="#" class="btn btn-outline-success" title="Estudiar">
+                                            <i class="bi bi-play-circle"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <nav aria-label="Paginación de temas">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Anterior</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Siguiente</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Última</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <!-- Estado Vacío -->
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-journal-x display-1 text-muted mb-3"></i>
+                    <h3 class="text-muted mb-3">No hay temas disponibles</h3>
+                    
+                    {% if request.user.is_admin %}
+                        <p class="text-muted mb-4">
+                            Comienza creando temas de estudio para organizar el contenido educativo.
+                        </p>
+                        <div>
+                            <a href="{% url 'core:admin_tema_create' %}" class="btn btn-primary me-2">
+                                <i class="bi bi-plus-circle me-2"></i>Crear Primer Tema
+                            </a>
+                            <a href="{% url 'core:admin_oposicion_list' %}" class="btn btn-outline-primary">
+                                <i class="bi bi-fire me-2"></i>Ver Oposiciones
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-4">
+                            No tienes acceso a ningún tema en este momento.<br>
+                            Contacta con el administrador para obtener acceso.
+                        </p>
+                        <a href="{% url 'core:dashboard' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left me-2"></i>Volver al Dashboard
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Resumen de Temas por Tipo -->
+        {% if temas and request.user.is_student %}
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h4 class="text-danger">{{ temas|length }}</h4>
+                            <p class="mb-0">
+                                <strong>Temas Obligatorios</strong><br>
+                                <small class="text-muted">Prioritarios para aprobar</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h4 class="text-warning">0</h4>
+                            <p class="mb-0">
+                                <strong>Temas Opcionales</strong><br>
+                                <small class="text-muted">Complementarios</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Información Adicional para Estudiantes -->
+        {% if request.user.is_student and temas %}
+            <div class="card mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                        Estrategia de Estudio por Temas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>🎯 Prioriza por peso</h6>
+                            <p class="small text-muted">Dedica más tiempo a temas con mayor peso en la evaluación.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>📋 Obligatorios primero</h6>
+                            <p class="small text-muted">Completa todos los temas obligatorios antes de los opcionales.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>🔄 Revisa regularmente</h6>
+                            <p class="small text-muted">Repasa temas completados para mantener el conocimiento fresco.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

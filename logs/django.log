@@ -2464,3 +2464,43 @@ Traceback (most recent call last):
     )
 TypeError: The format for date objects may not contain time-related format specifiers (found 'e').
 "GET /dashboard/oposiciones/1/ HTTP/1.1" 500 157473
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 16051
+"GET /auth/login/ HTTP/1.1" 200 10796
+"POST /auth/login/ HTTP/1.1" 200 11316
+"POST /auth/login/ HTTP/1.1" 200 11316
+"POST /auth/login/ HTTP/1.1" 200 11318
+Watching for file changes with StatReloader
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 19060
+"GET /dashboard/admin/temas/create/ HTTP/1.1" 200 18848
+"POST /dashboard/admin/temas/create/ HTTP/1.1" 302 0
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 15891
+"GET /dashboard/ HTTP/1.1" 200 18590
+"GET /dashboard/admin/temas/create/ HTTP/1.1" 200 18848
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 15454
+"GET /dashboard/admin/temas/1/edit/ HTTP/1.1" 200 18894
+"POST /dashboard/admin/temas/1/edit/ HTTP/1.1" 302 0
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 15896
+"GET /dashboard/ HTTP/1.1" 200 18590
+"GET /dashboard/admin/oposiciones/create/ HTTP/1.1" 200 19980
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 15731
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/urls.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/admin.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 302 0
+"GET /auth/login/?next=/dashboard/ HTTP/1.1" 200 10796
+"POST /auth/login/?next=/dashboard/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 17674
+"GET /dashboard/admin/oposiciones/create/ HTTP/1.1" 200 18614
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 12489
+"GET /dashboard/ HTTP/1.1" 200 17204
+"GET /dashboard/admin/temas/create/ HTTP/1.1" 200 17488
+"POST /dashboard/admin/temas/create/ HTTP/1.1" 200 18291
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 12581

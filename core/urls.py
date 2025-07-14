@@ -1,4 +1,4 @@
-# core/urls.py - CORREGIDO
+# core/urls.py - ACTUALIZADO con gestión de temas en oposiciones
 
 from django.urls import path, include
 from . import views
@@ -23,15 +23,19 @@ urlpatterns = [
     path('temas/', views.TemaListView.as_view(), name='tema_list'),
     path('temas/<int:pk>/', views.TemaDetailView.as_view(), name='tema_detail'),
     
-    # Sistema de exámenes - CORREGIDO: urls_evaluaciones en lugar de urls_evaluciones
+    # Sistema de exámenes
     path('examenes/', include('core.urls_evaluaciones')),
     
-    # Admin URLs (solo para administradores)
+    # Admin URLs - Oposiciones
     path('admin/oposiciones/', views.AdminOposicionListView.as_view(), name='admin_oposicion_list'),
     path('admin/oposiciones/create/', views.AdminOposicionCreateView.as_view(), name='admin_oposicion_create'),
     path('admin/oposiciones/<int:pk>/edit/', views.AdminOposicionUpdateView.as_view(), name='admin_oposicion_update'),
     path('admin/oposiciones/<int:pk>/delete/', views.AdminOposicionDeleteView.as_view(), name='admin_oposicion_delete'),
     
+    # NUEVO: Gestión de temas en oposiciones
+    path('admin/oposiciones/<int:pk>/temas/', views.AdminOposicionTemasView.as_view(), name='admin_oposicion_temas'),
+    
+    # Admin URLs - Temas
     path('admin/temas/', views.AdminTemaListView.as_view(), name='admin_tema_list'),
     path('admin/temas/create/', views.AdminTemaCreateView.as_view(), name='admin_tema_create'),
     path('admin/temas/<int:pk>/edit/', views.AdminTemaUpdateView.as_view(), name='admin_tema_update'),

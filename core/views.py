@@ -1,3 +1,5 @@
+# core/views.py - ACTUALIZADO con gestión de relación Oposicion-Tema
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
@@ -6,9 +8,9 @@ from django.views.generic import (
 )
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django import forms
-from .models import Oposicion, Tema
+from .models import Oposicion, Tema, TemaOposicion
 from accounts.models import CustomUser
 
 
@@ -46,15 +48,22 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['user_type'] = user.get_user_type_display()
         
         if user.is_student():
-            context['mis_oposiciones'] = user.oposiciones_acceso.all()[:5]
-            context['mis_temas'] = user.temas_acceso.all()[:5]
+            # Obtener oposiciones con sus temas
+            mis_oposiciones = user.oposiciones_acceso.prefetch_related('temas')[:5]
+            context['mis_oposiciones'] = mis_oposiciones
+            context['mis_temas'] = user.temas_acceso.prefetch_related('oposiciones')[:5]
             context['total_oposiciones'] = user.oposiciones_acceso.count()
             context['total_temas'] = user.temas_acceso.count()
+            
+            # Estadísticas adicionales
+            total_temas_oposiciones = sum([op.temas.count() for op in mis_oposiciones])
+            context['total_temas_en_oposiciones'] = total_temas_oposiciones
+            
         elif user.is_admin():
             context['total_oposiciones'] = Oposicion.objects.count()
             context['total_temas'] = Tema.objects.count()
             context['total_estudiantes'] = CustomUser.objects.filter(user_type='student').count()
-            context['oposiciones_recientes'] = Oposicion.objects.order_by('-created_at')[:5]
+            context['oposiciones_recientes'] = Oposicion.objects.prefetch_related('temas').order_by('-created_at')[:5]
             
         return context
 
@@ -68,9 +77,11 @@ class OposicionListView(LoginRequiredMixin, ListView):
     paginate_by = 12
 
     def get_queryset(self):
+        queryset = Oposicion.objects.prefetch_related('temas', 'alumnos_con_acceso')
+        
         if self.request.user.is_admin():
-            return Oposicion.objects.all()
-        return self.request.user.oposiciones_acceso.all()
+            return queryset.all()
+        return queryset.filter(alumnos_con_acceso=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -79,19 +90,40 @@ class OposicionListView(LoginRequiredMixin, ListView):
 
 
 class OposicionDetailView(LoginRequiredMixin, DetailView):
-    """Detalle de oposición"""
+    """Detalle de oposición con sus temas"""
     model = Oposicion
     template_name = 'core/oposicion_detail.html'
     context_object_name = 'oposicion'
 
     def get_queryset(self):
+        queryset = Oposicion.objects.prefetch_related(
+            'temas__archivos',
+            'archivos',
+            'alumnos_con_acceso'
+        )
+        
         if self.request.user.is_admin():
-            return Oposicion.objects.all()
-        return self.request.user.oposiciones_acceso.all()
+            return queryset.all()
+        return queryset.filter(alumnos_con_acceso=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.nombre
+        
+        # Obtener temas ordenados de la oposición
+        temas_oposicion = self.object.temas.prefetch_related('archivos').order_by('orden', 'nombre')
+        context['temas'] = temas_oposicion
+        
+        # Estadísticas para estudiantes
+        if self.request.user.is_student():
+            context['progreso_temas'] = {}
+            for tema in temas_oposicion:
+                # Aquí puedes calcular el progreso del estudiante en cada tema
+                context['progreso_temas'][tema.id] = {
+                    'completado': False,  # Implementar lógica de progreso
+                    'porcentaje': 0,
+                }
+        
         return context
 
 
@@ -103,9 +135,11 @@ class TemaListView(LoginRequiredMixin, ListView):
     paginate_by = 12
 
     def get_queryset(self):
+        queryset = Tema.objects.prefetch_related('oposiciones', 'alumnos_con_acceso')
+        
         if self.request.user.is_admin():
-            return Tema.objects.all()
-        return self.request.user.temas_acceso.all()
+            return queryset.all()
+        return queryset.filter(alumnos_con_acceso=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -114,101 +148,33 @@ class TemaListView(LoginRequiredMixin, ListView):
 
 
 class TemaDetailView(LoginRequiredMixin, DetailView):
-    """Detalle de tema"""
+    """Detalle de tema con sus oposiciones"""
     model = Tema
     template_name = 'core/tema_detail.html'
     context_object_name = 'tema'
 
     def get_queryset(self):
+        queryset = Tema.objects.prefetch_related(
+            'oposiciones',
+            'archivos',
+            'alumnos_con_acceso'
+        )
+        
         if self.request.user.is_admin():
-            return Tema.objects.all()
-        return self.request.user.temas_acceso.all()
+            return queryset.all()
+        return queryset.filter(alumnos_con_acceso=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.nombre
+        
+        # Obtener oposiciones relacionadas
+        context['oposiciones_relacionadas'] = self.object.oposiciones.all()
+        
         return context
 
 
-# Formularios para Admin
-class UserEditForm(forms.ModelForm):
-    class Meta:
-        model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'is_active']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Hacer que el email sea requerido
-        self.fields['email'].required = True
-        self.fields['first_name'].required = True
-        self.fields['last_name'].required = True
-        
-        # Configurar el campo is_active como checkbox
-        self.fields['is_active'].widget = forms.CheckboxInput(attrs={
-            'class': 'form-check-input',
-            'role': 'switch'
-        })
-        self.fields['is_active'].label = 'Usuario Activo'
-        
-        # Si estamos editando un usuario existente, asegurar que is_active tenga el valor correcto
-        if self.instance and self.instance.pk:
-            self.fields['is_active'].initial = self.instance.is_active
-
-
-class UserCreateForm(forms.ModelForm):
-    password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    password2 = forms.CharField(label='Confirmar contraseña', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    
-    class Meta:
-        model = CustomUser
-        fields = ['username', 'first_name', 'last_name', 'email', 'user_type', 'is_active']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'user_type': forms.Select(attrs={'class': 'form-control'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Establecer valores por defecto para nuevos usuarios
-        self.fields['is_active'].initial = True
-        self.fields['user_type'].initial = 'student'
-        
-        # Configurar el campo is_active como checkbox
-        self.fields['is_active'].widget = forms.CheckboxInput(attrs={
-            'class': 'form-check-input',
-            'role': 'switch'
-        })
-        self.fields['is_active'].label = 'Usuario Activo'
-        
-        # Hacer campos requeridos
-        self.fields['email'].required = True
-        self.fields['first_name'].required = True
-        self.fields['last_name'].required = True
-
-    def clean_password2(self):
-        password1 = self.cleaned_data.get("password1")
-        password2 = self.cleaned_data.get("password2")
-        if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("Las contraseñas no coinciden")
-        return password2
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
-        if commit:
-            user.save()
-        return user
-
-
+# Formularios actualizados
 class OposicionForm(forms.ModelForm):
     class Meta:
         model = Oposicion
@@ -228,24 +194,56 @@ class OposicionForm(forms.ModelForm):
 class TemaForm(forms.ModelForm):
     class Meta:
         model = Tema
-        fields = ['nombre', 'alumnos_con_acceso']
+        fields = ['nombre', 'descripcion', 'oposiciones', 'alumnos_con_acceso', 'orden', 'es_obligatorio', 'peso_evaluacion']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'oposiciones': forms.CheckboxSelectMultiple(),
             'alumnos_con_acceso': forms.CheckboxSelectMultiple(),
+            'orden': forms.NumberInput(attrs={'class': 'form-control'}),
+            'peso_evaluacion': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 10}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['alumnos_con_acceso'].queryset = CustomUser.objects.filter(user_type='student')
+        self.fields['oposiciones'].queryset = Oposicion.objects.all()
+        
+        # Configurar checkbox para es_obligatorio
+        self.fields['es_obligatorio'].widget = forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        })
 
 
-# Vistas para Administradores
+# Formulario para gestionar temas en una oposición específica
+class TemasOposicionForm(forms.Form):
+    """Formulario para añadir/quitar temas de una oposición"""
+    temas = forms.ModelMultipleChoiceField(
+        queryset=Tema.objects.all(),
+        widget=forms.CheckboxSelectMultiple(),
+        required=False,
+        help_text="Selecciona los temas que pertenecen a esta oposición"
+    )
+    
+    def __init__(self, *args, **kwargs):
+        oposicion = kwargs.pop('oposicion', None)
+        super().__init__(*args, **kwargs)
+        
+        if oposicion:
+            # Marcar temas actuales como seleccionados
+            self.fields['temas'].initial = oposicion.temas.all()
+
+
+# Vistas para Administradores - Oposiciones
 class AdminOposicionListView(AdminRequiredMixin, ListView):
     """Lista de oposiciones para admin"""
     model = Oposicion
     template_name = 'core/admin/oposicion_list.html'
     context_object_name = 'oposiciones'
     paginate_by = 15
+
+    def get_queryset(self):
+        return Oposicion.objects.prefetch_related('temas', 'alumnos_con_acceso')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -305,12 +303,47 @@ class AdminOposicionDeleteView(AdminRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-# Vistas similares para Temas
+# Vista para gestionar temas de una oposición
+class AdminOposicionTemasView(AdminRequiredMixin, UpdateView):
+    """Gestionar temas de una oposición"""
+    model = Oposicion
+    template_name = 'core/admin/oposicion_temas.html'
+    fields = []  # No usamos fields porque usamos form personalizado
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Gestionar Temas - {self.object.nombre}'
+        context['form'] = TemasOposicionForm(oposicion=self.object)
+        context['temas_actuales'] = self.object.temas.all()
+        context['todos_los_temas'] = Tema.objects.all()
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = TemasOposicionForm(request.POST, oposicion=self.object)
+        
+        if form.is_valid():
+            # Actualizar relación many-to-many
+            temas_seleccionados = form.cleaned_data['temas']
+            self.object.temas.set(temas_seleccionados)
+            
+            messages.success(request, f'Temas de "{self.object.nombre}" actualizados correctamente.')
+            return redirect('core:admin_oposicion_list')
+        
+        context = self.get_context_data()
+        context['form'] = form
+        return self.render_to_response(context)
+
+
+# Vistas para Administradores - Temas
 class AdminTemaListView(AdminRequiredMixin, ListView):
     model = Tema
     template_name = 'core/admin/tema_list.html'
     context_object_name = 'temas'
     paginate_by = 15
+
+    def get_queryset(self):
+        return Tema.objects.prefetch_related('oposiciones', 'alumnos_con_acceso')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -367,6 +400,79 @@ class AdminTemaDeleteView(AdminRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
+# Resto de vistas de usuario (sin cambios)...
+class UserEditForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'first_name', 'last_name', 'email', 'is_active']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].required = True
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+        
+        self.fields['is_active'].widget = forms.CheckboxInput(attrs={
+            'class': 'form-check-input',
+            'role': 'switch'
+        })
+        self.fields['is_active'].label = 'Usuario Activo'
+        
+        if self.instance and self.instance.pk:
+            self.fields['is_active'].initial = self.instance.is_active
+
+
+class UserCreateForm(forms.ModelForm):
+    password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    password2 = forms.CharField(label='Confirmar contraseña', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'first_name', 'last_name', 'email', 'user_type', 'is_active']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'user_type': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['is_active'].initial = True
+        self.fields['user_type'].initial = 'student'
+        
+        self.fields['is_active'].widget = forms.CheckboxInput(attrs={
+            'class': 'form-check-input',
+            'role': 'switch'
+        })
+        self.fields['is_active'].label = 'Usuario Activo'
+        
+        self.fields['email'].required = True
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Las contraseñas no coinciden")
+        return password2
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
+
+
 class AdminUserListView(AdminRequiredMixin, ListView):
     """Lista de usuarios para admin"""
     model = CustomUser
@@ -413,7 +519,6 @@ class AdminUserDeleteView(AdminRequiredMixin, DeleteView):
         return context
 
     def dispatch(self, request, *args, **kwargs):
-        # Prevenir que un admin se elimine a sí mismo
         if self.get_object() == request.user:
             messages.error(request, 'No puedes eliminar tu propia cuenta.')
             return redirect('core:admin_user_list')

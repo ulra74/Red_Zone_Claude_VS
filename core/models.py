@@ -1,4 +1,4 @@
-# core/models.py - ARCHIVO CORREGIDO
+# core/models.py - ACTUALIZADO con relación Oposicion-Tema
 
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -25,20 +25,90 @@ class Oposicion(models.Model):
     
     def __str__(self):
         return self.nombre
+    
+    @property
+    def total_temas(self):
+        """Cuenta total de temas asociados"""
+        return self.temas.count()
+    
+    @property
+    def total_estudiantes(self):
+        """Cuenta total de estudiantes con acceso"""
+        return self.alumnos_con_acceso.count()
+
 
 class Tema(models.Model):
     nombre = models.CharField(max_length=200)
+    descripcion = models.TextField(blank=True, help_text="Descripción del tema")
+    
+    # RELACIÓN MANY-TO-MANY CON OPOSICIONES
+    oposiciones = models.ManyToManyField(
+        Oposicion,
+        blank=True,
+        related_name='temas',
+        help_text="Oposiciones a las que pertenece este tema"
+    )
+    
     alumnos_con_acceso = models.ManyToManyField(
         User,
         limit_choices_to={'user_type': 'student'},
         blank=True,
         related_name='temas_acceso'
     )
+    
+    # Campos adicionales para organización
+    orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en la oposición")
+    es_obligatorio = models.BooleanField(default=True, help_text="Si es obligatorio para aprobar")
+    peso_evaluacion = models.PositiveIntegerField(default=1, help_text="Peso en la evaluación (1-10)")
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        ordering = ['orden', 'nombre']
+    
     def __str__(self):
         return self.nombre
+    
+    @property
+    def total_oposiciones(self):
+        """Cuenta total de oposiciones asociadas"""
+        return self.oposiciones.count()
+    
+    @property
+    def total_estudiantes(self):
+        """Cuenta total de estudiantes con acceso"""
+        return self.alumnos_con_acceso.count()
+    
+    def get_oposiciones_list(self):
+        """Devuelve lista de nombres de oposiciones"""
+        return ", ".join([op.nombre for op in self.oposiciones.all()[:3]]) + \
+               (f" (+{self.oposiciones.count() - 3} más)" if self.oposiciones.count() > 3 else "")
+
+
+# Modelo intermedio opcional para datos adicionales de la relación
+class TemaOposicion(models.Model):
+    """Modelo intermedio para datos adicionales de la relación Tema-Oposición"""
+    tema = models.ForeignKey(Tema, on_delete=models.CASCADE)
+    oposicion = models.ForeignKey(Oposicion, on_delete=models.CASCADE)
+    
+    # Campos específicos de la relación
+    orden_en_oposicion = models.PositiveIntegerField(default=0)
+    es_obligatorio_en_oposicion = models.BooleanField(default=True)
+    peso_en_oposicion = models.PositiveIntegerField(default=1, help_text="Peso específico en esta oposición")
+    fecha_inicio_tema = models.DateField(null=True, blank=True, help_text="Cuándo se empieza este tema")
+    fecha_fin_tema = models.DateField(null=True, blank=True, help_text="Cuándo se termina este tema")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['tema', 'oposicion']
+        ordering = ['orden_en_oposicion', 'tema__nombre']
+        verbose_name = "Tema en Oposición"
+        verbose_name_plural = "Temas en Oposiciones"
+    
+    def __str__(self):
+        return f"{self.tema.nombre} - {self.oposicion.nombre}"
 
 
 class TipoArchivo(models.TextChoices):
@@ -295,7 +365,7 @@ from .models_preparacion_fisica import (
 # Hacer que todos los modelos estén disponibles en este módulo
 __all__ = [
     # Modelos base
-    'Oposicion', 'Tema', 'TipoArchivo', 'ArchivoOposicion', 'ArchivoTema', 
+    'Oposicion', 'Tema', 'TemaOposicion', 'TipoArchivo', 'ArchivoOposicion', 'ArchivoTema', 
     'DescargaArchivo', 'ProgresoEstudiante',
     
     # Modelos de evaluaciones
