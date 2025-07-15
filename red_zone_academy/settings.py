@@ -108,6 +108,7 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
+LOGOUT_URL = '/auth/logout/'
 
 # Messages Framework
 from django.contrib.messages import constants as messages

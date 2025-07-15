@@ -24,12 +24,7 @@
                         Información del Tema
                     </h3>
                     <div>
-                        {% if tema.es_obligatorio %}
-                            <span class="badge bg-danger">Obligatorio</span>
-                        {% else %}
-                            <span class="badge bg-warning">Opcional</span>
-                        {% endif %}
-                        <span class="badge bg-info">Peso: {{ tema.peso_evaluacion }}/10</span>
+                        <span class="badge bg-danger">Obligatorio</span>
                         <span class="badge bg-secondary">Orden: {{ tema.orden }}</span>
                     </div>
                 </div>
@@ -213,8 +208,8 @@
                     <div class="col-6">
                         <div class="card bg-light">
                             <div class="card-body">
-                                <h4 class="text-warning">{{ tema.peso_evaluacion }}</h4>
-                                <small class="text-muted">Peso</small>
+                                <h4 class="text-warning">{{ tema.orden }}</h4>
+                                <small class="text-muted">Orden</small>
                             </div>
                         </div>
                     </div>
@@ -225,16 +220,8 @@
                     <h6 class="mb-3">Configuración</h6>
                     <ul class="list-unstyled">
                         <li class="mb-2">
-                            <i class="bi bi-check-circle {% if tema.es_obligatorio %}text-danger{% else %}text-warning{% endif %} me-2"></i>
-                            {% if tema.es_obligatorio %}
-                                <strong>Obligatorio</strong>
-                            {% else %}
-                                <strong>Opcional</strong>
-                            {% endif %}
-                        </li>
-                        <li class="mb-2">
-                            <i class="bi bi-trophy text-warning me-2"></i>
-                            <strong>Peso:</strong> {{ tema.peso_evaluacion }}/10
+                            <i class="bi bi-check-circle text-danger me-2"></i>
+                            <strong>Obligatorio</strong>
                         </li>
                         <li class="mb-2">
                             <i class="bi bi-sort-numeric-up text-info me-2"></i>

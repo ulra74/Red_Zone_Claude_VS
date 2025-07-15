@@ -97,4 +97,114 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                            
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="Navegación de páginas">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">
+                                            <i class="bi bi-chevron-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                            <i class="bi bi-chevron-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Estado vacío -->
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-book text-muted" style="font-size: 5rem;"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">No hay oposiciones disponibles</h3>
+                        <p class="text-muted mb-4">
+                            {% if user.is_admin %}
+                                Crea la primera oposición para comenzar.
+                            {% else %}
+                                Aún no tienes oposiciones asignadas. Contacta con el administrador.
+                            {% endif %}
+                        </p>
+                        {% if user.is_admin %}
+                            <a href="{% url 'core:admin_oposicion_create' %}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                Crear Primera Oposición
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.oposicion-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.oposicion-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(220,38,38,0.15) !important;
+}
+
+.page-link {
+    color: var(--rza-primary);
+    border-color: #dee2e6;
+}
+
+.page-link:hover {
+    color: var(--rza-secondary);
+    background-color: #fef2f2;
+    border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+    background: var(--rza-gradient);
+    border-color: var(--rza-primary);
+}
+</style>
+{% endblock %}

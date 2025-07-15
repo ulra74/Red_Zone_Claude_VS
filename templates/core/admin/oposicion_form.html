@@ -91,11 +91,19 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="{{ form.fecha_convocatoria.id_for_label }}" class="form-label fw-semibold">
                                         <i class="bi bi-calendar me-2"></i>Fecha de Convocatoria
+                                        {% if object %}
+                                            <span class="badge bg-secondary ms-2">Solo lectura</span>
+                                        {% endif %}
                                     </label>
                                     {{ form.fecha_convocatoria }}
                                     {% if form.fecha_convocatoria.errors %}
                                         <div class="text-danger small mt-1">
                                             {{ form.fecha_convocatoria.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    {% if form.fecha_convocatoria.help_text %}
+                                        <div class="form-text">
+                                            {{ form.fecha_convocatoria.help_text }}
                                         </div>
                                     {% endif %}
                                 </div>

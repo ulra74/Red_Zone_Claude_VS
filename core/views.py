@@ -25,15 +25,18 @@ class AdminRequiredMixin(UserPassesTestMixin):
 
 
 class HomeView(TemplateView):
-    """Vista de la página principal"""
-    template_name = 'core/home.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Red Zone Academy'
-        context['oposiciones_count'] = Oposicion.objects.count()
-        context['temas_count'] = Tema.objects.count()
-        return context
+    """Vista de la página principal - redirige directamente al login o dashboard"""
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Si el usuario está autenticado, redirigir al dashboard
+        if request.user.is_authenticated:
+            return redirect('core:dashboard')
+        else:
+            # Si no está autenticado, redirigir al login
+            return redirect('accounts:login')
+        
+        # Este código nunca se ejecutará, pero lo dejamos por consistencia
+        return super().dispatch(request, *args, **kwargs)
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -64,6 +67,21 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             context['total_temas'] = Tema.objects.count()
             context['total_estudiantes'] = CustomUser.objects.filter(user_type='student').count()
             context['oposiciones_recientes'] = Oposicion.objects.prefetch_related('temas').order_by('-created_at')[:5]
+            context['temas_recientes'] = Tema.objects.prefetch_related('oposiciones').order_by('-created_at')[:5]
+            
+            # Estadísticas adicionales para admin
+            from core.models import ArchivoOposicion, ArchivoTema
+            context['total_archivos_oposiciones'] = ArchivoOposicion.objects.count()
+            context['total_archivos_temas'] = ArchivoTema.objects.count()
+            
+            # Accesos rápidos
+            context['accesos_rapidos'] = [
+                {'name': 'Crear Oposición', 'url': 'core:admin_oposicion_create', 'icon': 'bi-plus-circle'},
+                {'name': 'Crear Tema', 'url': 'core:admin_tema_create', 'icon': 'bi-journal-plus'},
+                {'name': 'Gestionar Usuarios', 'url': 'core:admin_user_list', 'icon': 'bi-people'},
+                {'name': 'Ver Oposiciones', 'url': 'core:admin_oposicion_list', 'icon': 'bi-fire'},
+                {'name': 'Ver Temas', 'url': 'core:admin_tema_list', 'icon': 'bi-book'},
+            ]
             
         return context
 
@@ -175,7 +193,8 @@ class TemaDetailView(LoginRequiredMixin, DetailView):
 
 
 # Formularios actualizados
-class OposicionForm(forms.ModelForm):
+class OposicionCreateForm(forms.ModelForm):
+    """Formulario para crear oposiciones"""
     class Meta:
         model = Oposicion
         fields = ['nombre', 'descripcion', 'fecha_convocatoria', 'alumnos_con_acceso']
@@ -189,30 +208,49 @@ class OposicionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['alumnos_con_acceso'].queryset = CustomUser.objects.filter(user_type='student')
+        self.fields['fecha_convocatoria'].help_text = "Fecha de la convocatoria oficial"
+
+
+class OposicionUpdateForm(forms.ModelForm):
+    """Formulario para editar oposiciones"""
+    class Meta:
+        model = Oposicion
+        fields = ['nombre', 'descripcion', 'fecha_convocatoria', 'alumnos_con_acceso']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'fecha_convocatoria': forms.DateInput(attrs={
+                'class': 'form-control', 
+                'type': 'date',
+                'readonly': True,
+                'style': 'background-color: #f8f9fa; cursor: not-allowed;'
+            }),
+            'alumnos_con_acceso': forms.CheckboxSelectMultiple(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['alumnos_con_acceso'].queryset = CustomUser.objects.filter(user_type='student')
+        self.fields['fecha_convocatoria'].help_text = "La fecha de convocatoria no puede modificarse una vez creada"
+        self.fields['fecha_convocatoria'].disabled = True
 
 
 class TemaForm(forms.ModelForm):
     class Meta:
         model = Tema
-        fields = ['nombre', 'descripcion', 'oposiciones', 'alumnos_con_acceso', 'orden', 'es_obligatorio', 'peso_evaluacion']
+        fields = ['nombre', 'descripcion', 'oposiciones', 'alumnos_con_acceso', 'orden']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'oposiciones': forms.CheckboxSelectMultiple(),
             'alumnos_con_acceso': forms.CheckboxSelectMultiple(),
             'orden': forms.NumberInput(attrs={'class': 'form-control'}),
-            'peso_evaluacion': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 10}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['alumnos_con_acceso'].queryset = CustomUser.objects.filter(user_type='student')
         self.fields['oposiciones'].queryset = Oposicion.objects.all()
-        
-        # Configurar checkbox para es_obligatorio
-        self.fields['es_obligatorio'].widget = forms.CheckboxInput(attrs={
-            'class': 'form-check-input'
-        })
 
 
 # Formulario para gestionar temas en una oposición específica
@@ -254,7 +292,7 @@ class AdminOposicionListView(AdminRequiredMixin, ListView):
 class AdminOposicionCreateView(AdminRequiredMixin, CreateView):
     """Crear oposición"""
     model = Oposicion
-    form_class = OposicionForm
+    form_class = OposicionCreateForm
     template_name = 'core/admin/oposicion_form.html'
     success_url = reverse_lazy('core:admin_oposicion_list')
 
@@ -272,7 +310,7 @@ class AdminOposicionCreateView(AdminRequiredMixin, CreateView):
 class AdminOposicionUpdateView(AdminRequiredMixin, UpdateView):
     """Editar oposición"""
     model = Oposicion
-    form_class = OposicionForm
+    form_class = OposicionUpdateForm
     template_name = 'core/admin/oposicion_form.html'
     success_url = reverse_lazy('core:admin_oposicion_list')
 

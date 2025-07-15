@@ -58,8 +58,6 @@ class Tema(models.Model):
     
     # Campos adicionales para organización
     orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en la oposición")
-    es_obligatorio = models.BooleanField(default=True, help_text="Si es obligatorio para aprobar")
-    peso_evaluacion = models.PositiveIntegerField(default=1, help_text="Peso en la evaluación (1-10)")
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

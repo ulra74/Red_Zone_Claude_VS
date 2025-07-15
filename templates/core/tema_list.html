@@ -59,7 +59,6 @@
                             <option value="orden" {% if request.GET.orden == 'orden' %}selected{% endif %}>Orden</option>
                             <option value="nombre" {% if request.GET.orden == 'nombre' %}selected{% endif %}>Nombre A-Z</option>
                             <option value="-nombre" {% if request.GET.orden == '-nombre' %}selected{% endif %}>Nombre Z-A</option>
-                            <option value="-peso_evaluacion" {% if request.GET.orden == '-peso_evaluacion' %}selected{% endif %}>Mayor peso</option>
                             <option value="-created_at" {% if request.GET.orden == '-created_at' %}selected{% endif %}>Más recientes</option>
                         </select>
                     </div>
@@ -90,11 +89,7 @@
                             </h5>
                             <div>
                                 <span class="badge bg-secondary">{{ tema.orden }}</span>
-                                {% if tema.es_obligatorio %}
-                                    <span class="badge bg-danger">Obligatorio</span>
-                                {% else %}
-                                    <span class="badge bg-warning">Opcional</span>
-                                {% endif %}
+                                <span class="badge bg-danger">Obligatorio</span>
                             </div>
                         </div>
                         
@@ -105,17 +100,6 @@
                                 </p>
                             {% endif %}
                             
-                            <!-- Peso del Tema -->
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <small class="text-muted">Peso en evaluación:</small>
-                                    <span class="badge bg-info">{{ tema.peso_evaluacion }}/10</span>
-                                </div>
-                                <div class="progress" style="height: 6px;">
-                                    <div class="progress-bar bg-info" 
-                                         style="width: {{ tema.peso_evaluacion|mul:10 }}%"></div>
-                                </div>
-                            </div>
 
                             <!-- Oposiciones Relacionadas -->
                             <div class="mb-3">

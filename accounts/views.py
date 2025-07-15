@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from django.contrib.auth.views import LoginView
+from django.contrib.auth import login, logout
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import UpdateView, DetailView
 from django.urls import reverse_lazy
@@ -75,3 +75,23 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, 'Perfil actualizado correctamente.')
         return super().form_valid(form)
+
+
+class CustomLogoutView(LogoutView):
+    """Vista de logout personalizada"""
+    http_method_names = ['get', 'post']
+    
+    def get(self, request, *args, **kwargs):
+        # Permitir logout por GET
+        return self.post(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        # Añadir mensaje de despedida
+        if request.user.is_authenticated:
+            messages.success(request, f'¡Hasta pronto, {request.user.get_full_name() or request.user.username}!')
+        
+        # Llamar al logout original
+        logout(request)
+        
+        # Redirigir a home
+        return redirect('home')

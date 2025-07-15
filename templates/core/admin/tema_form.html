@@ -72,6 +72,107 @@
                                         Nombre descriptivo del tema de estudio
                                     </div>
                                 </div>
+
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-file-text me-2"></i>Descripción del Tema
+                                    </label>
+                                    {{ form.descripcion }}
+                                    {% if form.descripcion.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.descripcion.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Descripción detallada del contenido del tema
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Configuración del Tema -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-info mb-3">
+                                        <i class="bi bi-gear me-2"></i>
+                                        Configuración del Tema
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.orden.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-list-ol me-2"></i>Orden de Aparición
+                                    </label>
+                                    {{ form.orden }}
+                                    {% if form.orden.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.orden.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Orden en que aparece el tema (0 = primero)
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="alert alert-info border-0 mt-4">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            <div>
+                                                <small class="mb-0">
+                                                    <strong>Nota:</strong> Todos los temas son obligatorios y tienen la misma importancia en la evaluación.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Relación con Oposiciones -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-info mb-3">
+                                        <i class="bi bi-trophy me-2"></i>
+                                        Oposiciones Relacionadas
+                                    </h6>
+                                    
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body">
+                                            <label class="form-label fw-semibold mb-3">
+                                                Seleccionar oposiciones donde aparece este tema:
+                                            </label>
+                                            
+                                            <div class="oposicion-selection">
+                                                {% for choice in form.oposiciones %}
+                                                    <div class="form-check mb-2">
+                                                        {{ choice.tag }}
+                                                        <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                                                    <i class="bi bi-fire text-primary"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="fw-semibold">{{ choice.choice_label }}</div>
+                                                                    <small class="text-muted">Oposición activa</small>
+                                                                </div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                            
+                                            {% if form.oposiciones.errors %}
+                                                <div class="text-danger small mt-2">
+                                                    {{ form.oposiciones.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <div class="form-text mt-3">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                Puedes seleccionar múltiples oposiciones. Este tema aparecerá en todas las seleccionadas.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Acceso de Estudiantes -->
@@ -146,7 +247,8 @@
 </div>
 
 <style>
-.student-selection {
+.student-selection,
+.oposicion-selection {
     max-height: 300px;
     overflow-y: auto;
     border: 1px solid #e9ecef;
@@ -186,30 +288,41 @@
 <script>
 // Agregar funcionalidad de seleccionar todos/ninguno
 document.addEventListener('DOMContentLoaded', function() {
-    // Crear botones de control
-    const studentSelection = document.querySelector('.student-selection');
-    if (studentSelection) {
+    // Función para crear controles de selección
+    function createSelectionControls(container, prefix) {
         const controlDiv = document.createElement('div');
         controlDiv.className = 'mb-3 d-flex gap-2';
         controlDiv.innerHTML = `
-            <button type="button" class="btn btn-sm btn-outline-info" id="selectAll">
+            <button type="button" class="btn btn-sm btn-outline-info" id="${prefix}SelectAll">
                 <i class="bi bi-check-all me-1"></i>Seleccionar Todos
             </button>
-            <button type="button" class="btn btn-sm btn-outline-secondary" id="selectNone">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="${prefix}SelectNone">
                 <i class="bi bi-x me-1"></i>Quitar Todos
             </button>
         `;
         
-        studentSelection.parentNode.insertBefore(controlDiv, studentSelection);
+        container.parentNode.insertBefore(controlDiv, container);
         
         // Funcionalidad de los botones
-        document.getElementById('selectAll').addEventListener('click', function() {
-            studentSelection.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+        document.getElementById(`${prefix}SelectAll`).addEventListener('click', function() {
+            container.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
         });
         
-        document.getElementById('selectNone').addEventListener('click', function() {
-            studentSelection.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        document.getElementById(`${prefix}SelectNone`).addEventListener('click', function() {
+            container.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
         });
+    }
+    
+    // Controles para oposiciones
+    const oposicionSelection = document.querySelector('.oposicion-selection');
+    if (oposicionSelection) {
+        createSelectionControls(oposicionSelection, 'oposicion');
+    }
+    
+    // Controles para estudiantes
+    const studentSelection = document.querySelector('.student-selection');
+    if (studentSelection) {
+        createSelectionControls(studentSelection, 'student');
     }
 });
 </script>

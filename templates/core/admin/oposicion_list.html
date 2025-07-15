@@ -97,7 +97,7 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                                        </div>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
@@ -164,10 +164,12 @@
                         <p class="text-muted mb-4">
                             Crea la primera oposición para comenzar.
                         </p>
-                        <a href="{% url 'core:admin_oposicion_create' %}" class="btn btn-primary btn-lg">
-                            <i class="bi bi-plus-circle me-2"></i>
-                            Crear Primera Oposición
-                        </a>
+                        {% if user.is_admin %}
+                            <a href="{% url 'core:admin_oposicion_create' %}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                Crear Primera Oposición
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -289,21 +289,21 @@ class TemaAdmin(admin.ModelAdmin):
     
     list_display = (
         'nombre', 'oposiciones_count', 'estudiantes_count', 'archivos_count', 
-        'examenes_count', 'orden', 'es_obligatorio', 'created_at'
+        'examenes_count', 'orden', 'created_at'
     )
-    list_filter = ('es_obligatorio', 'peso_evaluacion', 'created_at', 'updated_at')
+    list_filter = ('created_at', 'updated_at')
     search_fields = ('nombre', 'descripcion')
     date_hierarchy = 'created_at'
     ordering = ('orden', 'nombre')
     inlines = [OposicionTemaInline, ArchivoTemaInline]
-    list_editable = ('orden', 'es_obligatorio')
+    list_editable = ('orden',)
     
     fieldsets = (
         ('Información General', {
             'fields': ('nombre', 'descripcion')
         }),
         ('Configuración', {
-            'fields': ('orden', 'es_obligatorio', 'peso_evaluacion')
+            'fields': ('orden',)
         }),
         ('Relaciones', {
             'fields': ('alumnos_con_acceso',),

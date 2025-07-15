@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0 text-danger">
+                        <i class="bi bi-trash me-3"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Confirma la eliminación del archivo
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'core:tema_detail' object.tema.pk %}" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver al Tema
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Alerta de confirmación -->
+                <div class="alert alert-danger border-0 shadow-sm mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill me-3 fs-2"></i>
+                        <div>
+                            <h5 class="alert-heading mb-1">¡Atención!</h5>
+                            <p class="mb-0">
+                                Esta acción no se puede deshacer. El archivo será eliminado permanentemente del sistema.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información del archivo a eliminar -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0">
+                            <i class="bi bi-file-earmark-text text-info me-2"></i>
+                            Archivo a Eliminar
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2 text-center">
+                                <div class="file-icon mb-3">
+                                    {% if object.tipo == 'pdf' %}
+                                        <i class="bi bi-file-pdf text-danger" style="font-size: 4rem;"></i>
+                                    {% elif object.tipo == 'documento' %}
+                                        <i class="bi bi-file-word text-primary" style="font-size: 4rem;"></i>
+                                    {% elif object.tipo == 'presentacion' %}
+                                        <i class="bi bi-file-ppt text-warning" style="font-size: 4rem;"></i>
+                                    {% elif object.tipo == 'video' %}
+                                        <i class="bi bi-file-play text-success" style="font-size: 4rem;"></i>
+                                    {% elif object.tipo == 'audio' %}
+                                        <i class="bi bi-file-music text-info" style="font-size: 4rem;"></i>
+                                    {% elif object.tipo == 'imagen' %}
+                                        <i class="bi bi-file-image text-secondary" style="font-size: 4rem;"></i>
+                                    {% else %}
+                                        <i class="bi bi-file-earmark text-muted" style="font-size: 4rem;"></i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <h6 class="fw-bold mb-2">{{ object.nombre }}</h6>
+                                
+                                {% if object.descripcion %}
+                                <p class="text-muted mb-3">{{ object.descripcion }}</p>
+                                {% endif %}
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                        <strong>Tema:</strong>
+                                        <span class="text-info">{{ object.tema.nombre }}</span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <strong>Tipo:</strong>
+                                        {% if object.tipo == 'pdf' %}
+                                            <span class="badge bg-danger">PDF</span>
+                                        {% elif object.tipo == 'documento' %}
+                                            <span class="badge bg-primary">DOC</span>
+                                        {% elif object.tipo == 'presentacion' %}
+                                            <span class="badge bg-warning">PPT</span>
+                                        {% elif object.tipo == 'video' %}
+                                            <span class="badge bg-success">VIDEO</span>
+                                        {% elif object.tipo == 'audio' %}
+                                            <span class="badge bg-info">AUDIO</span>
+                                        {% elif object.tipo == 'imagen' %}
+                                            <span class="badge bg-secondary">IMG</span>
+                                        {% else %}
+                                            <span class="badge bg-muted">OTRO</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                        <strong>Tamaño:</strong>
+                                        <span class="text-muted">{{ object.tamaño_legible }}</span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <strong>Descargas:</strong>
+                                        <span class="text-primary">{{ object.descargas }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                        <strong>Orden:</strong>
+                                        <span class="text-muted">{{ object.orden }}</span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <strong>Visibilidad:</strong>
+                                        {% if object.es_publico %}
+                                            <span class="badge bg-success">Público</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Privado</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <strong>Subido por:</strong>
+                                        <span class="text-muted">{{ object.subido_por.get_full_name|default:object.subido_por.username }}</span>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <strong>Fecha:</strong>
+                                        <span class="text-muted">{{ object.fecha_subida|date:"d/m/Y H:i" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Información Adicional
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <strong>Tema afectado:</strong><br>
+                                    <span class="text-info">{{ object.tema.nombre }}</span>
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Oposiciones relacionadas:</strong><br>
+                                    <span class="text-muted">{{ object.tema.get_oposiciones_list }}</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <strong>Estudiantes con acceso:</strong><br>
+                                    <span class="text-muted">{{ object.tema.alumnos_con_acceso.count }} estudiantes</span>
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Total archivos en tema:</strong><br>
+                                    <span class="text-muted">{{ object.tema.archivos.count }} archivos</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario de confirmación -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="text-center mb-4">
+                                <h6 class="fw-bold text-danger">¿Estás seguro de que quieres eliminar este archivo?</h6>
+                                <p class="text-muted">
+                                    Esta acción eliminará permanentemente el archivo "{{ object.nombre }}" del tema "{{ object.tema.nombre }}".
+                                </p>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'core:tema_detail' object.tema.pk %}" class="btn btn-light btn-lg">
+                                    <i class="bi bi-x-circle me-2"></i>
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="bi bi-trash me-2"></i>
+                                    Eliminar Archivo
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    padding: 2rem 0;
+}
+
+.file-icon {
+    opacity: 0.8;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    border: none;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+    transform: translateY(-1px);
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Añadir confirmación extra en el submit
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        if (!confirm('¿Estás completamente seguro? Esta acción no se puede deshacer.')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}
