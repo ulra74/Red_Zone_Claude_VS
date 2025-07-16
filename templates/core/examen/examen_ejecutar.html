@@ -1,0 +1,589 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .exam-container {
+        padding-top: 2rem;
+        min-height: calc(100vh - 120px);
+    }
+    
+    .exam-sidebar {
+        position: relative;
+        top: 0;
+    }
+    
+    .exam-sidebar .card {
+        margin-top: 1rem;
+    }
+    
+    .exam-main-content {
+        position: relative;
+        top: 0;
+    }
+    
+    .exam-main-content .card {
+        margin-top: 1rem;
+    }
+    
+    /* Asegurar separación del navbar */
+    @media (min-width: 768px) {
+        .exam-sidebar .card.sticky-top {
+            top: 100px;
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .exam-sidebar .card.sticky-top {
+            position: relative;
+            top: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="container-fluid exam-container">
+    <div class="row">
+        <!-- Sidebar con progreso -->
+        <div class="col-md-3 exam-sidebar">
+            <div class="card sticky-top">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-list-check me-2"></i>
+                        Progreso del Examen
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">Pregunta actual</small>
+                        <div class="progress mb-2" style="height: 10px;">
+                            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span id="currentQuestion">1</span>
+                            <span>/</span>
+                            <span id="totalQuestions">{{ total_preguntas }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">Tiempo restante</small>
+                        <div class="h5 mb-0" id="timeDisplay">
+                            {% if examen.tiempo_por_pregunta > 0 %}
+                                {{ examen.tiempo_por_pregunta }}s
+                            {% else %}
+                                Sin límite
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">Información del examen</small>
+                        <ul class="list-unstyled small mt-2">
+                            <li><strong>Tipo:</strong> {{ examen.get_tipo_display }}</li>
+                            <li><strong>Aclaraciones:</strong> {{ examen.get_tipo_aclaracion_display }}</li>
+                            <li><strong>Temas:</strong> {{ examen.temas_seleccionados.count }}</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Botones de control -->
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-warning btn-sm" onclick="pauseExam()">
+                            <i class="bi bi-pause me-1"></i>Pausar
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="finishExam()">
+                            <i class="bi bi-flag me-1"></i>Finalizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contenido principal -->
+        <div class="col-md-9 exam-main-content">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ examen.nombre }}</h5>
+                    <div>
+                        <span class="badge bg-primary">Pregunta <span id="questionNumber">1</span></span>
+                    </div>
+                </div>
+                
+                <div class="card-body" id="questionContainer">
+                    <!-- Las preguntas se cargarán aquí dinámicamente -->
+                    {% if not preguntas %}
+                        <div class="alert alert-warning">
+                            <h5>No hay preguntas disponibles</h5>
+                            <p>Este examen no tiene preguntas disponibles.</p>
+                            <a href="{% url 'core:examen_config' %}" class="btn btn-primary">Configurar Nuevo Examen</a>
+                        </div>
+                    {% else %}
+                        <div class="text-center">
+                            <i class="bi bi-hourglass-split fs-1 text-muted"></i>
+                            <p class="mt-3">Cargando pregunta...</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
+                            <i class="bi bi-arrow-left me-2"></i>Anterior
+                        </button>
+                        <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+                            Siguiente<i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para mostrar aclaraciones inmediatas -->
+<div class="modal fade" id="aclaracionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Aclaración
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="aclaracionContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="continueToNextQuestion()">
+                    Continuar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para finalizar -->
+<div class="modal fade" id="finishModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Finalizar Examen
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que quieres finalizar el examen?</p>
+                <p class="text-muted small">Has respondido <span id="answeredCount">0</span> de {{ total_preguntas }} preguntas.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="confirmFinishExam()">
+                    <i class="bi bi-flag me-2"></i>Finalizar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Datos de preguntas en JSON -->
+<script id="preguntas-data" type="application/json">{{ preguntas_json|safe }}</script>
+
+<script>
+// Get CSRF token
+const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+
+// Variables globales
+let currentQuestionIndex = 0;
+let timer = null;
+let timeLeft = {{ examen.tiempo_por_pregunta }};
+let answers = {};
+let startTime = Date.now();
+let questionStartTime = Date.now();
+
+// Configuración del examen
+const examConfig = {
+    id: {{ examen.id }},
+    tipo: '{{ examen.tipo }}',
+    tipoAclaracion: '{{ examen.tipo_aclaracion }}',
+    tiempoPorPregunta: {{ examen.tiempo_por_pregunta }},
+    totalPreguntas: {{ total_preguntas }}
+};
+
+// Datos de preguntas - usando script tag para mayor seguridad
+let questionData = [];
+try {
+    const scriptElement = document.getElementById('preguntas-data');
+    if (!scriptElement) {
+        throw new Error('No se encontró el elemento con las preguntas');
+    }
+    
+    const jsonText = scriptElement.textContent;
+    console.log('Contenido JSON:', jsonText.substring(0, 200) + '...');
+    
+    questionData = JSON.parse(jsonText);
+    console.log('Preguntas cargadas:', questionData.length);
+    if (questionData.length > 0) {
+        console.log('Primera pregunta:', questionData[0]);
+    }
+} catch (e) {
+    console.error('Error al cargar preguntas:', e);
+    console.error('Texto del script:', document.getElementById('preguntas-data')?.textContent);
+    alert('Error al cargar las preguntas del examen. Por favor, recarga la página.');
+}
+
+// Función para mezclar array
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// Función para decodificar HTML entities
+function decodeHtmlEntities(text) {
+    const textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    return textArea.value;
+}
+
+// Inicializar examen
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Inicializando examen...');
+    console.log('Preguntas disponibles:', questionData.length);
+    
+    if (questionData.length === 0) {
+        console.error('No hay preguntas disponibles');
+        document.getElementById('questionContainer').innerHTML = 
+            '<div class="alert alert-danger">No hay preguntas disponibles para este examen.</div>';
+        return;
+    }
+    
+    // Mezclar respuestas para cada pregunta
+    questionData.forEach(question => {
+        if (question.respuestas && question.respuestas.length > 0) {
+            question.respuestas = shuffleArray(question.respuestas);
+        }
+    });
+    
+    loadQuestion(0);
+    updateProgress();
+    if (examConfig.tiempoPorPregunta > 0) {
+        startTimer();
+    }
+});
+
+// Cargar pregunta
+function loadQuestion(index) {
+    console.log('Cargando pregunta:', index);
+    
+    if (index >= questionData.length) {
+        console.error('Índice de pregunta fuera de rango');
+        return;
+    }
+    
+    const question = questionData[index];
+    console.log('Pregunta:', question);
+    
+    let html = `
+        <div class="mb-4">
+            <h4 class="mb-3">Pregunta ${index + 1}</h4>
+            <div class="question-text p-3 bg-light rounded">
+                ${decodeHtmlEntities(question.enunciado)}
+            </div>
+        </div>
+        
+        <div class="answers-container">
+            <h6 class="mb-3">Selecciona una respuesta:</h6>
+    `;
+    
+    if (question.respuestas && question.respuestas.length > 0) {
+        question.respuestas.forEach((respuesta, i) => {
+            const isSelected = answers[question.id] === respuesta.id;
+            html += `
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="respuesta" 
+                           id="respuesta_${respuesta.id}" value="${respuesta.id}" 
+                           ${isSelected ? 'checked' : ''} 
+                           onchange="selectAnswer(${question.id}, ${respuesta.id})">
+                    <label class="form-check-label" for="respuesta_${respuesta.id}">
+                        ${decodeHtmlEntities(respuesta.texto)}
+                    </label>
+                </div>
+            `;
+        });
+    } else {
+        html += '<div class="alert alert-warning">No hay respuestas disponibles para esta pregunta.</div>';
+    }
+    
+    html += '</div>';
+    
+    document.getElementById('questionContainer').innerHTML = html;
+    document.getElementById('questionNumber').textContent = index + 1;
+    document.getElementById('currentQuestion').textContent = index + 1;
+    
+    // Reset timer for this question
+    questionStartTime = Date.now();
+    if (examConfig.tiempoPorPregunta > 0) {
+        timeLeft = examConfig.tiempoPorPregunta;
+        updateTimeDisplay();
+    }
+    
+    // Update navigation buttons
+    updateNavigationButtons();
+}
+
+// Seleccionar respuesta
+function selectAnswer(questionId, answerId) {
+    console.log('Respuesta seleccionada:', questionId, answerId);
+    answers[questionId] = answerId;
+    updateAnsweredCount();
+}
+
+// Actualizar contador de respuestas
+function updateAnsweredCount() {
+    const count = Object.keys(answers).length;
+    document.getElementById('answeredCount').textContent = count;
+}
+
+// Actualizar progreso
+function updateProgress() {
+    const progress = ((currentQuestionIndex + 1) / examConfig.totalPreguntas) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+}
+
+// Actualizar botones de navegación
+function updateNavigationButtons() {
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    prevBtn.disabled = currentQuestionIndex === 0;
+    
+    if (currentQuestionIndex === questionData.length - 1) {
+        nextBtn.innerHTML = '<i class="bi bi-flag me-2"></i>Finalizar';
+        nextBtn.onclick = finishExam;
+    } else {
+        nextBtn.innerHTML = 'Siguiente<i class="bi bi-arrow-right ms-2"></i>';
+        nextBtn.onclick = nextQuestion;
+    }
+}
+
+// Iniciar temporizador
+function startTimer() {
+    if (examConfig.tiempoPorPregunta === 0) {
+        document.getElementById('timeDisplay').textContent = 'Sin límite';
+        return;
+    }
+    
+    // Limpiar temporizador anterior si existe
+    if (timer) {
+        clearInterval(timer);
+    }
+    
+    timer = setInterval(() => {
+        timeLeft--;
+        updateTimeDisplay();
+        
+        if (timeLeft <= 0) {
+            handleTimeout();
+        }
+    }, 1000);
+}
+
+// Actualizar display de tiempo
+function updateTimeDisplay() {
+    if (examConfig.tiempoPorPregunta === 0) {
+        document.getElementById('timeDisplay').textContent = 'Sin límite';
+        return;
+    }
+    
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    const display = minutes > 0 ? `${minutes}:${seconds.toString().padStart(2, '0')}` : `${seconds}s`;
+    
+    document.getElementById('timeDisplay').textContent = display;
+    
+    // Cambiar color si queda poco tiempo
+    const timeDisplay = document.getElementById('timeDisplay');
+    if (timeLeft <= 10) {
+        timeDisplay.className = 'h5 mb-0 text-danger';
+    } else if (timeLeft <= 30) {
+        timeDisplay.className = 'h5 mb-0 text-warning';
+    } else {
+        timeDisplay.className = 'h5 mb-0';
+    }
+}
+
+// Manejar timeout
+function handleTimeout() {
+    clearInterval(timer);
+    const currentQuestion = questionData[currentQuestionIndex];
+    
+    // Enviar respuesta como timeout
+    sendAnswer(currentQuestion.id, null, true);
+    
+    // Ir a la siguiente pregunta
+    if (currentQuestionIndex < questionData.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+        updateProgress();
+        if (examConfig.tiempoPorPregunta > 0) {
+            startTimer();
+        }
+    } else {
+        finishExam();
+    }
+}
+
+// Enviar respuesta al servidor
+function sendAnswer(questionId, answerId, isTimeout = false) {
+    const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
+    
+    const formData = new FormData();
+    formData.append('csrfmiddlewaretoken', csrfToken);
+    formData.append('pregunta_id', questionId);
+    formData.append('respuesta_id', answerId || '');
+    formData.append('tiempo_empleado', timeSpent);
+    formData.append('orden_pregunta', currentQuestionIndex + 1);
+    formData.append('timeout', isTimeout ? 'true' : 'false');
+    
+    fetch(`/dashboard/examenes-test/${examConfig.id}/responder/`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && examConfig.tipoAclaracion === 'inmediata' && !isTimeout) {
+            showAclaracion(data);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+// Mostrar aclaración inmediata
+function showAclaracion(data) {
+    let content = '';
+    
+    if (data.es_correcta) {
+        content += '<div class="alert alert-success"><i class="bi bi-check-circle me-2"></i><strong>¡Correcto!</strong></div>';
+    } else {
+        content += '<div class="alert alert-danger"><i class="bi bi-x-circle me-2"></i><strong>Incorrecto</strong></div>';
+    }
+    
+    if (data.texto_aclaratorio) {
+        content += `<div class="mb-3"><strong>Explicación:</strong><br>${decodeHtmlEntities(data.texto_aclaratorio)}</div>`;
+    }
+    
+    if (data.explicacion_respuesta) {
+        content += `<div class="mb-3"><strong>Sobre tu respuesta:</strong><br>${decodeHtmlEntities(data.explicacion_respuesta)}</div>`;
+    }
+    
+    document.getElementById('aclaracionContent').innerHTML = content;
+    new bootstrap.Modal(document.getElementById('aclaracionModal')).show();
+}
+
+// Continuar a la siguiente pregunta después de la aclaración
+function continueToNextQuestion() {
+    if (currentQuestionIndex < questionData.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+        updateProgress();
+        if (examConfig.tiempoPorPregunta > 0) {
+            startTimer();
+        }
+    } else {
+        finishExam();
+    }
+}
+
+// Ir a la pregunta anterior
+function previousQuestion() {
+    if (currentQuestionIndex > 0) {
+        clearInterval(timer);
+        currentQuestionIndex--;
+        loadQuestion(currentQuestionIndex);
+        updateProgress();
+        if (examConfig.tiempoPorPregunta > 0) {
+            startTimer();
+        }
+    }
+}
+
+// Ir a la siguiente pregunta
+function nextQuestion() {
+    const currentQuestion = questionData[currentQuestionIndex];
+    const selectedAnswer = answers[currentQuestion.id];
+    
+    if (selectedAnswer) {
+        clearInterval(timer);
+        sendAnswer(currentQuestion.id, selectedAnswer);
+        
+        if (examConfig.tipoAclaracion === 'inmediata') {
+            // La aclaración se mostrará en el callback de sendAnswer
+            return;
+        }
+    }
+    
+    continueToNextQuestion();
+}
+
+// Finalizar examen
+function finishExam() {
+    clearInterval(timer);
+    updateAnsweredCount();
+    const finishModal = new bootstrap.Modal(document.getElementById('finishModal'));
+    finishModal.show();
+}
+
+// Confirmar finalización del examen
+function confirmFinishExam() {
+    const formData = new FormData();
+    formData.append('csrfmiddlewaretoken', csrfToken);
+    
+    fetch(`/dashboard/examenes-test/${examConfig.id}/finalizar/`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect_url;
+        } else {
+            alert('Error al finalizar el examen: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al finalizar el examen');
+    });
+}
+
+// Pausar examen
+function pauseExam() {
+    if (timer) {
+        clearInterval(timer);
+        timer = null;
+        document.getElementById('timeDisplay').textContent = 'PAUSADO';
+        alert('Examen pausado. Presiona OK para continuar.');
+        if (examConfig.tiempoPorPregunta > 0) {
+            startTimer();
+        }
+    }
+}
+
+// Prevenir salida accidental de la página
+window.addEventListener('beforeunload', function(e) {
+    if (currentQuestionIndex < questionData.length) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+</script>
+{% endblock %}

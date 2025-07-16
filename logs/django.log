@@ -4416,3 +4416,171 @@ Not Found: /.well-known/appspecific/com.chrome.devtools.json
 "GET /dashboard/oposiciones/ HTTP/1.1" 200 22271
 "GET /dashboard/temas/ HTTP/1.1" 200 20700
 "GET /dashboard/temas/1/ HTTP/1.1" 200 24713
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 200 23187
+Forbidden (Permission denied): /dashboard/examenes-test/
+Traceback (most recent call last):
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/contrib/auth/mixins.py", line 134, in dispatch
+    return self.handle_no_permission()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py", line 898, in handle_no_permission
+    return super().handle_no_permission()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/contrib/auth/mixins.py", line 48, in handle_no_permission
+    raise PermissionDenied(self.get_permission_denied_message())
+django.core.exceptions.PermissionDenied
+"GET /dashboard/examenes-test/ HTTP/1.1" 403 135
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 19352
+"GET /dashboard/admin/temas/1/apartados/ HTTP/1.1" 200 26999
+Forbidden (Permission denied): /dashboard/examenes-test/
+Traceback (most recent call last):
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/contrib/auth/mixins.py", line 134, in dispatch
+    return self.handle_no_permission()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py", line 898, in handle_no_permission
+    return super().handle_no_permission()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/contrib/auth/mixins.py", line 48, in handle_no_permission
+    raise PermissionDenied(self.get_permission_denied_message())
+django.core.exceptions.PermissionDenied
+"GET /dashboard/examenes-test/ HTTP/1.1" 403 135
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 15589
+"GET /dashboard/ HTTP/1.1" 200 23187
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 15112
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 23752
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/1/ejecutar/ HTTP/1.1" 200 32064
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 200 23187
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 18249
+"GET /dashboard/examenes-test/1/ejecutar/ HTTP/1.1" 200 32952
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 200 23187
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 18250
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 23752
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/2/ejecutar/ HTTP/1.1" 200 40919
+"GET /dashboard/ HTTP/1.1" 200 23187
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 22248
+"GET /dashboard/examenes-test/1/ejecutar/ HTTP/1.1" 200 48299
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/examenes-test/1/ejecutar/ HTTP/1.1" 200 46001
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /dashboard/examenes-test/2/ejecutar/ HTTP/1.1" 200 39209
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /dashboard/examenes-test/2/ejecutar/ HTTP/1.1" 200 39165
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 235
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 275
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 196
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 273
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 262
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 283
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 255
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 265
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 278
+"POST /dashboard/examenes-test/2/finalizar/ HTTP/1.1" 200 74
+"GET /dashboard/examenes-test/2/ejecutar/ HTTP/1.1" 200 39835
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 239
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 245
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 136
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 278
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 235
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 196
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 238
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 265
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 312
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 243
+"POST /dashboard/examenes-test/2/finalizar/ HTTP/1.1" 200 91
+"POST /dashboard/examenes-test/2/finalizar/ HTTP/1.1" 200 91
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+"POST /dashboard/examenes-test/2/finalizar/ HTTP/1.1" 200 74
+"GET /dashboard/examenes-test/2/resultado/ HTTP/1.1" 200 83062
+"GET /dashboard/ranking/ HTTP/1.1" 200 26384
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /auth/profile/ HTTP/1.1" 200 20502
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 24095
+"GET /auth/profile/ HTTP/1.1" 200 20925

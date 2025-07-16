@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header text-center seamless mb-4">
+        <h1 class="text-white mb-3">
+            <i class="bi bi-gear-fill me-2"></i>
+            Configurar Examen
+        </h1>
+    </div>
+
+    <div class="main-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-sliders me-2"></i>
+                            Configuración del Examen
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" id="examConfigForm">
+                            {% csrf_token %}
+                            
+                            <!-- Información básica -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <label for="nombre" class="form-label">Nombre del Examen</label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" 
+                                           placeholder="Ej: Examen de Derecho Constitucional" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="tipo" class="form-label">Tipo de Examen</label>
+                                    <select class="form-select" id="tipo" name="tipo" required>
+                                        <option value="normal">Normal</option>
+                                        <option value="examen">Examen</option>
+                                    </select>
+                                    <div class="form-text">
+                                        <strong>Normal:</strong> Puedes elegir cuándo ver las aclaraciones<br>
+                                        <strong>Examen:</strong> Aclaraciones solo al final, orden aleatorio
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="tipo_aclaracion" class="form-label">Mostrar Aclaraciones</label>
+                                    <select class="form-select" id="tipo_aclaracion" name="tipo_aclaracion" required>
+                                        <option value="inmediata">Después de cada pregunta</option>
+                                        <option value="final">Al final del examen</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="numero_preguntas" class="form-label">Número de Preguntas</label>
+                                    <input type="number" class="form-control" id="numero_preguntas" name="numero_preguntas" 
+                                           min="10" max="100" value="20" required>
+                                    <div class="form-text">Mínimo 10 preguntas</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="tiempo_por_pregunta" class="form-label">Tiempo por Pregunta (segundos)</label>
+                                    <input type="number" class="form-control" id="tiempo_por_pregunta" name="tiempo_por_pregunta" 
+                                           min="0" max="300" value="60" required>
+                                    <div class="form-text">0 = Sin límite de tiempo</div>
+                                </div>
+                            </div>
+
+                            <!-- Selección de Temas -->
+                            <div class="mb-4">
+                                <h6 class="mb-3">
+                                    <i class="bi bi-journals me-2"></i>
+                                    Seleccionar Temas
+                                </h6>
+                                <div class="row">
+                                    {% for tema in temas_disponibles %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="form-check">
+                                                    <input class="form-check-input tema-checkbox" type="checkbox" 
+                                                           name="temas" value="{{ tema.id }}" id="tema_{{ tema.id }}"
+                                                           onchange="toggleApartados({{ tema.id }})">
+                                                    <label class="form-check-label" for="tema_{{ tema.id }}">
+                                                        <strong>{{ tema.nombre }}</strong>
+                                                    </label>
+                                                </div>
+                                                
+                                                {% if tema.apartados.exists %}
+                                                <div class="mt-2 apartados-container" id="apartados_{{ tema.id }}" style="display: none;">
+                                                    <small class="text-muted">Apartados específicos (opcional):</small>
+                                                    {% for apartado in tema.apartados.all %}
+                                                    <div class="form-check form-check-sm mt-1">
+                                                        <input class="form-check-input apartado-checkbox" type="checkbox" 
+                                                               name="apartados" value="{{ apartado.id }}" 
+                                                               id="apartado_{{ apartado.id }}"
+                                                               data-tema="{{ tema.id }}">
+                                                        <label class="form-check-label small" for="apartado_{{ apartado.id }}">
+                                                            {{ apartado.nombre }}
+                                                        </label>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'core:examen_test_list' %}" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-play-circle me-2"></i>
+                                    Crear y Comenzar Examen
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleApartados(temaId) {
+    const checkbox = document.getElementById(`tema_${temaId}`);
+    const apartadosContainer = document.getElementById(`apartados_${temaId}`);
+    
+    if (checkbox.checked) {
+        apartadosContainer.style.display = 'block';
+    } else {
+        apartadosContainer.style.display = 'none';
+        // Desmarcar todos los apartados del tema
+        const apartadosCheckboxes = apartadosContainer.querySelectorAll('.apartado-checkbox');
+        apartadosCheckboxes.forEach(cb => cb.checked = false);
+    }
+}
+
+// Validar que al menos un tema esté seleccionado
+document.getElementById('examConfigForm').addEventListener('submit', function(e) {
+    const temasCheckboxes = document.querySelectorAll('.tema-checkbox:checked');
+    if (temasCheckboxes.length === 0) {
+        e.preventDefault();
+        alert('Debes seleccionar al menos un tema para el examen.');
+        return false;
+    }
+});
+
+// Manejar el tipo de examen
+document.getElementById('tipo').addEventListener('change', function() {
+    const tipoAclaracion = document.getElementById('tipo_aclaracion');
+    if (this.value === 'examen') {
+        tipoAclaracion.value = 'final';
+        tipoAclaracion.disabled = true;
+    } else {
+        tipoAclaracion.disabled = false;
+    }
+});
+</script>
+{% endblock %}

@@ -26,6 +26,15 @@ urlpatterns = [
     # Sistema de exámenes
     path('examenes/', include('core.urls_evaluaciones')),
     
+    # Sistema de exámenes test
+    path('examenes-test/', views.ExamenTestListView.as_view(), name='examen_test_list'),
+    path('examenes-test/configurar/', views.ExamenTestConfigView.as_view(), name='examen_config'),
+    path('examenes-test/<int:examen_id>/ejecutar/', views.ExamenTestEjecutarView.as_view(), name='examen_ejecutar'),
+    path('examenes-test/<int:examen_id>/responder/', views.ExamenTestRespuestaView.as_view(), name='examen_responder'),
+    path('examenes-test/<int:examen_id>/finalizar/', views.ExamenTestFinalizarView.as_view(), name='examen_finalizar'),
+    path('examenes-test/<int:examen_id>/resultado/', views.ExamenTestResultadoView.as_view(), name='examen_resultado'),
+    path('ranking/', views.ExamenTestRankingView.as_view(), name='examen_ranking'),
+    
     # Admin URLs - Oposiciones
     path('admin/oposiciones/', views.AdminOposicionListView.as_view(), name='admin_oposicion_list'),
     path('admin/oposiciones/create/', views.AdminOposicionCreateView.as_view(), name='admin_oposicion_create'),

@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header text-center seamless mb-4">
+        <h1 class="text-white mb-3">
+            <i class="bi bi-trophy me-2"></i>
+            Ranking de Estudiantes
+        </h1>
+    </div>
+
+    <div class="main-content">
+        <!-- Mi Posición -->
+        {% if mi_posicion %}
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <h1 class="mb-0">
+                                    {% if mi_posicion <= 3 %}
+                                        <i class="bi bi-trophy-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-award-fill"></i>
+                                    {% endif %}
+                                </h1>
+                            </div>
+                            <div class="col-md-10">
+                                <h4 class="mb-1">Tu Posición en el Ranking</h4>
+                                {% with rango=request.user.get_rango_firefighter %}
+                                    {% if rango %}
+                                        <div class="mb-3">
+                                            <span class="badge text-white p-2" style="background-color: {{ rango.color }}; font-size: 0.9rem;">
+                                                <span style="font-size: 1.2em;">{{ rango.icono }}</span>
+                                                {{ rango.nombre }}
+                                            </span>
+                                            <span class="ms-2 text-white-50">Nivel {{ rango.nivel }}</span>
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <strong>Posición:</strong><br>
+                                        <span class="h3">#{{ mi_posicion }}</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Mejor Resultado:</strong><br>
+                                        <span class="h5">{{ mi_mejor_resultado.porcentaje_acierto|floatformat:1 }}%</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Tiempo Promedio:</strong><br>
+                                        <span class="h6">{{ mi_mejor_resultado.tiempo_promedio_por_pregunta|floatformat:1 }}s</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Examen:</strong><br>
+                                        <span class="small">{{ mi_mejor_resultado.examen.nombre|truncatewords:3 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Filtros -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="get" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="tipo_examen" class="form-label">Tipo de Examen</label>
+                                <select class="form-select" id="tipo_examen" name="tipo_examen">
+                                    <option value="">Todos</option>
+                                    <option value="normal" {% if request.GET.tipo_examen == 'normal' %}selected{% endif %}>Normal</option>
+                                    <option value="examen" {% if request.GET.tipo_examen == 'examen' %}selected{% endif %}>Examen</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="orden" class="form-label">Ordenar por</label>
+                                <select class="form-select" id="orden" name="orden">
+                                    <option value="porcentaje" {% if request.GET.orden == 'porcentaje' %}selected{% endif %}>Porcentaje de Acierto</option>
+                                    <option value="tiempo" {% if request.GET.orden == 'tiempo' %}selected{% endif %}>Tiempo Promedio</option>
+                                    <option value="fecha" {% if request.GET.orden == 'fecha' %}selected{% endif %}>Fecha Reciente</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="bi bi-filter me-1"></i>Filtrar
+                                </button>
+                                <a href="{% url 'core:examen_ranking' %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-circle"></i>
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Podio (Top 3) -->
+        {% if resultados %}
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-podium me-2"></i>
+                            Top 3 Estudiantes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            {% for resultado in resultados|slice:":3" %}
+                            <div class="col-md-4">
+                                <div class="card {% if forloop.counter == 1 %}border-warning{% elif forloop.counter == 2 %}border-secondary{% else %}border-success{% endif %}">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            {% if forloop.counter == 1 %}
+                                                <i class="bi bi-trophy-fill text-warning display-4"></i>
+                                            {% elif forloop.counter == 2 %}
+                                                <i class="bi bi-trophy-fill text-secondary display-4"></i>
+                                            {% else %}
+                                                <i class="bi bi-trophy-fill text-success display-4"></i>
+                                            {% endif %}
+                                        </div>
+                                        <h5 class="card-title">{{ resultado.examen.estudiante.get_full_name|default:resultado.examen.estudiante.username }}</h5>
+                                        {% with rango=resultado.examen.estudiante.get_rango_firefighter %}
+                                            {% if rango %}
+                                                <div class="mb-2">
+                                                    <span class="badge text-white" style="background-color: {{ rango.color }}; font-size: 0.75rem;">
+                                                        <span style="font-size: 1.1em;">{{ rango.icono }}</span>
+                                                        {{ rango.nombre }}
+                                                    </span>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <h3 class="text-primary">{{ resultado.porcentaje_acierto|floatformat:1 }}%</h3>
+                                                <small class="text-muted">Acierto</small>
+                                            </div>
+                                            <div class="col-6">
+                                                <h6 class="text-info">{{ resultado.tiempo_promedio_por_pregunta|floatformat:1 }}s</h6>
+                                                <small class="text-muted">Promedio</small>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">{{ resultado.examen.nombre|truncatewords:3 }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Ranking Completo -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-list-ol me-2"></i>
+                            Ranking Completo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if resultados %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th width="8%">Posición</th>
+                                        <th width="20%">Estudiante</th>
+                                        <th width="17%">Rango</th>
+                                        <th width="20%">Examen</th>
+                                        <th width="15%">Acierto</th>
+                                        <th width="12%">Tiempo Promedio</th>
+                                        <th width="8%">Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for resultado in resultados %}
+                                    <tr {% if resultado.examen.estudiante == request.user %}class="table-primary"{% endif %}>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">
+                                                    {% if forloop.counter == 1 %}
+                                                        <i class="bi bi-trophy-fill text-warning"></i>
+                                                    {% elif forloop.counter == 2 %}
+                                                        <i class="bi bi-trophy-fill text-secondary"></i>
+                                                    {% elif forloop.counter == 3 %}
+                                                        <i class="bi bi-trophy-fill text-success"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-person-circle text-muted"></i>
+                                                    {% endif %}
+                                                </span>
+                                                <strong>#{{ forloop.counter }}</strong>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ resultado.examen.estudiante.get_full_name|default:resultado.examen.estudiante.username }}</strong>
+                                                {% if resultado.examen.estudiante == request.user %}
+                                                    <span class="badge bg-primary ms-2">Tú</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% with rango=resultado.examen.estudiante.get_rango_firefighter %}
+                                                {% if rango %}
+                                                    <div class="badge text-white" style="background-color: {{ rango.color }}; font-size: 0.7rem;">
+                                                        <span style="font-size: 1em;">{{ rango.icono }}</span>
+                                                        {{ rango.nombre }}
+                                                    </div>
+                                                    <div class="small text-muted mt-1">
+                                                        Nivel {{ rango.nivel }}
+                                                    </div>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <span class="text-muted">{{ resultado.examen.nombre|truncatewords:4 }}</span>
+                                                <br>
+                                                <small class="badge bg-{% if resultado.examen.tipo == 'examen' %}danger{% else %}primary{% endif %}">
+                                                    {{ resultado.examen.get_tipo_display }}
+                                                </small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">
+                                                    <strong class="text-{% if resultado.porcentaje_acierto >= 80 %}success{% elif resultado.porcentaje_acierto >= 60 %}warning{% else %}danger{% endif %}">
+                                                        {{ resultado.porcentaje_acierto|floatformat:1 }}%
+                                                    </strong>
+                                                </span>
+                                                <div class="progress flex-grow-1" style="height: 8px;">
+                                                    <div class="progress-bar bg-{% if resultado.porcentaje_acierto >= 80 %}success{% elif resultado.porcentaje_acierto >= 60 %}warning{% else %}danger{% endif %}" 
+                                                         style="width: {{ resultado.porcentaje_acierto }}%"></div>
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">{{ resultado.preguntas_correctas }}/{{ resultado.puntuacion_maxima }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ resultado.tiempo_promedio_por_pregunta|floatformat:1 }}s</strong>
+                                            <br>
+                                            <small class="text-muted">{{ resultado.tiempo_total_minutos|floatformat:1 }}m total</small>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ resultado.created_at|date:"d/m/Y" }}</small>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginación -->
+                        {% if is_paginated %}
+                        <nav aria-label="Paginación del ranking">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if request.GET.tipo_examen %}&tipo_examen={{ request.GET.tipo_examen }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Primera</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.tipo_examen %}&tipo_examen={{ request.GET.tipo_examen }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Anterior</a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.tipo_examen %}&tipo_examen={{ request.GET.tipo_examen }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Siguiente</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.tipo_examen %}&tipo_examen={{ request.GET.tipo_examen }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Última</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+
+                        {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-trophy display-1 text-muted mb-3"></i>
+                            <h4 class="text-muted">No hay resultados de exámenes aún</h4>
+                            <p class="text-muted">Realiza algunos exámenes para ver el ranking de estudiantes.</p>
+                            <a href="{% url 'core:examen_config' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>Crear Examen
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas Generales -->
+        {% if resultados %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-graph-up me-2"></i>
+                            Estadísticas Generales
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="border rounded p-3">
+                                    <h4 class="text-primary mb-1">{{ resultados|length }}</h4>
+                                    <small class="text-muted">Total de Exámenes</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border rounded p-3">
+                                    <h4 class="text-success mb-1">{{ resultados.0.porcentaje_acierto|floatformat:1 }}%</h4>
+                                    <small class="text-muted">Mejor Resultado</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border rounded p-3">
+                                    <h4 class="text-info mb-1">{{ resultados|length }}</h4>
+                                    <small class="text-muted">Estudiantes Activos</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border rounded p-3">
+                                    <h4 class="text-warning mb-1">{{ resultados.0.tiempo_promedio_por_pregunta|floatformat:1 }}s</h4>
+                                    <small class="text-muted">Mejor Tiempo</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

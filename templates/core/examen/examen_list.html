@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header text-center seamless mb-4">
+        <h1 class="text-white mb-3">
+            <i class="bi bi-clipboard-check me-2"></i>
+            Mis Exámenes
+        </h1>
+    </div>
+
+    <div class="main-content">
+        <!-- Barra de Herramientas -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-0">Exámenes Realizados</h3>
+                <small class="text-muted">{{ examenes|length }} examen{{ examenes|length|pluralize:"es" }} encontrado{{ examenes|length|pluralize:"s" }}</small>
+            </div>
+            
+            <div>
+                <a href="{% url 'core:examen_config' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Nuevo Examen
+                </a>
+                <a href="{% url 'core:examen_ranking' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-trophy me-2"></i>Ranking
+                </a>
+            </div>
+        </div>
+
+        <!-- Lista de Exámenes -->
+        {% if examenes %}
+            <div class="row">
+                {% for examen in examenes %}
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-file-text me-2"></i>
+                                {{ examen.nombre }}
+                            </h5>
+                            <div>
+                                <span class="badge bg-{% if examen.tipo == 'examen' %}danger{% else %}primary{% endif %}">
+                                    {{ examen.get_tipo_display }}
+                                </span>
+                                {% if examen.completado %}
+                                    <span class="badge bg-success">Completado</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Pendiente</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <!-- Información del Examen -->
+                            <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <div class="border rounded p-2">
+                                        <h6 class="text-primary mb-0">{{ examen.numero_preguntas }}</h6>
+                                        <small class="text-muted">Preguntas</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="border rounded p-2">
+                                        <h6 class="text-info mb-0">{{ examen.tiempo_por_pregunta }}s</h6>
+                                        <small class="text-muted">Por pregunta</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="border rounded p-2">
+                                        <h6 class="text-success mb-0">{{ examen.temas_seleccionados.count }}</h6>
+                                        <small class="text-muted">Temas</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Temas Incluidos -->
+                            <div class="mb-3">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-journals text-primary me-1"></i>
+                                    Temas Incluidos
+                                </h6>
+                                <div class="mb-2">
+                                    {% for tema in examen.temas_seleccionados.all|slice:":3" %}
+                                        <span class="badge bg-outline-primary me-1 mb-1">
+                                            {{ tema.nombre|truncatewords:3 }}
+                                        </span>
+                                    {% endfor %}
+                                    {% if examen.temas_seleccionados.count > 3 %}
+                                        <span class="badge bg-secondary">+{{ examen.temas_seleccionados.count|add:"-3" }} más</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Resultados si está completado -->
+                            {% if examen.completado and examen.resultado %}
+                                <div class="mb-3">
+                                    <h6 class="mb-2">
+                                        <i class="bi bi-graph-up text-success me-1"></i>
+                                        Resultados
+                                    </h6>
+                                    <div class="progress mb-2" style="height: 20px;">
+                                        <div class="progress-bar bg-{% if examen.resultado.porcentaje_acierto >= 70 %}success{% elif examen.resultado.porcentaje_acierto >= 50 %}warning{% else %}danger{% endif %}" 
+                                             style="width: {{ examen.resultado.porcentaje_acierto }}%">
+                                            {{ examen.resultado.porcentaje_acierto|floatformat:1 }}%
+                                        </div>
+                                    </div>
+                                    <div class="row text-center small">
+                                        <div class="col">
+                                            <span class="text-success">{{ examen.resultado.preguntas_correctas }} correctas</span>
+                                        </div>
+                                        <div class="col">
+                                            <span class="text-danger">{{ examen.resultado.preguntas_incorrectas }} incorrectas</span>
+                                        </div>
+                                        <div class="col">
+                                            <span class="text-muted">{{ examen.resultado.tiempo_total_minutos|floatformat:1 }} min</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Fecha -->
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    {% if examen.completado %}
+                                        Completado {{ examen.fecha_fin|naturaltime }}
+                                    {% else %}
+                                        Creado {{ examen.created_at|naturaltime }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <div class="btn-group w-100">
+                                {% if examen.completado %}
+                                    <a href="{% url 'core:examen_resultado' examen.id %}" class="btn btn-outline-primary">
+                                        <i class="bi bi-eye me-1"></i>Ver Resultados
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'core:examen_ejecutar' examen.id %}" class="btn btn-primary">
+                                        <i class="bi bi-play-circle me-1"></i>Continuar
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <nav aria-label="Paginación de exámenes">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <!-- Estado Vacío -->
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-clipboard-x display-1 text-muted mb-3"></i>
+                    <h3 class="text-muted mb-3">No has realizado ningún examen aún</h3>
+                    <p class="text-muted mb-4">
+                        Comienza creando tu primer examen de práctica para evaluar tus conocimientos.
+                    </p>
+                    <div>
+                        <a href="{% url 'core:examen_config' %}" class="btn btn-primary me-2">
+                            <i class="bi bi-plus-circle me-2"></i>Crear Primer Examen
+                        </a>
+                        <a href="{% url 'core:dashboard' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left me-2"></i>Volver al Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

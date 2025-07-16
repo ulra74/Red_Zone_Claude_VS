@@ -536,6 +536,276 @@ class ProgresoEstudiante(models.Model):
 
 
 # ============================================================================
+# MODELOS DEL SISTEMA DE EXÁMENES
+# ============================================================================
+
+class ExamenTest(models.Model):
+    """Modelo para configurar y almacenar exámenes tipo test"""
+    
+    TIPO_CHOICES = [
+        ('normal', 'Normal'),
+        ('examen', 'Examen'),
+    ]
+    
+    TIPO_ACLARACION_CHOICES = [
+        ('inmediata', 'Inmediata (después de cada pregunta)'),
+        ('final', 'Al final del examen'),
+    ]
+    
+    estudiante = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        limit_choices_to={'user_type': 'student'},
+        related_name='examenes_test'
+    )
+    
+    nombre = models.CharField(
+        max_length=200,
+        help_text="Nombre del examen"
+    )
+    
+    tipo = models.CharField(
+        max_length=20,
+        choices=TIPO_CHOICES,
+        default='normal',
+        help_text="Tipo de examen"
+    )
+    
+    # Configuración de temas y apartados
+    temas_seleccionados = models.ManyToManyField(
+        Tema,
+        related_name='examenes_test_tema',
+        help_text="Temas seleccionados para el examen"
+    )
+    
+    apartados_seleccionados = models.ManyToManyField(
+        Apartado,
+        related_name='examenes_test_apartado',
+        blank=True,
+        help_text="Apartados específicos seleccionados (opcional)"
+    )
+    
+    # Configuración del examen
+    numero_preguntas = models.PositiveIntegerField(
+        help_text="Número de preguntas del examen (mínimo 10)"
+    )
+    
+    tiempo_por_pregunta = models.PositiveIntegerField(
+        help_text="Tiempo máximo por pregunta en segundos (0 = sin límite)"
+    )
+    
+    tipo_aclaracion = models.CharField(
+        max_length=20,
+        choices=TIPO_ACLARACION_CHOICES,
+        default='inmediata',
+        help_text="Cuándo mostrar las aclaraciones"
+    )
+    
+    # Fechas
+    fecha_inicio = models.DateTimeField(
+        help_text="Fecha y hora de inicio del examen"
+    )
+    
+    fecha_fin = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text="Fecha y hora de finalización del examen"
+    )
+    
+    # Estado
+    completado = models.BooleanField(
+        default=False,
+        help_text="Si el examen ha sido completado"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Examen Test"
+        verbose_name_plural = "Exámenes Test"
+    
+    def __str__(self):
+        return f"{self.estudiante.username} - {self.nombre}"
+    
+    @property
+    def duracion_total(self):
+        """Duración total del examen en minutos"""
+        if self.fecha_fin and self.fecha_inicio:
+            delta = self.fecha_fin - self.fecha_inicio
+            return int(delta.total_seconds() / 60)
+        return 0
+    
+    @property
+    def preguntas_respondidas(self):
+        """Número de preguntas respondidas"""
+        return self.respuestas_examen.count()
+    
+    @property
+    def preguntas_correctas(self):
+        """Número de preguntas correctas"""
+        return self.respuestas_examen.filter(es_correcta=True).count()
+    
+    @property
+    def porcentaje_acierto(self):
+        """Porcentaje de acierto del examen"""
+        if self.preguntas_respondidas == 0:
+            return 0
+        return (self.preguntas_correctas / self.preguntas_respondidas) * 100
+    
+    def clean(self):
+        """Validación del modelo"""
+        from django.core.exceptions import ValidationError
+        
+        if self.numero_preguntas < 10:
+            raise ValidationError("El número mínimo de preguntas es 10")
+        
+        if self.fecha_fin and self.fecha_fin <= self.fecha_inicio:
+            raise ValidationError("La fecha de fin debe ser posterior a la fecha de inicio")
+
+
+class ExamenTestResultado(models.Model):
+    """Modelo para almacenar los resultados finales de un examen test"""
+    
+    examen = models.OneToOneField(
+        ExamenTest,
+        on_delete=models.CASCADE,
+        related_name='resultado'
+    )
+    
+    puntuacion_total = models.PositiveIntegerField(
+        help_text="Puntuación total obtenida"
+    )
+    
+    puntuacion_maxima = models.PositiveIntegerField(
+        help_text="Puntuación máxima posible"
+    )
+    
+    porcentaje_acierto = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        help_text="Porcentaje de acierto"
+    )
+    
+    tiempo_total_segundos = models.PositiveIntegerField(
+        help_text="Tiempo total empleado en segundos"
+    )
+    
+    preguntas_correctas = models.PositiveIntegerField(
+        help_text="Número de preguntas correctas"
+    )
+    
+    preguntas_incorrectas = models.PositiveIntegerField(
+        help_text="Número de preguntas incorrectas"
+    )
+    
+    preguntas_sin_responder = models.PositiveIntegerField(
+        default=0,
+        help_text="Número de preguntas sin responder (por timeout)"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Resultado de Examen Test"
+        verbose_name_plural = "Resultados de Exámenes Test"
+    
+    def __str__(self):
+        return f"{self.examen.estudiante.username} - {self.examen.nombre} - {self.porcentaje_acierto}%"
+    
+    @property
+    def tiempo_total_minutos(self):
+        """Tiempo total en minutos"""
+        return self.tiempo_total_segundos / 60
+    
+    @property
+    def tiempo_promedio_por_pregunta(self):
+        """Tiempo promedio por pregunta en segundos"""
+        if self.examen.preguntas_respondidas == 0:
+            return 0
+        return self.tiempo_total_segundos / self.examen.preguntas_respondidas
+    
+    @property
+    def calificacion_texto(self):
+        """Calificación en texto"""
+        if self.porcentaje_acierto >= 90:
+            return "Excelente"
+        elif self.porcentaje_acierto >= 80:
+            return "Muy Bueno"
+        elif self.porcentaje_acierto >= 70:
+            return "Bueno"
+        elif self.porcentaje_acierto >= 60:
+            return "Regular"
+        else:
+            return "Insuficiente"
+
+
+class RespuestaExamenTest(models.Model):
+    """Modelo para almacenar las respuestas individuales de un examen test"""
+    
+    examen = models.ForeignKey(
+        ExamenTest,
+        on_delete=models.CASCADE,
+        related_name='respuestas_examen'
+    )
+    
+    pregunta = models.ForeignKey(
+        Pregunta,
+        on_delete=models.CASCADE,
+        related_name='respuestas_en_examenes_test'
+    )
+    
+    respuesta_seleccionada = models.ForeignKey(
+        Respuesta,
+        on_delete=models.CASCADE,
+        related_name='seleccionada_en_examenes_test',
+        blank=True,
+        null=True,
+        help_text="Respuesta seleccionada por el estudiante"
+    )
+    
+    es_correcta = models.BooleanField(
+        default=False,
+        help_text="Si la respuesta seleccionada es correcta"
+    )
+    
+    tiempo_empleado_segundos = models.PositiveIntegerField(
+        help_text="Tiempo empleado en responder esta pregunta en segundos"
+    )
+    
+    orden_pregunta = models.PositiveIntegerField(
+        help_text="Orden en que apareció la pregunta en el examen"
+    )
+    
+    timeout = models.BooleanField(
+        default=False,
+        help_text="Si la pregunta se respondió por timeout"
+    )
+    
+    respondida_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['orden_pregunta']
+        verbose_name = "Respuesta de Examen Test"
+        verbose_name_plural = "Respuestas de Exámenes Test"
+        unique_together = ['examen', 'pregunta']
+    
+    def __str__(self):
+        estado = "✓" if self.es_correcta else "✗"
+        timeout_text = " (TIMEOUT)" if self.timeout else ""
+        return f"{estado} {self.pregunta.enunciado[:50]}...{timeout_text}"
+    
+    def save(self, *args, **kwargs):
+        """Actualizar estadísticas de la pregunta al guardar"""
+        if self.pk is None:  # Solo en creación
+            # Actualizar estadísticas de la pregunta
+            self.pregunta.incrementar_estadisticas(acertada=self.es_correcta)
+        super().save(*args, **kwargs)
+
+
+# ============================================================================
 # IMPORTAR TODOS LOS MODELOS DE LOS OTROS ARCHIVOS
 # ============================================================================
 

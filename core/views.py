@@ -10,8 +10,12 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Q, Prefetch
 from django import forms
-from .models import Oposicion, Tema, TemaOposicion, Apartado, Pregunta, Respuesta
+from .models import Oposicion, Tema, TemaOposicion, Apartado, Pregunta, Respuesta, ExamenTest, ExamenTestResultado, RespuestaExamenTest
 from accounts.models import CustomUser
+from django.http import JsonResponse, Http404
+from django.utils import timezone
+from django.db import transaction
+import random
 
 
 class AdminRequiredMixin(UserPassesTestMixin):
@@ -878,3 +882,394 @@ class AdminPreguntaDeleteView(AdminRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(request, f'Pregunta eliminada exitosamente.')
         return super().delete(request, *args, **kwargs)
+
+
+# ============================================================================
+# VISTAS DEL SISTEMA DE EXÁMENES
+# ============================================================================
+
+class StudentRequiredMixin(UserPassesTestMixin):
+    """Mixin para requerir permisos de estudiante (o admin)"""
+    def test_func(self):
+        return self.request.user.is_authenticated and (self.request.user.is_student() or self.request.user.is_admin())
+
+    def handle_no_permission(self):
+        messages.error(self.request, 'No tienes permisos para acceder a esta página.')
+        return redirect('core:dashboard')
+
+
+class ExamenTestListView(LoginRequiredMixin, ListView):
+    """Lista de exámenes del estudiante"""
+    model = ExamenTest
+    template_name = 'core/examen/examen_list.html'
+    context_object_name = 'examenes'
+    paginate_by = 10
+
+    def get_queryset(self):
+        if self.request.user.is_admin():
+            return ExamenTest.objects.all().order_by('-created_at')
+        return ExamenTest.objects.filter(estudiante=self.request.user).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Mis Exámenes'
+        return context
+
+
+class ExamenTestConfigView(LoginRequiredMixin, TemplateView):
+    """Vista para configurar un nuevo examen"""
+    template_name = 'core/examen/examen_config.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Configurar Examen'
+        
+        # Obtener temas disponibles para el usuario
+        if self.request.user.is_admin():
+            context['temas_disponibles'] = Tema.objects.all().prefetch_related('apartados')
+        else:
+            context['temas_disponibles'] = Tema.objects.filter(
+                alumnos_con_acceso=self.request.user
+            ).prefetch_related('apartados')
+        
+        return context
+
+    def post(self, request, *args, **kwargs):
+        """Crear nuevo examen con la configuración seleccionada"""
+        try:
+            # Obtener datos del formulario
+            nombre = request.POST.get('nombre')
+            tipo = request.POST.get('tipo')
+            numero_preguntas = int(request.POST.get('numero_preguntas', 10))
+            tiempo_por_pregunta = int(request.POST.get('tiempo_por_pregunta', 0))
+            tipo_aclaracion = request.POST.get('tipo_aclaracion')
+            temas_ids = request.POST.getlist('temas')
+            apartados_ids = request.POST.getlist('apartados')
+
+            # Validaciones
+            if numero_preguntas < 10:
+                messages.error(request, 'El número mínimo de preguntas es 10.')
+                return redirect('core:examen_config')
+
+            if not temas_ids:
+                messages.error(request, 'Debes seleccionar al menos un tema.')
+                return redirect('core:examen_config')
+
+            # Crear examen
+            examen = ExamenTest.objects.create(
+                estudiante=request.user,
+                nombre=nombre,
+                tipo=tipo,
+                numero_preguntas=numero_preguntas,
+                tiempo_por_pregunta=tiempo_por_pregunta,
+                tipo_aclaracion=tipo_aclaracion,
+                fecha_inicio=timezone.now()
+            )
+
+            # Asociar temas
+            if request.user.is_admin():
+                temas = Tema.objects.filter(id__in=temas_ids)
+            else:
+                temas = Tema.objects.filter(id__in=temas_ids, alumnos_con_acceso=request.user)
+            examen.temas_seleccionados.set(temas)
+
+            # Asociar apartados si se seleccionaron
+            if apartados_ids:
+                apartados = Apartado.objects.filter(id__in=apartados_ids, tema__in=temas)
+                examen.apartados_seleccionados.set(apartados)
+
+            messages.success(request, 'Examen configurado exitosamente.')
+            return redirect('core:examen_ejecutar', examen_id=examen.id)
+
+        except Exception as e:
+            messages.error(request, f'Error al configurar el examen: {str(e)}')
+            return redirect('core:examen_config')
+
+
+class ExamenTestEjecutarView(LoginRequiredMixin, DetailView):
+    """Vista para ejecutar un examen"""
+    model = ExamenTest
+    template_name = 'core/examen/examen_ejecutar.html'
+    context_object_name = 'examen'
+    pk_url_kwarg = 'examen_id'
+
+    def get_object(self):
+        examen = super().get_object()
+        if examen.estudiante != self.request.user and not self.request.user.is_admin():
+            raise Http404("Examen no encontrado")
+        return examen
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Examen: {self.object.nombre}'
+        
+        # Obtener preguntas para el examen
+        preguntas = self.get_preguntas_examen()
+        context['preguntas'] = preguntas
+        context['total_preguntas'] = len(preguntas)
+        
+        # Convertir preguntas a JSON para JavaScript
+        import json
+        from django.utils.html import escape
+        preguntas_json = []
+        for pregunta in preguntas:
+            pregunta_dict = {
+                'id': pregunta.id,
+                'enunciado': escape(pregunta.enunciado),
+                'textoAclaratorio': escape(pregunta.texto_aclaratorio or ''),
+                'respuestas': []
+            }
+            for respuesta in pregunta.respuestas.all():
+                pregunta_dict['respuestas'].append({
+                    'id': respuesta.id,
+                    'texto': escape(respuesta.texto),
+                    'esCorrecta': respuesta.es_correcta,
+                    'explicacion': escape(respuesta.explicacion or '')
+                })
+            preguntas_json.append(pregunta_dict)
+        
+        context['preguntas_json'] = json.dumps(preguntas_json, ensure_ascii=False, indent=2)
+        
+        return context
+
+    def get_preguntas_examen(self):
+        """Obtener preguntas aleatorias para el examen"""
+        examen = self.object
+        
+        # Obtener preguntas disponibles
+        if examen.apartados_seleccionados.exists():
+            # Si hay apartados específicos seleccionados
+            preguntas_disponibles = Pregunta.objects.filter(
+                apartado__in=examen.apartados_seleccionados.all(),
+                activa=True
+            ).select_related('apartado__tema').prefetch_related('respuestas')
+        else:
+            # Si no hay apartados específicos, usar todos los de los temas
+            preguntas_disponibles = Pregunta.objects.filter(
+                apartado__tema__in=examen.temas_seleccionados.all(),
+                activa=True
+            ).select_related('apartado__tema').prefetch_related('respuestas')
+        
+        # Obtener preguntas aleatorias
+        preguntas_list = list(preguntas_disponibles)
+        if len(preguntas_list) == 0:
+            messages.error(
+                self.request,
+                'No hay preguntas disponibles para los temas seleccionados.'
+            )
+            return []
+            
+        if len(preguntas_list) < examen.numero_preguntas:
+            messages.warning(
+                self.request, 
+                f'Solo hay {len(preguntas_list)} preguntas disponibles. Se ajustará el número de preguntas.'
+            )
+            
+        # Seleccionar preguntas aleatorias
+        num_preguntas = min(examen.numero_preguntas, len(preguntas_list))
+        if num_preguntas == 0:
+            return []
+            
+        preguntas_seleccionadas = random.sample(preguntas_list, num_preguntas)
+        
+        # Verificar que las preguntas tengan respuestas
+        preguntas_con_respuestas = []
+        for pregunta in preguntas_seleccionadas:
+            if pregunta.respuestas.exists():
+                preguntas_con_respuestas.append(pregunta)
+        
+        if len(preguntas_con_respuestas) < len(preguntas_seleccionadas):
+            messages.warning(
+                self.request,
+                f'Algunas preguntas no tienen respuestas y fueron omitidas.'
+            )
+            
+        return preguntas_con_respuestas
+
+
+class ExamenTestRespuestaView(LoginRequiredMixin, TemplateView):
+    """Vista para procesar respuestas del examen"""
+    
+    def post(self, request, *args, **kwargs):
+        """Procesar respuesta de una pregunta"""
+        try:
+            examen_id = kwargs.get('examen_id')
+            examen = get_object_or_404(ExamenTest, id=examen_id)
+            if examen.estudiante != request.user and not request.user.is_admin():
+                return JsonResponse({'success': False, 'error': 'No tienes permisos para este examen'})
+            
+            pregunta_id = request.POST.get('pregunta_id')
+            respuesta_id = request.POST.get('respuesta_id')
+            tiempo_empleado = int(request.POST.get('tiempo_empleado', 0))
+            orden_pregunta = int(request.POST.get('orden_pregunta', 1))
+            timeout = request.POST.get('timeout', 'false') == 'true'
+            
+            pregunta = get_object_or_404(Pregunta, id=pregunta_id)
+            respuesta_seleccionada = None
+            es_correcta = False
+            
+            if respuesta_id and not timeout:
+                respuesta_seleccionada = get_object_or_404(Respuesta, id=respuesta_id)
+                es_correcta = respuesta_seleccionada.es_correcta
+            
+            # Guardar respuesta
+            respuesta_examen, created = RespuestaExamenTest.objects.get_or_create(
+                examen=examen,
+                pregunta=pregunta,
+                defaults={
+                    'respuesta_seleccionada': respuesta_seleccionada,
+                    'es_correcta': es_correcta,
+                    'tiempo_empleado_segundos': tiempo_empleado,
+                    'orden_pregunta': orden_pregunta,
+                    'timeout': timeout
+                }
+            )
+            
+            # Preparar respuesta JSON
+            response_data = {
+                'success': True,
+                'es_correcta': es_correcta,
+                'respuesta_correcta_id': pregunta.respuesta_correcta.id if pregunta.respuesta_correcta else None,
+                'timeout': timeout
+            }
+            
+            # Añadir aclaración si es modo inmediato
+            if examen.tipo_aclaracion == 'inmediata':
+                response_data['texto_aclaratorio'] = pregunta.texto_aclaratorio
+                if respuesta_seleccionada:
+                    response_data['explicacion_respuesta'] = respuesta_seleccionada.explicacion
+            
+            return JsonResponse(response_data)
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+
+class ExamenTestFinalizarView(LoginRequiredMixin, TemplateView):
+    """Vista para finalizar un examen"""
+    
+    def post(self, request, *args, **kwargs):
+        """Finalizar examen y generar resultado"""
+        try:
+            examen_id = kwargs.get('examen_id')
+            examen = get_object_or_404(ExamenTest, id=examen_id)
+            if examen.estudiante != request.user and not request.user.is_admin():
+                return JsonResponse({'success': False, 'error': 'No tienes permisos para este examen'})
+            
+            # Verificar si el examen ya está completado
+            if examen.completado:
+                return JsonResponse({
+                    'success': True,
+                    'redirect_url': reverse_lazy('core:examen_resultado', kwargs={'examen_id': examen.id})
+                })
+            
+            # Marcar examen como completado
+            examen.completado = True
+            examen.fecha_fin = timezone.now()
+            examen.save()
+            
+            # Calcular resultados
+            respuestas = examen.respuestas_examen.all()
+            preguntas_correctas = respuestas.filter(es_correcta=True).count()
+            preguntas_incorrectas = respuestas.filter(es_correcta=False, timeout=False).count()
+            preguntas_sin_responder = respuestas.filter(timeout=True).count()
+            
+            tiempo_total = sum([r.tiempo_empleado_segundos for r in respuestas])
+            porcentaje_acierto = (preguntas_correctas / len(respuestas)) * 100 if respuestas else 0
+            
+            # Crear o actualizar resultado
+            resultado, created = ExamenTestResultado.objects.get_or_create(
+                examen=examen,
+                defaults={
+                    'puntuacion_total': preguntas_correctas,
+                    'puntuacion_maxima': len(respuestas),
+                    'porcentaje_acierto': porcentaje_acierto,
+                    'tiempo_total_segundos': tiempo_total,
+                    'preguntas_correctas': preguntas_correctas,
+                    'preguntas_incorrectas': preguntas_incorrectas,
+                    'preguntas_sin_responder': preguntas_sin_responder
+                }
+            )
+            
+            # Si el resultado ya existía, actualizarlo
+            if not created:
+                resultado.puntuacion_total = preguntas_correctas
+                resultado.puntuacion_maxima = len(respuestas)
+                resultado.porcentaje_acierto = porcentaje_acierto
+                resultado.tiempo_total_segundos = tiempo_total
+                resultado.preguntas_correctas = preguntas_correctas
+                resultado.preguntas_incorrectas = preguntas_incorrectas
+                resultado.preguntas_sin_responder = preguntas_sin_responder
+                resultado.save()
+            
+            return JsonResponse({
+                'success': True,
+                'redirect_url': reverse_lazy('core:examen_resultado', kwargs={'examen_id': examen.id})
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+
+class ExamenTestResultadoView(LoginRequiredMixin, DetailView):
+    """Vista para mostrar resultados del examen"""
+    model = ExamenTest
+    template_name = 'core/examen/examen_resultado.html'
+    context_object_name = 'examen'
+    pk_url_kwarg = 'examen_id'
+
+    def get_object(self):
+        examen = super().get_object()
+        if examen.estudiante != self.request.user and not self.request.user.is_admin():
+            raise Http404("Examen no encontrado")
+        return examen
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Resultados: {self.object.nombre}'
+        context['resultado'] = self.object.resultado
+        context['respuestas'] = self.object.respuestas_examen.all().order_by('orden_pregunta')
+        return context
+
+
+class ExamenTestRankingView(LoginRequiredMixin, ListView):
+    """Vista para mostrar ranking de estudiantes"""
+    model = ExamenTestResultado
+    template_name = 'core/examen/examen_ranking.html'
+    context_object_name = 'resultados'
+    paginate_by = 20
+
+    def get_queryset(self):
+        # Solo incluir exámenes realizados por estudiantes (excluir administradores)
+        return ExamenTestResultado.objects.select_related(
+            'examen__estudiante'
+        ).filter(
+            examen__estudiante__user_type='student'
+        ).order_by('-porcentaje_acierto', 'tiempo_total_segundos')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Ranking de Estudiantes'
+        
+        # Obtener posición del usuario actual (solo si es estudiante)
+        try:
+            if self.request.user.is_student():
+                user_resultados = ExamenTestResultado.objects.filter(
+                    examen__estudiante=self.request.user,
+                    examen__estudiante__user_type='student'
+                ).order_by('-porcentaje_acierto', 'tiempo_total_segundos')
+                
+                if user_resultados.exists():
+                    mejor_resultado = user_resultados.first()
+                    todos_resultados = list(self.get_queryset())
+                    posicion = todos_resultados.index(mejor_resultado) + 1
+                    context['mi_posicion'] = posicion
+                    context['mi_mejor_resultado'] = mejor_resultado
+            else:
+                # Si es administrador, no mostrar posición
+                context['mi_posicion'] = None
+                context['mi_mejor_resultado'] = None
+        except:
+            context['mi_posicion'] = None
+            
+        return context

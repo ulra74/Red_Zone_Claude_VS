@@ -94,6 +94,8 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 2px 8px rgba(127, 29, 29, 0.3);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1050;
+            position: relative;
         }
         
         .navbar .nav-link {
@@ -115,6 +117,8 @@
             box-shadow: 0 8px 32px rgba(127, 29, 29, 0.2);
             border-radius: 0.5rem;
             margin-top: 0.5rem;
+            z-index: 1051;
+            position: relative;
         }
         
         .navbar .dropdown-item {
@@ -134,6 +138,15 @@
         .navbar .dropdown-divider {
             border-color: rgba(55, 65, 81, 0.2);
             margin: 0.5rem 0;
+        }
+        
+        /* Asegurar que el dropdown tenga prioridad sobre las cards */
+        .navbar .dropdown {
+            z-index: 1052;
+        }
+        
+        .navbar .dropdown-menu.show {
+            z-index: 1053 !important;
         }
         
         .navbar-toggler {
@@ -162,6 +175,8 @@
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
         }
         
         .card:hover {
@@ -336,6 +351,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'core:tema_list' %}">
                             <i class="bi bi-journals me-1"></i>Temas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:examen_test_list' %}">
+                            <i class="bi bi-clipboard-check me-1"></i>Exámenes
                         </a>
                     </li>
                 </ul>

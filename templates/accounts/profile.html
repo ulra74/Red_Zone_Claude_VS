@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
     <!-- Page Header -->
-    <div class="page-header">
+    <div class="page-header seamless">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col">
@@ -50,6 +50,21 @@
                                 <span class="badge bg-danger">Administrador</span>
                             {% else %}
                                 <span class="badge bg-primary">Estudiante</span>
+                                {% if user.is_student %}
+                                    {% with rango=user.get_rango_firefighter %}
+                                        {% if rango %}
+                                            <div class="mt-2">
+                                                <div class="badge text-white p-2" style="background-color: {{ rango.color }}; font-size: 0.85rem;">
+                                                    <span style="font-size: 1.2em;">{{ rango.icono }}</span>
+                                                    {{ rango.nombre }}
+                                                </div>
+                                                <div class="small text-muted mt-1">
+                                                    Nivel {{ rango.nivel }} - {{ rango.porcentaje_actual|floatformat:1 }}% acierto
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endif %}
                             {% endif %}
                         </div>
 
