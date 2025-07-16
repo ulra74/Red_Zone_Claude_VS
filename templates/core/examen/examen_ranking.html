@@ -67,41 +67,6 @@
         </div>
         {% endif %}
 
-        <!-- Filtros -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <form method="get" class="row g-3">
-                            <div class="col-md-4">
-                                <label for="tipo_examen" class="form-label">Tipo de Examen</label>
-                                <select class="form-select" id="tipo_examen" name="tipo_examen">
-                                    <option value="">Todos</option>
-                                    <option value="normal" {% if request.GET.tipo_examen == 'normal' %}selected{% endif %}>Normal</option>
-                                    <option value="examen" {% if request.GET.tipo_examen == 'examen' %}selected{% endif %}>Examen</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="orden" class="form-label">Ordenar por</label>
-                                <select class="form-select" id="orden" name="orden">
-                                    <option value="porcentaje" {% if request.GET.orden == 'porcentaje' %}selected{% endif %}>Porcentaje de Acierto</option>
-                                    <option value="tiempo" {% if request.GET.orden == 'tiempo' %}selected{% endif %}>Tiempo Promedio</option>
-                                    <option value="fecha" {% if request.GET.orden == 'fecha' %}selected{% endif %}>Fecha Reciente</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary me-2">
-                                    <i class="bi bi-filter me-1"></i>Filtrar
-                                </button>
-                                <a href="{% url 'core:examen_ranking' %}" class="btn btn-outline-secondary">
-                                    <i class="bi bi-x-circle"></i>
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Podio (Top 3) -->
         {% if resultados %}
@@ -121,12 +86,18 @@
                                 <div class="card {% if forloop.counter == 1 %}border-warning{% elif forloop.counter == 2 %}border-secondary{% else %}border-success{% endif %}">
                                     <div class="card-body">
                                         <div class="mb-3">
-                                            {% if forloop.counter == 1 %}
-                                                <i class="bi bi-trophy-fill text-warning display-4"></i>
-                                            {% elif forloop.counter == 2 %}
-                                                <i class="bi bi-trophy-fill text-secondary display-4"></i>
+                                            {% if resultado.examen.estudiante.profile_picture %}
+                                                <img src="{{ resultado.examen.estudiante.profile_picture.url }}" alt="Foto de perfil" 
+                                                     class="rounded-circle border border-3 {% if forloop.counter == 1 %}border-warning{% elif forloop.counter == 2 %}border-secondary{% else %}border-success{% endif %}" 
+                                                     style="width: 80px; height: 80px; object-fit: cover;">
                                             {% else %}
-                                                <i class="bi bi-trophy-fill text-success display-4"></i>
+                                                {% if forloop.counter == 1 %}
+                                                    <i class="bi bi-trophy-fill text-warning display-4"></i>
+                                                {% elif forloop.counter == 2 %}
+                                                    <i class="bi bi-trophy-fill text-secondary display-4"></i>
+                                                {% else %}
+                                                    <i class="bi bi-trophy-fill text-success display-4"></i>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                         <h5 class="card-title">{{ resultado.examen.estudiante.get_full_name|default:resultado.examen.estudiante.username }}</h5>
@@ -209,11 +180,23 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div>
-                                                <strong>{{ resultado.examen.estudiante.get_full_name|default:resultado.examen.estudiante.username }}</strong>
-                                                {% if resultado.examen.estudiante == request.user %}
-                                                    <span class="badge bg-primary ms-2">Tú</span>
+                                            <div class="d-flex align-items-center">
+                                                {% if resultado.examen.estudiante.profile_picture %}
+                                                    <img src="{{ resultado.examen.estudiante.profile_picture.url }}" alt="Foto de perfil" 
+                                                         class="rounded-circle me-2" 
+                                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                                         style="width: 40px; height: 40px; min-width: 40px;">
+                                                        <i class="bi bi-person-fill text-primary"></i>
+                                                    </div>
                                                 {% endif %}
+                                                <div>
+                                                    <strong>{{ resultado.examen.estudiante.get_full_name|default:resultado.examen.estudiante.username }}</strong>
+                                                    {% if resultado.examen.estudiante == request.user %}
+                                                        <span class="badge bg-primary ms-2">Tú</span>
+                                                    {% endif %}
+                                                </div>
                                             </div>
                                         </td>
                                         <td>
@@ -274,10 +257,10 @@
                             <ul class="pagination justify-content-center">
                                 {% if page_obj.has_previous %}
                                     <li class="page-item">
-                                        <a class="page-link" href="?page=1{% if request.GET.tipo_examen %}&tipo_examen={{ request.GET.tipo_examen }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Primera</a>
+                                        <a class="page-link" href="?page=1">Primera</a>
                                     </li>
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.tipo_examen %}&tipo_examen={{ request.GET.tipo_examen }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Anterior</a>
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
                                     </li>
                                 {% endif %}
 
@@ -289,10 +272,10 @@
 
                                 {% if page_obj.has_next %}
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.tipo_examen %}&tipo_examen={{ request.GET.tipo_examen }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Siguiente</a>
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
                                     </li>
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.tipo_examen %}&tipo_examen={{ request.GET.tipo_examen }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Última</a>
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
                                     </li>
                                 {% endif %}
                             </ul>

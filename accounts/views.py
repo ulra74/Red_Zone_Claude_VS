@@ -7,6 +7,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django import forms
 from .models import CustomUser
+from .forms import UserProfileForm
 
 
 class CustomLoginView(LoginView):
@@ -45,22 +46,11 @@ class ProfileView(LoginRequiredMixin, DetailView):
         return context
 
 
-class ProfileEditForm(forms.ModelForm):
-    """Formulario para editar perfil"""
-    class Meta:
-        model = CustomUser
-        fields = ['first_name', 'last_name', 'email']
-        widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-        }
-
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
     """Vista para editar perfil"""
     model = CustomUser
-    form_class = ProfileEditForm
+    form_class = UserProfileForm
     template_name = 'accounts/profile_edit.html'
     success_url = reverse_lazy('accounts:profile')
 

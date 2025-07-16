@@ -980,7 +980,6 @@ class ExamenTestConfigView(LoginRequiredMixin, TemplateView):
         """Crear nuevo examen con la configuración seleccionada"""
         try:
             # Obtener datos del formulario
-            nombre = request.POST.get('nombre')
             tipo = request.POST.get('tipo')
             numero_preguntas = int(request.POST.get('numero_preguntas', 10))
             tiempo_por_pregunta = int(request.POST.get('tiempo_por_pregunta', 0))
@@ -997,6 +996,21 @@ class ExamenTestConfigView(LoginRequiredMixin, TemplateView):
                 messages.error(request, 'Debes seleccionar al menos un tema.')
                 return redirect('core:examen_config')
 
+            # Generar nombre automáticamente
+            if request.user.is_admin():
+                temas = Tema.objects.filter(id__in=temas_ids)
+            else:
+                temas = Tema.objects.filter(id__in=temas_ids, alumnos_con_acceso=request.user)
+            
+            if temas.count() == 1:
+                nombre = f"Examen de {temas.first().nombre}"
+            else:
+                nombre = f"Examen de {temas.count()} temas"
+            
+            # Añadir tipo al nombre
+            if tipo == 'examen':
+                nombre += " (Examen)"
+            
             # Crear examen
             examen = ExamenTest.objects.create(
                 estudiante=request.user,
@@ -1008,11 +1022,7 @@ class ExamenTestConfigView(LoginRequiredMixin, TemplateView):
                 fecha_inicio=timezone.now()
             )
 
-            # Asociar temas
-            if request.user.is_admin():
-                temas = Tema.objects.filter(id__in=temas_ids)
-            else:
-                temas = Tema.objects.filter(id__in=temas_ids, alumnos_con_acceso=request.user)
+            # Asociar temas (ya fueron cargados arriba)
             examen.temas_seleccionados.set(temas)
 
             # Asociar apartados si se seleccionaron

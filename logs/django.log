@@ -4755,3 +4755,77 @@ Watching for file changes with StatReloader
 "GET /auth/profile/edit/ HTTP/1.1" 200 21893
 "POST /auth/profile/edit/ HTTP/1.1" 302 0
 "GET /auth/profile/ HTTP/1.1" 200 22181
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /auth/profile/ HTTP/1.1" 200 21807
+"GET /auth/profile/edit/ HTTP/1.1" 200 22794
+"GET /auth/profile/ HTTP/1.1" 200 21807
+"GET /dashboard/ranking/ HTTP/1.1" 200 17055
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 15504
+"GET /dashboard/temas/ HTTP/1.1" 200 67079
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 24400
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 15504
+"GET /dashboard/temas/ HTTP/1.1" 200 67079
+"GET /dashboard/temas/ HTTP/1.1" 200 67079
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 24400
+"GET /dashboard/temas/ HTTP/1.1" 200 67079
+"GET /dashboard/temas/?q=emergencia&orden=orden HTTP/1.1" 200 67097
+"GET /dashboard/temas/?q=emergencia&orden=orden HTTP/1.1" 200 67097
+"GET /dashboard/temas/?q=emergencia&orden=orden HTTP/1.1" 200 67097
+"GET /dashboard/temas/?q=emergencia&orden=orden HTTP/1.1" 200 67097
+"GET /dashboard/temas/?q=emergencia&orden=orden HTTP/1.1" 200 67097
+"GET /dashboard/temas/?q=Emergencia&orden=orden HTTP/1.1" 200 67097
+"GET /dashboard/temas/?q=Emergencias&orden=orden HTTP/1.1" 200 67098
+"GET /dashboard/temas/?q=Emergencias&orden=orden HTTP/1.1" 200 64631
+"GET /dashboard/temas/?q=Emergencias&orden=orden HTTP/1.1" 200 62535
+"GET /dashboard/temas/2/ HTTP/1.1" 200 23962
+"GET /dashboard/examenes-test/configurar/?tema=2 HTTP/1.1" 200 59589
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/examenes-test/configurar/?tema=2 HTTP/1.1" 200 59042
+"POST /dashboard/examenes-test/configurar/?tema=2 HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/3/ejecutar/ HTTP/1.1" 200 40927
+"POST /dashboard/examenes-test/3/responder/ HTTP/1.1" 200 87
+"POST /dashboard/examenes-test/3/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/3/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/3/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/3/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/3/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/3/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/3/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/3/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/3/finalizar/ HTTP/1.1" 200 74
+"GET /dashboard/examenes-test/3/resultado/ HTTP/1.1" 200 69418
+"GET /dashboard/ranking/ HTTP/1.1" 200 29845
+"GET /dashboard/ranking/ HTTP/1.1" 200 27875
+"GET /auth/profile/ HTTP/1.1" 200 21808
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /auth/profile/ HTTP/1.1" 200 21817
+"GET /dashboard/ HTTP/1.1" 200 33153
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15609
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 25975
+"GET /dashboard/admin/users/ HTTP/1.1" 200 25557
+"GET /dashboard/admin/users/2/edit/ HTTP/1.1" 200 22618
+"GET /dashboard/admin/users/ HTTP/1.1" 200 25557
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 26997
+"GET /dashboard/oposiciones/3/ HTTP/1.1" 200 26894
+"GET /dashboard/admin/oposiciones/3/edit/ HTTP/1.1" 200 25601
+"POST /dashboard/admin/oposiciones/3/edit/ HTTP/1.1" 302 0
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 27539
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15631
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 32226
