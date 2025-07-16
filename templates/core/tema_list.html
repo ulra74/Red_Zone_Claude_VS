@@ -7,15 +7,8 @@
     <div class="page-header text-center mb-4">
         <h1 class="text-white mb-3">
             <i class="bi bi-journals me-2"></i>
-            {% if request.user.is_admin %}Todos los Temas{% else %}Mis Temas{% endif %}
+            Temas
         </h1>
-        <p class="text-white-50 mb-0">
-            {% if request.user.is_admin %}
-                Gestiona todos los temas disponibles en la plataforma
-            {% else %}
-                Temas de estudio a los que tienes acceso
-            {% endif %}
-        </p>
     </div>
 
     <div class="main-content">

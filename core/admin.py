@@ -6,7 +6,7 @@ from django.db.models import Count
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from .models import (
-    Oposicion, Tema, TemaOposicion, ArchivoOposicion, ArchivoTema, 
+    Oposicion, Tema, TemaOposicion, Apartado, Pregunta, Respuesta, ArchivoOposicion, ArchivoTema, 
     DescargaArchivo, ProgresoEstudiante
 )
 
@@ -166,6 +166,14 @@ class ArchivoTemaInline(admin.TabularInline):
     fields = ('nombre', 'archivo', 'tipo', 'descripcion', 'orden', 'es_publico', 'tamaño', 'descargas')
 
 
+class ApartadoInline(admin.TabularInline):
+    """Inline para apartados en el admin de temas"""
+    model = Apartado
+    extra = 1
+    fields = ('nombre', 'descripcion', 'orden')
+    ordering = ('orden',)
+
+
 # ============================================================================
 # ADMIN PARA RELACIÓN TEMA-OPOSICIÓN
 # ============================================================================
@@ -295,7 +303,7 @@ class TemaAdmin(admin.ModelAdmin):
     search_fields = ('nombre', 'descripcion')
     date_hierarchy = 'created_at'
     ordering = ('orden', 'nombre')
-    inlines = [OposicionTemaInline, ArchivoTemaInline]
+    inlines = [OposicionTemaInline, ApartadoInline, ArchivoTemaInline]
     list_editable = ('orden',)
     
     fieldsets = (
@@ -378,8 +386,122 @@ class TemaAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         """Optimiza las consultas con prefetch"""
         return super().get_queryset(request).prefetch_related(
-            'alumnos_con_acceso', 'archivos', 'oposiciones'
+            'alumnos_con_acceso', 'archivos', 'oposiciones', 'apartados'
         )
+
+
+# ============================================================================
+# ADMIN PARA APARTADOS
+# ============================================================================
+
+@admin.register(Apartado)
+class ApartadoAdmin(admin.ModelAdmin):
+    """Administración de Apartados"""
+    
+    list_display = ('nombre', 'tema', 'orden', 'total_preguntas', 'created_at')
+    list_filter = ('tema', 'created_at')
+    search_fields = ('nombre', 'descripcion', 'tema__nombre')
+    ordering = ('tema', 'orden')
+    list_editable = ('orden',)
+    
+    fieldsets = (
+        ('Información General', {
+            'fields': ('tema', 'nombre', 'descripcion', 'orden')
+        }),
+        ('Metadatos', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ('created_at', 'updated_at')
+    
+    def total_preguntas(self, obj):
+        """Muestra el total de preguntas del apartado"""
+        count = obj.preguntas.count()
+        return format_html(
+            '<span style="background-color: #17a2b8; color: white; padding: 2px 6px; '
+            'border-radius: 3px; font-size: 11px;">{} preguntas</span>',
+            count
+        )
+    total_preguntas.short_description = 'Preguntas'
+
+
+class RespuestaInline(admin.TabularInline):
+    """Inline para respuestas de preguntas"""
+    model = Respuesta
+    extra = 2
+    min_num = 2
+    max_num = 6
+    fields = ('texto', 'es_correcta', 'explicacion')
+
+
+@admin.register(Pregunta)
+class PreguntaAdmin(admin.ModelAdmin):
+    """Administración de Preguntas"""
+    
+    list_display = ('enunciado_corto', 'apartado', 'dificultad_display', 'activa', 'estadisticas', 'created_at')
+    list_filter = ('activa', 'apartado__tema', 'apartado', 'created_at')
+    search_fields = ('enunciado', 'apartado__nombre', 'apartado__tema__nombre')
+    ordering = ('apartado__tema__nombre', 'apartado__nombre', 'created_at')
+    inlines = [RespuestaInline]
+    
+    def enunciado_corto(self, obj):
+        """Enunciado truncado"""
+        return obj.enunciado[:100] + '...' if len(obj.enunciado) > 100 else obj.enunciado
+    enunciado_corto.short_description = 'Enunciado'
+    
+    def dificultad_display(self, obj):
+        """Muestra la dificultad con color"""
+        dificultad = obj.dificultad
+        colors = {
+            'facil': '#28a745',
+            'medio': '#ffc107', 
+            'dificil': '#dc3545'
+        }
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 2px 6px; '
+            'border-radius: 3px; font-size: 11px;">{}</span>',
+            colors.get(dificultad, '#6c757d'),
+            obj.get_dificultad_display()
+        )
+    dificultad_display.short_description = 'Dificultad'
+    
+    def estadisticas(self, obj):
+        """Estadísticas de la pregunta"""
+        if obj.veces_preguntada > 0:
+            return format_html(
+                '<small>{}% acierto<br>{} usos</small>',
+                round(obj.porcentaje_acierto, 1),
+                obj.veces_preguntada
+            )
+        return format_html('<small>Sin estadísticas</small>')
+    estadisticas.short_description = 'Estadísticas'
+
+
+@admin.register(Respuesta)
+class RespuestaAdmin(admin.ModelAdmin):
+    """Administración de Respuestas"""
+    
+    list_display = ('texto_corto', 'pregunta_info', 'es_correcta', 'created_at')
+    list_filter = ('es_correcta', 'pregunta__apartado__tema', 'created_at')
+    search_fields = ('texto', 'pregunta__enunciado')
+    ordering = ('pregunta__apartado__tema__nombre', 'pregunta__apartado__nombre', 'created_at')
+    
+    def texto_corto(self, obj):
+        """Texto truncado"""
+        return obj.texto[:80] + '...' if len(obj.texto) > 80 else obj.texto
+    texto_corto.short_description = 'Texto'
+    
+    def pregunta_info(self, obj):
+        """Información de la pregunta"""
+        return format_html(
+            '<strong>{}</strong><br><small>{} - {}</small>',
+            obj.pregunta.enunciado[:50] + '...' if len(obj.pregunta.enunciado) > 50 else obj.pregunta.enunciado,
+            obj.pregunta.apartado.tema.nombre,
+            obj.pregunta.apartado.nombre
+        )
+    pregunta_info.short_description = 'Pregunta'
 
 
 # ============================================================================

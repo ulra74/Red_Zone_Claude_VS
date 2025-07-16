@@ -10,7 +10,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Q, Prefetch
 from django import forms
-from .models import Oposicion, Tema, TemaOposicion
+from .models import Oposicion, Tema, TemaOposicion, Apartado, Pregunta, Respuesta
 from accounts.models import CustomUser
 
 
@@ -583,3 +583,298 @@ class AdminUserUpdateView(AdminRequiredMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, 'Usuario actualizado exitosamente.')
         return super().form_valid(form)
+
+
+# =================== VISTAS PARA APARTADOS ===================
+
+class ApartadoForm(forms.ModelForm):
+    """Formulario para crear/editar apartados"""
+    class Meta:
+        model = Apartado
+        fields = ['nombre', 'descripcion', 'orden']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'orden': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['descripcion'].required = False
+        self.fields['orden'].help_text = "Orden de aparición en el tema (números más bajos aparecen primero)"
+
+
+class AdminApartadoListView(AdminRequiredMixin, ListView):
+    """Lista de apartados para un tema específico"""
+    model = Apartado
+    template_name = 'core/admin/apartado_list.html'
+    context_object_name = 'apartados'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        self.tema = get_object_or_404(Tema, pk=self.kwargs['tema_id'])
+        return Apartado.objects.filter(tema=self.tema).order_by('orden', 'nombre')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tema'] = self.tema
+        context['title'] = f'Apartados de {self.tema.nombre}'
+        return context
+
+
+class AdminApartadoCreateView(AdminRequiredMixin, CreateView):
+    """Crear apartado para un tema específico"""
+    model = Apartado
+    form_class = ApartadoForm
+    template_name = 'core/admin/apartado_form.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        self.tema = get_object_or_404(Tema, pk=self.kwargs['tema_id'])
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tema'] = self.tema
+        context['title'] = f'Crear Apartado para {self.tema.nombre}'
+        context['form_title'] = 'Nuevo Apartado'
+        return context
+    
+    def form_valid(self, form):
+        form.instance.tema = self.tema
+        messages.success(self.request, f'Apartado "{form.instance.nombre}" creado exitosamente.')
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('core:admin_apartado_list', kwargs={'tema_id': self.tema.id})
+
+
+class AdminApartadoUpdateView(AdminRequiredMixin, UpdateView):
+    """Editar apartado"""
+    model = Apartado
+    form_class = ApartadoForm
+    template_name = 'core/admin/apartado_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tema'] = self.object.tema
+        context['title'] = f'Editar Apartado: {self.object.nombre}'
+        context['form_title'] = 'Editar Apartado'
+        return context
+    
+    def form_valid(self, form):
+        messages.success(self.request, f'Apartado "{form.instance.nombre}" actualizado exitosamente.')
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('core:admin_apartado_list', kwargs={'tema_id': self.object.tema.id})
+
+
+class AdminApartadoDeleteView(AdminRequiredMixin, DeleteView):
+    """Eliminar apartado"""
+    model = Apartado
+    template_name = 'core/admin/apartado_confirm_delete.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tema'] = self.object.tema
+        context['title'] = f'Eliminar Apartado: {self.object.nombre}'
+        return context
+    
+    def get_success_url(self):
+        return reverse_lazy('core:admin_apartado_list', kwargs={'tema_id': self.object.tema.id})
+    
+    def delete(self, request, *args, **kwargs):
+        apartado_nombre = self.get_object().nombre
+        messages.success(request, f'Apartado "{apartado_nombre}" eliminado exitosamente.')
+        return super().delete(request, *args, **kwargs)
+
+
+# =================== VISTAS PARA PREGUNTAS ===================
+
+# Formulario para crear/editar preguntas con respuestas inline
+class RespuestaForm(forms.ModelForm):
+    """Formulario para respuestas individuales"""
+    class Meta:
+        model = Respuesta
+        fields = ['texto', 'es_correcta', 'explicacion']
+        widgets = {
+            'texto': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'es_correcta': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'explicacion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['explicacion'].required = False
+
+
+# Formset para manejar múltiples respuestas
+RespuestaFormSet = forms.inlineformset_factory(
+    Pregunta,
+    Respuesta,
+    form=RespuestaForm,
+    extra=4,
+    min_num=2,
+    max_num=6,
+    can_delete=True,
+    can_order=False  # Sin orden ya que se mostrarán aleatoriamente
+)
+
+
+class PreguntaForm(forms.ModelForm):
+    """Formulario para crear/editar preguntas"""
+    class Meta:
+        model = Pregunta
+        fields = ['enunciado', 'texto_aclaratorio', 'activa']
+        widgets = {
+            'enunciado': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'texto_aclaratorio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'activa': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['texto_aclaratorio'].required = False
+        self.fields['activa'].initial = True
+
+
+class AdminPreguntaListView(AdminRequiredMixin, ListView):
+    """Lista de preguntas para un apartado específico"""
+    model = Pregunta
+    template_name = 'core/admin/pregunta_list.html'
+    context_object_name = 'preguntas'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        self.apartado = get_object_or_404(Apartado, pk=self.kwargs['apartado_id'])
+        return Pregunta.objects.filter(apartado=self.apartado).prefetch_related('respuestas').order_by('created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['apartado'] = self.apartado
+        context['tema'] = self.apartado.tema
+        context['title'] = f'Preguntas de {self.apartado.nombre}'
+        return context
+
+
+class AdminPreguntaCreateView(AdminRequiredMixin, CreateView):
+    """Crear pregunta para un apartado específico"""
+    model = Pregunta
+    form_class = PreguntaForm
+    template_name = 'core/admin/pregunta_form.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        self.apartado = get_object_or_404(Apartado, pk=self.kwargs['apartado_id'])
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['apartado'] = self.apartado
+        context['tema'] = self.apartado.tema
+        context['title'] = f'Crear Pregunta para {self.apartado.nombre}'
+        context['form_title'] = 'Nueva Pregunta'
+        
+        if self.request.POST:
+            context['respuesta_formset'] = RespuestaFormSet(self.request.POST)
+        else:
+            context['respuesta_formset'] = RespuestaFormSet()
+        
+        return context
+    
+    def form_valid(self, form):
+        context = self.get_context_data()
+        respuesta_formset = context['respuesta_formset']
+        
+        if respuesta_formset.is_valid():
+            form.instance.apartado = self.apartado
+            self.object = form.save()
+            respuesta_formset.instance = self.object
+            respuesta_formset.save()
+            
+            # Verificar que haya al menos una respuesta correcta
+            if not self.object.respuestas.filter(es_correcta=True).exists():
+                messages.error(self.request, 'Debe haber al menos una respuesta correcta.')
+                return self.form_invalid(form)
+            
+            messages.success(self.request, f'Pregunta creada exitosamente.')
+            return redirect(self.get_success_url())
+        else:
+            # Debug: mostrar errores del formset
+            for i, form_errors in enumerate(respuesta_formset.errors):
+                if form_errors:
+                    messages.error(self.request, f'Error en respuesta {i+1}: {form_errors}')
+            if respuesta_formset.non_form_errors():
+                messages.error(self.request, f'Errores del formset: {respuesta_formset.non_form_errors()}')
+            return self.form_invalid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('core:admin_pregunta_list', kwargs={'apartado_id': self.apartado.id})
+
+
+class AdminPreguntaUpdateView(AdminRequiredMixin, UpdateView):
+    """Editar pregunta"""
+    model = Pregunta
+    form_class = PreguntaForm
+    template_name = 'core/admin/pregunta_form.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['apartado'] = self.object.apartado
+        context['tema'] = self.object.apartado.tema
+        context['title'] = f'Editar Pregunta'
+        context['form_title'] = 'Editar Pregunta'
+        
+        if self.request.POST:
+            context['respuesta_formset'] = RespuestaFormSet(self.request.POST, instance=self.object)
+        else:
+            context['respuesta_formset'] = RespuestaFormSet(instance=self.object)
+        
+        return context
+    
+    def form_valid(self, form):
+        context = self.get_context_data()
+        respuesta_formset = context['respuesta_formset']
+        
+        if respuesta_formset.is_valid():
+            self.object = form.save()
+            respuesta_formset.instance = self.object
+            respuesta_formset.save()
+            
+            # Verificar que haya al menos una respuesta correcta
+            if not self.object.respuestas.filter(es_correcta=True).exists():
+                messages.error(self.request, 'Debe haber al menos una respuesta correcta.')
+                return self.form_invalid(form)
+            
+            messages.success(self.request, f'Pregunta actualizada exitosamente.')
+            return redirect(self.get_success_url())
+        else:
+            # Debug: mostrar errores del formset
+            for i, form_errors in enumerate(respuesta_formset.errors):
+                if form_errors:
+                    messages.error(self.request, f'Error en respuesta {i+1}: {form_errors}')
+            if respuesta_formset.non_form_errors():
+                messages.error(self.request, f'Errores del formset: {respuesta_formset.non_form_errors()}')
+            return self.form_invalid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('core:admin_pregunta_list', kwargs={'apartado_id': self.object.apartado.id})
+
+
+class AdminPreguntaDeleteView(AdminRequiredMixin, DeleteView):
+    """Eliminar pregunta"""
+    model = Pregunta
+    template_name = 'core/admin/pregunta_confirm_delete.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['apartado'] = self.object.apartado
+        context['tema'] = self.object.apartado.tema
+        context['title'] = f'Eliminar Pregunta'
+        return context
+    
+    def get_success_url(self):
+        return reverse_lazy('core:admin_pregunta_list', kwargs={'apartado_id': self.object.apartado.id})
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, f'Pregunta eliminada exitosamente.')
+        return super().delete(request, *args, **kwargs)

@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-question-circle-fill me-3"></i>
+                        {{ title }}
+                    </h1>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'core:admin_pregunta_list' apartado_id=apartado.id %}" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver a Preguntas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="mb-0">{{ form_title }}</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if form.errors or respuesta_formset.errors %}
+                            <div class="alert alert-danger">
+                                <h6><i class="bi bi-exclamation-triangle-fill me-2"></i>Errores en el formulario:</h6>
+                                <ul class="mb-0">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ field|capfirst }}: {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% for error in respuesta_formset.non_form_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Información de la Pregunta -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Información de la Pregunta
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.enunciado.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-question-circle me-2"></i>Enunciado de la Pregunta
+                                    </label>
+                                    {{ form.enunciado }}
+                                    {% if form.enunciado.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.enunciado.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Escribe la pregunta de forma clara y concisa
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <label for="{{ form.texto_aclaratorio.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="bi bi-lightbulb me-2"></i>Texto Aclaratorio
+                                    </label>
+                                    {{ form.texto_aclaratorio }}
+                                    {% if form.texto_aclaratorio.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.texto_aclaratorio.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Explicación que se mostrará después de responder (opcional)
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <div class="alert alert-info d-flex align-items-center">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        <div>
+                                            <strong>Información:</strong> La dificultad se calcula automáticamente según el porcentaje de acierto. 
+                                            Todas las preguntas valen 1 punto y se mostrarán en orden aleatorio.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <div class="form-check">
+                                        {{ form.activa }}
+                                        <label class="form-check-label fw-semibold" for="{{ form.activa.id_for_label }}">
+                                            <i class="bi bi-check-circle me-2"></i>Pregunta Activa
+                                        </label>
+                                        {% if form.activa.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {{ form.activa.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            Solo las preguntas activas se pueden usar en exámenes
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Respuestas -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="bi bi-list-check me-2"></i>
+                                        Respuestas Posibles
+                                    </h6>
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        <strong>Importante:</strong> Debe haber al menos una respuesta correcta. 
+                                        Puedes añadir entre 2 y 6 respuestas.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <div class="respuestas-container">
+                                        {{ respuesta_formset.management_form }}
+                                        {% for form_respuesta in respuesta_formset %}
+                                            <div class="respuesta-form mb-4" data-form-index="{{ forloop.counter0 }}">
+                                                <!-- Campos ocultos del formset -->
+                                                {% for hidden in form_respuesta.hidden_fields %}
+                                                    {{ hidden }}
+                                                {% endfor %}
+                                                
+                                                <div class="card border-1">
+                                                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                                        <h6 class="mb-0">
+                                                            <i class="bi bi-circle me-2"></i>
+                                                            Respuesta {{ forloop.counter }}
+                                                        </h6>
+                                                        {% if respuesta_formset.can_delete %}
+                                                            <div class="form-check">
+                                                                {{ form_respuesta.DELETE }}
+                                                                <label class="form-check-label text-danger" for="{{ form_respuesta.DELETE.id_for_label }}">
+                                                                    <small>Eliminar</small>
+                                                                </label>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-md-10 mb-3">
+                                                                <label for="{{ form_respuesta.texto.id_for_label }}" class="form-label fw-semibold">
+                                                                    Texto de la Respuesta
+                                                                </label>
+                                                                {{ form_respuesta.texto }}
+                                                                {% if form_respuesta.texto.errors %}
+                                                                    <div class="text-danger small mt-1">
+                                                                        {{ form_respuesta.texto.errors.0 }}
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                            
+                                                            <div class="col-md-2 mb-3">
+                                                                <label class="form-label fw-semibold">Estado</label>
+                                                                <div class="form-check">
+                                                                    {{ form_respuesta.es_correcta }}
+                                                                    <label class="form-check-label text-success" for="{{ form_respuesta.es_correcta.id_for_label }}">
+                                                                        <i class="bi bi-check-circle me-1"></i>Correcta
+                                                                    </label>
+                                                                </div>
+                                                                {% if form_respuesta.es_correcta.errors %}
+                                                                    <div class="text-danger small mt-1">
+                                                                        {{ form_respuesta.es_correcta.errors.0 }}
+                                                                    </div>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <label for="{{ form_respuesta.explicacion.id_for_label }}" class="form-label fw-semibold">
+                                                                    Explicación (opcional)
+                                                                </label>
+                                                                {{ form_respuesta.explicacion }}
+                                                                {% if form_respuesta.explicacion.errors %}
+                                                                    <div class="text-danger small mt-1">
+                                                                        {{ form_respuesta.explicacion.errors.0 }}
+                                                                    </div>
+                                                                {% endif %}
+                                                                <div class="form-text">
+                                                                    Explicación adicional para esta respuesta
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información del Apartado -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body">
+                                            <h6 class="text-primary mb-3">
+                                                <i class="bi bi-folder-open me-2"></i>
+                                                Apartado y Tema
+                                            </h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                                            <i class="bi bi-folder-open text-primary"></i>
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-semibold">{{ apartado.nombre }}</div>
+                                                            <small class="text-muted">Apartado</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                                            <i class="bi bi-book text-info"></i>
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-semibold">{{ tema.nombre }}</div>
+                                                            <small class="text-muted">Tema</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{% url 'core:admin_pregunta_list' apartado_id=apartado.id %}" class="btn btn-outline-secondary">
+                                            <i class="bi bi-x-circle me-2"></i>
+                                            Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            {% if object %}Actualizar{% else %}Crear{% endif %} Pregunta
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control:focus {
+    border-color: var(--rza-primary);
+    box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
+}
+
+.respuesta-form {
+    transition: opacity 0.3s ease;
+}
+
+.respuesta-form.to-delete {
+    opacity: 0.5;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.form-check-input:checked {
+    background-color: var(--rza-primary);
+    border-color: var(--rza-primary);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejar la eliminación de respuestas
+    const deleteCheckboxes = document.querySelectorAll('input[name$="-DELETE"]');
+    
+    deleteCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const formContainer = this.closest('.respuesta-form');
+            if (this.checked) {
+                formContainer.classList.add('to-delete');
+            } else {
+                formContainer.classList.remove('to-delete');
+            }
+        });
+    });
+    
+    // Validar que haya al menos una respuesta correcta
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const correctaCheckboxes = document.querySelectorAll('input[name$="-es_correcta"]:checked');
+        const deleteCheckboxes = document.querySelectorAll('input[name$="-DELETE"]:checked');
+        
+        // Contar respuestas correctas que no van a ser eliminadas
+        let correctasCount = 0;
+        correctaCheckboxes.forEach(checkbox => {
+            const formContainer = checkbox.closest('.respuesta-form');
+            const deleteCheckbox = formContainer.querySelector('input[name$="-DELETE"]');
+            if (!deleteCheckbox || !deleteCheckbox.checked) {
+                correctasCount++;
+            }
+        });
+        
+        if (correctasCount === 0) {
+            e.preventDefault();
+            alert('Debe haber al menos una respuesta correcta.');
+        }
+    });
+});
+</script>
+{% endblock %}

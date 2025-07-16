@@ -12,9 +12,6 @@
                         <i class="bi bi-journals me-3"></i>
                         {{ title }}
                     </h1>
-                    <p class="mb-0 opacity-75">
-                        Administra los temas de estudio del sistema
-                    </p>
                 </div>
                 <div class="col-auto">
                     <a href="{% url 'core:admin_tema_create' %}" class="btn btn-light">
@@ -76,12 +73,19 @@
                                         Ver Detalles
                                     </a>
                                     <div class="btn-group" role="group">
+                                        <a href="{% url 'core:admin_apartado_list' tema_id=tema.pk %}" 
+                                           class="btn btn-outline-info btn-sm"
+                                           title="Apartados">
+                                            <i class="bi bi-list-ul"></i>
+                                        </a>
                                         <a href="{% url 'core:admin_tema_update' tema.pk %}" 
-                                           class="btn btn-outline-secondary btn-sm">
+                                           class="btn btn-outline-secondary btn-sm"
+                                           title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         <a href="{% url 'core:admin_tema_delete' tema.pk %}" 
                                            class="btn btn-outline-danger btn-sm"
+                                           title="Eliminar"
                                            onclick="return confirm('¿Estás seguro de que quieres eliminar este tema?')">
                                             <i class="bi bi-trash"></i>
                                         </a>

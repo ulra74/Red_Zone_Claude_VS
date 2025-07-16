@@ -24,6 +24,12 @@
                         Información del Tema
                     </h3>
                     <div>
+                        {% if user.is_admin %}
+                            <a href="{% url 'core:admin_apartado_list' tema_id=tema.pk %}" class="btn btn-primary btn-sm me-2">
+                                <i class="bi bi-folder-open me-1"></i>
+                                Gestionar Apartados
+                            </a>
+                        {% endif %}
                         <span class="badge bg-danger">Obligatorio</span>
                         <span class="badge bg-secondary">Orden: {{ tema.orden }}</span>
                     </div>

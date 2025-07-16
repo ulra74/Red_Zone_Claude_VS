@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-exclamation-triangle-fill text-danger me-3"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="mb-0 opacity-75">
+                        Confirmar eliminación del apartado
+                    </p>
+                </div>
+                <div class="col-auto">
+                    <a href="{% url 'core:admin_apartado_list' tema_id=tema.id %}" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver a Apartados
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-danger bg-opacity-10 border-0">
+                        <h5 class="mb-0 text-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            Confirmar Eliminación
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-danger">
+                            <h6><i class="bi bi-exclamation-triangle-fill me-2"></i>¡Atención!</h6>
+                            <p class="mb-0">
+                                Esta acción <strong>no se puede deshacer</strong>. Al eliminar este apartado:
+                            </p>
+                            <ul class="mb-0 mt-2">
+                                <li>Se eliminará permanentemente el apartado y todo su contenido</li>
+                                <li>Las preguntas asociadas a este apartado también serán eliminadas</li>
+                                <li>Los estudiantes perderán el acceso a este contenido</li>
+                            </ul>
+                        </div>
+
+                        <!-- Información del Apartado -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">
+                                    <i class="bi bi-folder-open me-2"></i>
+                                    Apartado a Eliminar
+                                </h6>
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-start">
+                                            <div class="bg-danger bg-opacity-10 rounded-circle p-3 me-3">
+                                                <i class="bi bi-folder-x text-danger fs-4"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h5 class="mb-1">{{ object.nombre }}</h5>
+                                                <p class="text-muted mb-2">
+                                                    {{ object.descripcion|default:"Sin descripción" }}
+                                                </p>
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-book me-1"></i>
+                                                            Tema: <strong>{{ tema.nombre }}</strong>
+                                                        </small>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-sort-numeric-up me-1"></i>
+                                                            Orden: <strong>{{ object.orden }}</strong>
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-2">
+                                                    <div class="col-sm-6">
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-calendar me-1"></i>
+                                                            Creado: <strong>{{ object.created_at|date:"d/m/Y H:i" }}</strong>
+                                                        </small>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-question-circle me-1"></i>
+                                                            Preguntas: <strong>{{ object.total_preguntas }}</strong>
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Confirmación -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card bg-light border-0">
+                                    <div class="card-body text-center">
+                                        <h6 class="text-muted mb-3">
+                                            ¿Estás seguro de que quieres eliminar este apartado?
+                                        </h6>
+                                        <form method="post" class="d-inline">
+                                            {% csrf_token %}
+                                            <div class="btn-group gap-3">
+                                                <a href="{% url 'core:admin_apartado_list' tema_id=tema.id %}" 
+                                                   class="btn btn-outline-secondary">
+                                                    <i class="bi bi-x-circle me-2"></i>
+                                                    Cancelar
+                                                </a>
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="bi bi-trash me-2"></i>
+                                                    Sí, Eliminar Apartado
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-danger.bg-opacity-10 {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.btn-group {
+    gap: 1rem;
+}
+
+.btn-group .btn {
+    margin-right: 0;
+}
+</style>
+{% endblock %}

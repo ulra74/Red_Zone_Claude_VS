@@ -12,9 +12,6 @@
                         <i class="bi bi-clipboard-check me-3"></i>
                         {{ title }}
                     </h1>
-                    <p class="mb-0 opacity-75">
-                        Finalizado el {{ intento.fecha_fin|date:"d/m/Y H:i" }}
-                    </p>
                 </div>
                 <div class="col-auto">
                     <a href="{% url 'evaluaciones:examen_list' %}" class="btn btn-light">

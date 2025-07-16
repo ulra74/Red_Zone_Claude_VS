@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-question-circle me-3"></i>
+                        {{ title }}
+                    </h1>
+                </div>
+                <div class="col-auto">
+                    <div class="btn-group">
+                        <a href="{% url 'core:admin_pregunta_create' apartado_id=apartado.id %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Nueva Pregunta
+                        </a>
+                        <a href="{% url 'core:admin_apartado_list' tema_id=tema.id %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            Volver a Apartados
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container flex-grow-1">
+        {% if preguntas %}
+            <!-- Información del Apartado -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="card-title mb-2">
+                                        <i class="bi bi-folder-open text-primary me-2"></i>
+                                        {{ apartado.nombre }}
+                                    </h5>
+                                    <p class="text-muted mb-0">{{ apartado.descripcion|default:"Sin descripción" }}</p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="d-flex justify-content-end gap-3">
+                                        <div class="text-center">
+                                            <div class="fw-bold text-primary">{{ preguntas|length }}</div>
+                                            <small class="text-muted">Preguntas</small>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="fw-bold text-success">{{ apartado.tema.nombre }}</div>
+                                            <small class="text-muted">Tema</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Preguntas -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-list-ul text-primary me-2"></i>
+                                    Preguntas del Apartado
+                                </h5>
+                                <span class="badge bg-primary">{{ preguntas|length }} preguntas</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            {% for pregunta in preguntas %}
+                                <div class="border-bottom p-4 pregunta-item">
+                                    <div class="row align-items-start">
+                                        <div class="col-md-1">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <span class="badge bg-secondary mb-2">{{ pregunta.orden }}</span>
+                                                <div class="text-center">
+                                                    {% if pregunta.dificultad == 'facil' %}
+                                                    <span class="badge bg-success">{{ pregunta.get_dificultad_display }}</span>
+                                                {% elif pregunta.dificultad == 'medio' %}
+                                                    <span class="badge bg-warning">{{ pregunta.get_dificultad_display }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">{{ pregunta.get_dificultad_display }}</span>
+                                                {% endif %}
+                                                </div>
+                                                <div class="text-center mt-1">
+                                                    {% if pregunta.veces_preguntada < 10 %}
+                                                        <small class="text-muted">Auto</small>
+                                                    {% else %}
+                                                        <small class="text-muted">{{ pregunta.porcentaje_acierto|floatformat:0 }}%</small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-7">
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold mb-2">
+                                                    {{ pregunta.enunciado|truncatechars:100 }}
+                                                </h6>
+                                                {% if pregunta.texto_aclaratorio %}
+                                                    <p class="text-muted small mb-2">
+                                                        <i class="bi bi-info-circle me-1"></i>
+                                                        {{ pregunta.texto_aclaratorio|truncatechars:80 }}
+                                                    </p>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Respuestas -->
+                                            <div class="row">
+                                                {% for respuesta in pregunta.respuestas.all %}
+                                                    <div class="col-md-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            {% if respuesta.es_correcta %}
+                                                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                                            {% else %}
+                                                                <i class="bi bi-circle text-muted me-2"></i>
+                                                            {% endif %}
+                                                            <small class="text-muted">{{ respuesta.texto|truncatechars:50 }}</small>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-2 text-center">
+                                            <div class="mb-2">
+                                                <span class="badge bg-info">1 pt</span>
+                                            </div>
+                                            {% if pregunta.veces_preguntada > 0 %}
+                                                <div class="mb-2">
+                                                    <small class="text-muted">
+                                                        {{ pregunta.porcentaje_acierto|floatformat:1 }}% acierto
+                                                    </small>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted">
+                                                        {{ pregunta.veces_preguntada }} usos
+                                                    </small>
+                                                </div>
+                                            {% else %}
+                                                <small class="text-muted">Sin estadísticas</small>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="col-md-2 text-end">
+                                            <div class="mb-2">
+                                                {% if pregunta.activa %}
+                                                    <span class="badge bg-success">Activa</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Inactiva</span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'core:admin_pregunta_update' pk=pregunta.pk %}" 
+                                                   class="btn btn-outline-primary btn-sm"
+                                                   title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{% url 'core:admin_pregunta_delete' pk=pregunta.pk %}" 
+                                                   class="btn btn-outline-danger btn-sm"
+                                                   title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <nav aria-label="Navegación de páginas">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">
+                                            <i class="bi bi-chevron-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                            <i class="bi bi-chevron-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Estado vacío -->
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-question-circle text-muted" style="font-size: 5rem;"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">No hay preguntas creadas</h3>
+                        <p class="text-muted mb-4">
+                            Crea la primera pregunta para el apartado "<strong>{{ apartado.nombre }}</strong>".
+                        </p>
+                        <a href="{% url 'core:admin_pregunta_create' apartado_id=apartado.id %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            Crear Primera Pregunta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.pregunta-item {
+    transition: background-color 0.2s ease;
+}
+
+.pregunta-item:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+.pregunta-item:last-child {
+    border-bottom: none !important;
+}
+
+.page-link {
+    color: var(--rza-primary);
+    border-color: #dee2e6;
+}
+
+.page-link:hover {
+    color: var(--rza-secondary);
+    background-color: #fef2f2;
+    border-color: #dee2e6;
+}
+
+.page-item.active .page-link {
+    background: var(--rza-gradient);
+    border-color: var(--rza-primary);
+}
+</style>
+{% endblock %}

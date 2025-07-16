@@ -41,6 +41,18 @@ urlpatterns = [
     path('admin/temas/<int:pk>/edit/', views.AdminTemaUpdateView.as_view(), name='admin_tema_update'),
     path('admin/temas/<int:pk>/delete/', views.AdminTemaDeleteView.as_view(), name='admin_tema_delete'),
     
+    # Admin URLs - Apartados
+    path('admin/temas/<int:tema_id>/apartados/', views.AdminApartadoListView.as_view(), name='admin_apartado_list'),
+    path('admin/temas/<int:tema_id>/apartados/create/', views.AdminApartadoCreateView.as_view(), name='admin_apartado_create'),
+    path('admin/apartados/<int:pk>/edit/', views.AdminApartadoUpdateView.as_view(), name='admin_apartado_update'),
+    path('admin/apartados/<int:pk>/delete/', views.AdminApartadoDeleteView.as_view(), name='admin_apartado_delete'),
+    
+    # Admin URLs - Preguntas
+    path('admin/apartados/<int:apartado_id>/preguntas/', views.AdminPreguntaListView.as_view(), name='admin_pregunta_list'),
+    path('admin/apartados/<int:apartado_id>/preguntas/create/', views.AdminPreguntaCreateView.as_view(), name='admin_pregunta_create'),
+    path('admin/preguntas/<int:pk>/edit/', views.AdminPreguntaUpdateView.as_view(), name='admin_pregunta_update'),
+    path('admin/preguntas/<int:pk>/delete/', views.AdminPreguntaDeleteView.as_view(), name='admin_pregunta_delete'),
+    
     # Gestión de usuarios (solo admin)
     path('admin/users/', views.AdminUserListView.as_view(), name='admin_user_list'),
     path('admin/users/create/', views.AdminUserCreateView.as_view(), name='admin_user_create'),

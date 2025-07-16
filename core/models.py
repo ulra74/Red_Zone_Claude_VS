@@ -82,6 +82,204 @@ class Tema(models.Model):
         """Devuelve lista de nombres de oposiciones"""
         return ", ".join([op.nombre for op in self.oposiciones.all()[:3]]) + \
                (f" (+{self.oposiciones.count() - 3} más)" if self.oposiciones.count() > 3 else "")
+    
+    @property
+    def total_apartados(self):
+        """Cuenta total de apartados del tema"""
+        return self.apartados.count()
+
+
+class Apartado(models.Model):
+    """Apartados o secciones dentro de un tema"""
+    tema = models.ForeignKey(
+        Tema, 
+        on_delete=models.CASCADE, 
+        related_name='apartados',
+        help_text="Tema al que pertenece este apartado"
+    )
+    nombre = models.CharField(max_length=200, help_text="Nombre del apartado")
+    descripcion = models.TextField(blank=True, help_text="Descripción del apartado")
+    orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en el tema")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['orden', 'nombre']
+        unique_together = ['tema', 'nombre']  # No permitir apartados duplicados en el mismo tema
+        verbose_name_plural = "Apartados"
+    
+    def __str__(self):
+        return f"{self.tema.nombre} - {self.nombre}"
+    
+    @property
+    def total_preguntas(self):
+        """Cuenta total de preguntas en este apartado"""
+        return self.preguntas.count() if hasattr(self, 'preguntas') else 0
+
+
+class Pregunta(models.Model):
+    """Preguntas tipo test para examenes"""
+    
+    # Tipos de dificultad
+    DIFICULTAD_CHOICES = [
+        ('facil', 'Fácil'),
+        ('medio', 'Medio'),
+        ('dificil', 'Difícil'),
+    ]
+    
+    apartado = models.ForeignKey(
+        Apartado,
+        on_delete=models.CASCADE,
+        related_name='preguntas',
+        help_text="Apartado al que pertenece esta pregunta"
+    )
+    
+    enunciado = models.TextField(
+        help_text="Texto de la pregunta"
+    )
+    
+    texto_aclaratorio = models.TextField(
+        blank=True,
+        help_text="Explicación que se mostrará después de responder (opcional)"
+    )
+    
+    # La dificultad se calcula automáticamente basada en el porcentaje de acierto
+    # No necesitamos almacenar puntos ya que siempre serán los mismos
+    # No necesitamos orden ya que las preguntas se mostrarán aleatoriamente
+    
+    activa = models.BooleanField(
+        default=True,
+        help_text="Si la pregunta está activa para usar en exámenes"
+    )
+    
+    # Estadísticas de uso
+    veces_preguntada = models.PositiveIntegerField(
+        default=0,
+        help_text="Número de veces que se ha usado en exámenes"
+    )
+    
+    veces_acertada = models.PositiveIntegerField(
+        default=0,
+        help_text="Número de veces que se ha respondido correctamente"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['created_at']  # Orden por fecha de creación
+        verbose_name_plural = "Preguntas"
+    
+    def __str__(self):
+        return f"{self.apartado.tema.nombre} - {self.apartado.nombre} - {self.enunciado[:50]}..."
+    
+    @property
+    def porcentaje_acierto(self):
+        """Calcula el porcentaje de acierto de la pregunta"""
+        if self.veces_preguntada == 0:
+            return 0
+        return (self.veces_acertada / self.veces_preguntada) * 100
+    
+    @property
+    def dificultad_automatica(self):
+        """Calcula la dificultad automáticamente basada en el porcentaje de acierto"""
+        if self.veces_preguntada < 10:  # Mínimo 10 intentos para calcular dificultad
+            return 'medio'
+        
+        porcentaje = self.porcentaje_acierto
+        if porcentaje >= 70:
+            return 'facil'
+        elif porcentaje >= 40:
+            return 'medio'
+        else:
+            return 'dificil'
+    
+    @property
+    def dificultad(self):
+        """Propiedad para compatibilidad con templates existentes"""
+        return self.dificultad_automatica
+    
+    def get_dificultad_display(self):
+        """Obtiene el display de la dificultad automática"""
+        dificultad_choices = {
+            'facil': 'Fácil',
+            'medio': 'Medio',
+            'dificil': 'Difícil'
+        }
+        return dificultad_choices.get(self.dificultad_automatica, 'Medio')
+    
+    @property
+    def puntos(self):
+        """Todos los puntos valen 1 - propiedad para compatibilidad"""
+        return 1
+    
+    @property
+    def respuesta_correcta(self):
+        """Obtiene la respuesta correcta"""
+        return self.respuestas.filter(es_correcta=True).first()
+    
+    @property
+    def respuestas_incorrectas(self):
+        """Obtiene las respuestas incorrectas"""
+        return self.respuestas.filter(es_correcta=False)
+    
+    def incrementar_estadisticas(self, acertada=False):
+        """Incrementa las estadísticas de uso"""
+        self.veces_preguntada += 1
+        if acertada:
+            self.veces_acertada += 1
+        self.save(update_fields=['veces_preguntada', 'veces_acertada'])
+
+
+class Respuesta(models.Model):
+    """Respuestas posibles para una pregunta"""
+    
+    pregunta = models.ForeignKey(
+        Pregunta,
+        on_delete=models.CASCADE,
+        related_name='respuestas',
+        help_text="Pregunta a la que pertenece esta respuesta"
+    )
+    
+    texto = models.TextField(
+        help_text="Texto de la respuesta"
+    )
+    
+    es_correcta = models.BooleanField(
+        default=False,
+        help_text="Marcar si esta es la respuesta correcta"
+    )
+    
+    # Eliminamos el orden fijo - se mostrará aleatoriamente
+    
+    explicacion = models.TextField(
+        blank=True,
+        help_text="Explicación adicional para esta respuesta (opcional)"
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['created_at']  # Las respuestas se mostrarán en orden aleatorio
+        verbose_name_plural = "Respuestas"
+        # Asegurar que solo haya una respuesta correcta por pregunta
+        unique_together = []
+    
+    def __str__(self):
+        estado = "✓" if self.es_correcta else "✗"
+        return f"{estado} {self.texto[:30]}..."
+    
+    def save(self, *args, **kwargs):
+        """Validar que solo hay una respuesta correcta por pregunta"""
+        if self.es_correcta:
+            # Si esta respuesta se marca como correcta, desmarcar las otras
+            Respuesta.objects.filter(
+                pregunta=self.pregunta,
+                es_correcta=True
+            ).exclude(pk=self.pk).update(es_correcta=False)
+        super().save(*args, **kwargs)
 
 
 # Modelo intermedio opcional para datos adicionales de la relación
