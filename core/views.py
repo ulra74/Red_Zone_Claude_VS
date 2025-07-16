@@ -66,6 +66,38 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             total_temas_oposiciones = sum([op.temas.count() for op in mis_oposiciones])
             context['total_temas_en_oposiciones'] = total_temas_oposiciones
             
+            # Información del rango y ranking
+            context['rango_info'] = user.get_rango_firefighter()
+            
+            # Calcular posición en ranking
+            try:
+                from core.models import ExamenTestResultado
+                ranking_resultados = ExamenTestResultado.objects.select_related(
+                    'examen__estudiante'
+                ).filter(
+                    examen__estudiante__user_type='student'
+                ).order_by('-porcentaje_acierto', 'tiempo_total_segundos')
+                
+                # Buscar posición del usuario actual
+                mi_posicion = None
+                total_estudiantes = 0
+                for idx, resultado in enumerate(ranking_resultados):
+                    if resultado.examen.estudiante == user:
+                        mi_posicion = idx + 1
+                        break
+                    total_estudiantes += 1
+                
+                if mi_posicion is None:
+                    total_estudiantes = ExamenTestResultado.objects.filter(
+                        examen__estudiante__user_type='student'
+                    ).values('examen__estudiante').distinct().count()
+                
+                context['mi_posicion_ranking'] = mi_posicion
+                context['total_estudiantes_ranking'] = total_estudiantes if mi_posicion else total_estudiantes
+            except:
+                context['mi_posicion_ranking'] = None
+                context['total_estudiantes_ranking'] = 0
+            
         elif user.is_admin():
             context['total_oposiciones'] = Oposicion.objects.count()
             context['total_temas'] = Tema.objects.count()
@@ -134,17 +166,20 @@ class OposicionDetailView(LoginRequiredMixin, DetailView):
         
         # Obtener temas ordenados de la oposición
         temas_oposicion = self.object.temas.prefetch_related('archivos').order_by('orden', 'nombre')
-        context['temas'] = temas_oposicion
         
-        # Estadísticas para estudiantes
+        # Añadir información de progreso a cada tema para estudiantes
         if self.request.user.is_student():
-            context['progreso_temas'] = {}
+            temas_con_progreso = []
             for tema in temas_oposicion:
                 # Aquí puedes calcular el progreso del estudiante en cada tema
-                context['progreso_temas'][tema.id] = {
+                tema.progreso = {
                     'completado': False,  # Implementar lógica de progreso
                     'porcentaje': 0,
                 }
+                temas_con_progreso.append(tema)
+            context['temas'] = temas_con_progreso
+        else:
+            context['temas'] = temas_oposicion
         
         return context
 
@@ -190,8 +225,15 @@ class TemaDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.nombre
         
-        # Obtener oposiciones relacionadas
-        context['oposiciones_relacionadas'] = self.object.oposiciones.all()
+        # Obtener oposiciones relacionadas según el tipo de usuario
+        if self.request.user.is_admin():
+            # Los administradores ven todas las oposiciones
+            context['oposiciones_relacionadas'] = self.object.oposiciones.all()
+        else:
+            # Los estudiantes solo ven las oposiciones a las que tienen acceso
+            context['oposiciones_relacionadas'] = self.object.oposiciones.filter(
+                alumnos_con_acceso=self.request.user
+            )
         
         return context
 

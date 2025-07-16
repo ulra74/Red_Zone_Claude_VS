@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container">
     <!-- Page Header -->
-    <div class="page-header text-center mb-4">
+    <div class="page-header seamless text-center mb-4">
         <h1 class="text-white mb-3">
             <i class="bi bi-journal-text me-2"></i>{{ tema.nombre }}
         </h1>
@@ -30,7 +30,6 @@
                                 Gestionar Apartados
                             </a>
                         {% endif %}
-                        <span class="badge bg-danger">Obligatorio</span>
                         <span class="badge bg-secondary">Orden: {{ tema.orden }}</span>
                     </div>
                 </div>
@@ -44,7 +43,7 @@
                 <!-- Oposiciones Relacionadas -->
                 <h4 class="mb-3">
                     <i class="bi bi-fire text-primary me-2"></i>
-                    Oposiciones que incluyen este tema ({{ oposiciones_relacionadas.count }})
+                    Oposiciones que incluyen este tema
                 </h4>
 
                 {% if oposiciones_relacionadas %}
@@ -155,80 +154,17 @@
                     {% endif %}
                 </div>
 
-                <!-- Exámenes Relacionados -->
-                <div class="mt-5">
-                    <h4 class="mb-3">
-                        <i class="bi bi-clipboard-check text-primary me-2"></i>
-                        Exámenes de este Tema
-                    </h4>
-                    
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Los exámenes específicos de este tema estarán disponibles próximamente.
-                        <br>
-                        <small class="text-muted">
-                            Mientras tanto, puedes practicar con los exámenes generales de las oposiciones relacionadas.
-                        </small>
-                    </div>
-                </div>
             </div>
         </div>
 
         <!-- Sidebar -->
         <div class="col-lg-4">
             <div class="main-content">
-                <!-- Estadísticas -->
-                <h5 class="mb-3">
-                    <i class="bi bi-graph-up text-primary me-2"></i>
-                    Estadísticas
-                </h5>
-                
-                <div class="row text-center">
-                    <div class="col-6">
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h4 class="text-primary">{{ oposiciones_relacionadas.count }}</h4>
-                                <small class="text-muted">Oposiciones</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h4 class="text-success">{{ tema.archivos.count }}</h4>
-                                <small class="text-muted">Archivos</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row text-center mt-2">
-                    <div class="col-6">
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h4 class="text-info">{{ tema.total_estudiantes }}</h4>
-                                <small class="text-muted">Estudiantes</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h4 class="text-warning">{{ tema.orden }}</h4>
-                                <small class="text-muted">Orden</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Configuración del Tema -->
                 <div class="mt-4">
                     <h6 class="mb-3">Configuración</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <i class="bi bi-check-circle text-danger me-2"></i>
-                            <strong>Obligatorio</strong>
-                        </li>
                         <li class="mb-2">
                             <i class="bi bi-sort-numeric-up text-info me-2"></i>
                             <strong>Orden:</strong> {{ tema.orden }}
@@ -242,11 +178,7 @@
                     
                     <div class="d-grid gap-2">
                         {% if request.user.is_student %}
-                            <a href="#" class="btn btn-primary">
-                                <i class="bi bi-play-circle me-2"></i>
-                                Estudiar Tema
-                            </a>
-                            <a href="#" class="btn btn-outline-primary">
+                            <a href="{% url 'core:examen_config' %}?tema={{ tema.pk }}" class="btn btn-outline-primary">
                                 <i class="bi bi-clipboard-check me-2"></i>
                                 Hacer Test
                             </a>
@@ -287,20 +219,6 @@
                 </div>
                 {% endif %}
 
-                <!-- Información Adicional -->
-                <div class="mt-4">
-                    <h6 class="mb-3">Información</h6>
-                    <ul class="list-unstyled small">
-                        <li class="mb-2">
-                            <i class="bi bi-clock text-muted me-2"></i>
-                            <strong>Creado:</strong> {{ tema.created_at|date:"d/m/Y" }}
-                        </li>
-                        <li class="mb-2">
-                            <i class="bi bi-arrow-clockwise text-muted me-2"></i>
-                            <strong>Actualizado:</strong> {{ tema.updated_at|naturaltime }}
-                        </li>
-                    </ul>
-                </div>
             </div>
         </div>
     </div>

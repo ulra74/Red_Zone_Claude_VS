@@ -7,6 +7,90 @@
         {% if user.is_student %}
             <!-- Dashboard de Estudiante -->
             <div class="row">
+                <!-- Rango y Ranking -->
+                <div class="col-md-12 mb-4">
+                    <div class="card border-0 shadow-sm bg-white" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-4">
+                                            {% if rango_info %}
+                                                <div class="text-center">
+                                                    <div class="badge text-white p-3 mb-2" style="background-color: {{ rango_info.color }}; font-size: 1.2rem;">
+                                                        <span style="font-size: 1.8em;">{{ rango_info.icono }}</span>
+                                                    </div>
+                                                    <div class="small text-muted">Nivel {{ rango_info.nivel }}</div>
+                                                </div>
+                                            {% else %}
+                                                <div class="text-center">
+                                                    <div class="badge bg-secondary p-3 mb-2" style="font-size: 1.2rem;">
+                                                        <span style="font-size: 1.8em;">🪣</span>
+                                                    </div>
+                                                    <div class="small text-muted">Nivel 1</div>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <h6 class="card-subtitle mb-1 text-muted">Tu Rango de Bombero</h6>
+                                            <h4 class="card-title mb-1 fw-bold text-dark">
+                                                {% if rango_info %}
+                                                    {{ rango_info.nombre }}
+                                                {% else %}
+                                                    Portador de Cubo
+                                                {% endif %}
+                                            </h4>
+                                            <small class="text-muted">
+                                                {% if rango_info %}
+                                                    {{ rango_info.porcentaje_actual|floatformat:1 }}% de acierto
+                                                {% else %}
+                                                    Realiza tu primer examen para obtener un rango
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-center">
+                                        <div class="d-flex justify-content-center align-items-center mb-2">
+                                            <div class="me-3">
+                                                <i class="bi bi-trophy text-warning" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-muted">Posición en Ranking</h6>
+                                                <h2 class="card-title mb-0 fw-bold text-dark">
+                                                    {% if mi_posicion_ranking %}
+                                                        #{{ mi_posicion_ranking }}
+                                                    {% else %}
+                                                        Sin posición
+                                                    {% endif %}
+                                                </h2>
+                                                <small class="text-muted">
+                                                    {% if mi_posicion_ranking %}
+                                                        de {{ total_estudiantes_ranking }} estudiantes
+                                                    {% else %}
+                                                        Completa un examen para aparecer en el ranking
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <a href="{% url 'core:examen_config' %}" class="btn btn-warning btn-sm me-2">
+                                                <i class="bi bi-clipboard-check me-1"></i>Hacer Examen
+                                            </a>
+                                            <a href="{% url 'core:examen_ranking' %}" class="btn btn-outline-warning btn-sm">
+                                                <i class="bi bi-trophy me-1"></i>Ver Ranking
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
                 <!-- Estadísticas -->
                 <div class="col-md-6 mb-4">
                     <div class="card border-0 shadow-sm h-100 bg-white">

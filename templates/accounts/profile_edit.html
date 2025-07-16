@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-fluid d-flex flex-column" style="min-height: calc(100vh - 120px);">
     <!-- Page Header -->
-    <div class="page-header">
+    <div class="page-header seamless">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col">
@@ -134,8 +134,8 @@
                                         <i class="bi bi-calendar me-2"></i>Miembro desde
                                     </label>
                                     <div class="form-control-plaintext bg-light border rounded p-2">
-                                        {{ user.date_joined|date:"d de F de Y" }}
-                                        <small class="text-muted ms-2">({{ user.date_joined|timesince }} ago)</small>
+                                        {{ user.date_joined|date:"d/m/Y" }}
+                                        <small class="text-muted ms-2">({{ user.date_joined|timesince }})</small>
                                     </div>
                                 </div>
                             </div>
