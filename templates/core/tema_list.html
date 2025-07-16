@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container">
     <!-- Page Header -->
-    <div class="page-header text-center mb-4">
+    <div class="page-header text-center seamless mb-4">
         <h1 class="text-white mb-3">
             <i class="bi bi-journals me-2"></i>
             Temas
@@ -32,21 +32,13 @@
         <div class="card mb-4">
             <div class="card-body">
                 <form method="get" class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="buscar" class="form-label">Buscar</label>
                         <input type="text" class="form-control" id="buscar" name="q" 
                                value="{{ request.GET.q }}" 
                                placeholder="Buscar por nombre o descripción...">
                     </div>
-                    <div class="col-md-3">
-                        <label for="tipo" class="form-label">Tipo</label>
-                        <select class="form-select" id="tipo" name="tipo">
-                            <option value="">Todos</option>
-                            <option value="obligatorio" {% if request.GET.tipo == 'obligatorio' %}selected{% endif %}>Obligatorios</option>
-                            <option value="opcional" {% if request.GET.tipo == 'opcional' %}selected{% endif %}>Opcionales</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label for="ordenar" class="form-label">Ordenar por</label>
                         <select class="form-select" id="ordenar" name="orden">
                             <option value="orden" {% if request.GET.orden == 'orden' %}selected{% endif %}>Orden</option>
@@ -82,7 +74,6 @@
                             </h5>
                             <div>
                                 <span class="badge bg-secondary">{{ tema.orden }}</span>
-                                <span class="badge bg-danger">Obligatorio</span>
                             </div>
                         </div>
                         
@@ -200,10 +191,10 @@
                     <ul class="pagination justify-content-center">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Primera</a>
+                                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Primera</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Anterior</a>
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Anterior</a>
                             </li>
                         {% endif %}
 
@@ -215,10 +206,10 @@
 
                         {% if page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Siguiente</a>
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Siguiente</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">Última</a>
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Última</a>
                             </li>
                         {% endif %}
                     </ul>

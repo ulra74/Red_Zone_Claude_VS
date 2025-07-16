@@ -31,15 +31,20 @@
         
         body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(
-        135deg,
-        #1f2937 0%,
-        #374151 25%,
-        #7f1d1d 50%,
-        #374151 75%,
-        #1f2937 100%
-    );
+    background: 
+        linear-gradient(
+            135deg,
+            rgba(31, 41, 55, 0.85) 0%,
+            rgba(55, 65, 81, 0.8) 25%,
+            rgba(127, 29, 29, 0.85) 50%,
+            rgba(55, 65, 81, 0.8) 75%,
+            rgba(31, 41, 55, 0.85) 100%
+        ),
+        url('{% static "img/fondo.jpeg" %}');
     background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     line-height: 1.6;
     min-height: 100vh;
     display: flex;
@@ -85,8 +90,10 @@
         }
         
         .navbar {
-            background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #b91c1c 100%) !important;
+            background: linear-gradient(135deg, rgba(127, 29, 29, 0.95) 0%, rgba(153, 27, 27, 0.95) 50%, rgba(185, 28, 28, 0.95) 100%) !important;
+            backdrop-filter: blur(10px);
             box-shadow: 0 2px 8px rgba(127, 29, 29, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .navbar .nav-link {
@@ -100,20 +107,33 @@
             transform: translateY(-1px);
         }
         
+        /* Dropdown styles para el menú de usuario */
         .navbar .dropdown-menu {
-            background-color: #7f1d1d;
-            border: none;
-            box-shadow: 0 4px 12px rgba(127, 29, 29, 0.3);
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(127, 29, 29, 0.2);
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
         }
         
         .navbar .dropdown-item {
-            color: rgba(255, 255, 255, 0.9);
-            transition: all 0.3s ease;
+            color: #374151 !important;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            margin: 0.125rem;
+            transition: all 0.2s ease;
         }
         
         .navbar .dropdown-item:hover {
-            background-color: #991b1b;
-            color: #fbbf24;
+            background-color: rgba(220, 38, 38, 0.1) !important;
+            color: #dc2626 !important;
+        }
+        
+        .navbar .dropdown-divider {
+            border-color: rgba(55, 65, 81, 0.2);
+            margin: 0.5rem 0;
         }
         
         .navbar-toggler {
@@ -139,8 +159,9 @@
             border: none;
             box-shadow: 0 4px 12px rgba(127, 29, 29, 0.15), 0 2px 4px rgba(127, 29, 29, 0.25);
             transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .card:hover {
@@ -149,12 +170,13 @@
         }
         
         .main-content {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
             border-radius: 1rem;
             padding: 2rem;
             margin: 1rem 0;
             box-shadow: 0 4px 12px rgba(127, 29, 29, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .btn-outline-primary {
@@ -170,9 +192,10 @@
         .alert {
             border: none;
             border-radius: 0.75rem;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
             box-shadow: 0 2px 8px rgba(127, 29, 29, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .text-primary {
@@ -213,6 +236,65 @@
         .container, .container-fluid {
             background: none !important;
         }
+        
+        /* Mejorar legibilidad para elementos específicos */
+        .page-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Page header específico para tema_list */
+        .page-header.text-center {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            box-shadow: none;
+        }
+        
+        /* Page header completamente integrado */
+        .page-header.seamless {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(15px);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(127, 29, 29, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Mejorar contraste para texto en headers */
+        .page-header h1, .page-header h2 {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .page-header.seamless h1, .page-header.seamless h2 {
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+        }
+        
+        /* Responsividad para el fondo */
+        @media (max-width: 768px) {
+            body {
+                background-attachment: scroll;
+            }
+            
+            .page-header {
+                margin-bottom: 1rem;
+            }
+            
+            .login-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -240,7 +322,7 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 {% if user.is_authenticated %}
-                <ul class="navbar-nav me-auto">
+                <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'core:dashboard' %}">
                             <i class="bi bi-speedometer2 me-1"></i>Dashboard
@@ -256,20 +338,6 @@
                             <i class="bi bi-journals me-1"></i>Temas
                         </a>
                     </li>
-                    {% if user.is_admin %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-gear me-1"></i>Administración
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'core:admin_oposicion_list' %}">Gestionar Oposiciones</a></li>
-                                <li><a class="dropdown-item" href="{% url 'core:admin_tema_list' %}">Gestionar Temas</a></li>
-                                <li><a class="dropdown-item" href="{% url 'core:admin_user_list' %}">Gestionar Usuarios</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/admin/">Panel Admin Django</a></li>
-                            </ul>
-                        </li>
-                    {% endif %}
                 </ul>
                 
                 <ul class="navbar-nav">

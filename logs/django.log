@@ -4362,3 +4362,57 @@ Watching for file changes with StatReloader
 "GET /auth/logout/ HTTP/1.1" 302 0
 "GET / HTTP/1.1" 302 0
 "GET /auth/login/ HTTP/1.1" 200 12284
+Watching for file changes with StatReloader
+"GET /auth/login/ HTTP/1.1" 200 13571
+"GET /static/img/fondo.jpeg HTTP/1.1" 304 0
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 22801
+"GET /dashboard/ HTTP/1.1" 200 22331
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22088
+"GET /dashboard/temas/ HTTP/1.1" 200 21064
+"GET /dashboard/temas/ HTTP/1.1" 200 21064
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22088
+"GET /dashboard/ HTTP/1.1" 200 22331
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22088
+"GET /dashboard/temas/ HTTP/1.1" 200 21064
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22088
+"GET /dashboard/ HTTP/1.1" 200 22331
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22088
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /dashboard/temas/ HTTP/1.1" 200 21064
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+"GET /dashboard/temas/ HTTP/1.1" 200 22194
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"GET /dashboard/temas/ HTTP/1.1" 200 22194
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 23218
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22271
+"GET /dashboard/ HTTP/1.1" 200 22932
+"GET /dashboard/ HTTP/1.1" 200 22932
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /dashboard/ HTTP/1.1" 200 22932
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22271
+"GET /dashboard/temas/ HTTP/1.1" 200 21247
+"GET /dashboard/temas/ HTTP/1.1" 200 20781
+"GET /dashboard/temas/ HTTP/1.1" 200 20700
+"GET /dashboard/temas/ HTTP/1.1" 200 20700
+"GET /dashboard/ HTTP/1.1" 200 22932
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22271
+"GET /dashboard/temas/ HTTP/1.1" 200 20700
+"GET /dashboard/temas/1/ HTTP/1.1" 200 24713
