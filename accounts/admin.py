@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
-from .models import CustomUser
+from .models import CustomUser, UserActivityStats
 
 
 @admin.register(CustomUser)
@@ -42,3 +42,54 @@ class CustomUserAdmin(UserAdmin):
     def get_queryset(self, request):
         """Optimiza las consultas"""
         return super().get_queryset(request).select_related()
+
+
+@admin.register(UserActivityStats)
+class UserActivityStatsAdmin(admin.ModelAdmin):
+    """Administración de estadísticas de actividad de usuarios"""
+    
+    list_display = (
+        'user', 'current_streak', 'best_streak', 'total_exams_completed',
+        'total_exams_retaken', 'last_exam_date', 'activity_level_badge'
+    )
+    list_filter = ('last_exam_date', 'current_streak', 'best_streak')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name')
+    ordering = ('-current_streak', '-best_streak', '-total_exams_completed')
+    readonly_fields = ('created_at', 'updated_at', 'last_activity_date')
+    
+    fieldsets = (
+        ('Usuario', {
+            'fields': ('user',)
+        }),
+        ('Estadísticas de Exámenes', {
+            'fields': ('total_exams_completed', 'total_exams_retaken')
+        }),
+        ('Racha de Actividad', {
+            'fields': ('current_streak', 'best_streak', 'streak_start_date')
+        }),
+        ('Fechas Importantes', {
+            'fields': ('last_exam_date', 'last_activity_date')
+        }),
+        ('Puntuaciones', {
+            'fields': ('streak_bonus_points', 'consistency_bonus_points', 'inactivity_penalty_points')
+        }),
+        ('Metadatos', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+    
+    def activity_level_badge(self, obj):
+        """Muestra el nivel de actividad con un badge colorido"""
+        level_info = obj.get_activity_level()
+        return format_html(
+            '<span style="background-color: {}; color: white; padding: 3px 8px; '
+            'border-radius: 3px; font-size: 12px;">{} {}</span>',
+            level_info['color'],
+            level_info['icon'],
+            level_info['name']
+        )
+    activity_level_badge.short_description = 'Nivel de Actividad'
+    
+    def get_queryset(self, request):
+        """Optimiza las consultas"""
+        return super().get_queryset(request).select_related('user')

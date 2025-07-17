@@ -28,36 +28,6 @@
             {% endif %}
         </div>
 
-        <!-- Filtros y Búsqueda -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <form method="get" class="row g-3">
-                    <div class="col-md-6">
-                        <label for="buscar" class="form-label">Buscar</label>
-                        <input type="text" class="form-control" id="buscar" name="q" 
-                               value="{{ request.GET.q }}" 
-                               placeholder="Buscar por nombre o descripción...">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="ordenar" class="form-label">Ordenar por</label>
-                        <select class="form-select" id="ordenar" name="orden">
-                            <option value="orden" {% if request.GET.orden == 'orden' %}selected{% endif %}>Orden</option>
-                            <option value="nombre" {% if request.GET.orden == 'nombre' %}selected{% endif %}>Nombre A-Z</option>
-                            <option value="-nombre" {% if request.GET.orden == '-nombre' %}selected{% endif %}>Nombre Z-A</option>
-                            <option value="-created_at" {% if request.GET.orden == '-created_at' %}selected{% endif %}>Más recientes</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-outline-primary me-2">
-                            <i class="bi bi-search me-1"></i>Buscar
-                        </button>
-                        <a href="{% url 'core:tema_list' %}" class="btn btn-outline-secondary">
-                            <i class="bi bi-x-circle"></i>
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
 
         <!-- Lista de Temas -->
         {% if temas %}
@@ -187,10 +157,10 @@
                     <ul class="pagination justify-content-center">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Primera</a>
+                                <a class="page-link" href="?page=1">Primera</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Anterior</a>
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
                             </li>
                         {% endif %}
 
@@ -202,10 +172,10 @@
 
                         {% if page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Siguiente</a>
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}">Última</a>
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
                             </li>
                         {% endif %}
                     </ul>

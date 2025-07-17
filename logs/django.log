@@ -4829,3 +4829,109 @@ Watching for file changes with StatReloader
 "GET /auth/login/ HTTP/1.1" 200 15631
 "POST /auth/login/ HTTP/1.1" 302 0
 "GET /dashboard/ HTTP/1.1" 200 32226
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 31768
+"GET /dashboard/ HTTP/1.1" 200 31768
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 21186
+"GET /dashboard/temas/ HTTP/1.1" 200 62500
+"GET /dashboard/temas/ HTTP/1.1" 200 60915
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 20100
+"GET /dashboard/examenes-test/3/resultado/ HTTP/1.1" 200 69418
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 20100
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/urls.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 20709
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 20723
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/admin.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/admin.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 20723
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 20723
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 20723
+"GET /auth/profile/ HTTP/1.1" 200 21817
+"GET /dashboard/ HTTP/1.1" 200 31893
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 20723
+"GET /dashboard/temas/ HTTP/1.1" 200 60915
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 21186
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 21186
+"GET /dashboard/temas/ HTTP/1.1" 200 60915
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 21186
+"GET /dashboard/ HTTP/1.1" 200 31893
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15609
+"POST /auth/login/ HTTP/1.1" 302 0
+Internal Server Error: /dashboard/
+Traceback (most recent call last):
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/contrib/auth/mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 226, in get
+    context = self.get_context_data(**kwargs)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py", line 116, in get_context_data
+    context['total_estudiantes'] = CustomUser.objects.filter(user_type='student').count()
+                                   ^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'CustomUser' where it is not associated with a value
+"GET /dashboard/ HTTP/1.1" 500 86011
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 2683
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 302 0
+Internal Server Error: /dashboard/
+Traceback (most recent call last):
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/contrib/auth/mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/venv/lib/python3.13/site-packages/django/views/generic/base.py", line 226, in get
+    context = self.get_context_data(**kwargs)
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py", line 116, in get_context_data
+    context['total_estudiantes'] = CustomUser.objects.filter(user_type='student').count()
+                                   ^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'CustomUser' where it is not associated with a value
+"GET /dashboard/ HTTP/1.1" 500 85849
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 200 25975
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15631
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 25975

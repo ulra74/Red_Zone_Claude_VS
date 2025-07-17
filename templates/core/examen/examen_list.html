@@ -134,13 +134,19 @@
                         </div>
                         
                         <div class="card-footer">
-                            <div class="btn-group w-100">
+                            <div class="d-flex gap-2">
                                 {% if examen.completado %}
-                                    <a href="{% url 'core:examen_resultado' examen.id %}" class="btn btn-outline-primary">
+                                    <a href="{% url 'core:examen_resultado' examen.id %}" class="btn btn-outline-primary flex-fill">
                                         <i class="bi bi-eye me-1"></i>Ver Resultados
                                     </a>
+                                    <form method="post" action="{% url 'core:examen_repetir' examen.id %}" class="flex-fill">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-success w-100" title="Repetir examen con preguntas aleatorias">
+                                            <i class="bi bi-arrow-repeat me-1"></i>Repetir
+                                        </button>
+                                    </form>
                                 {% else %}
-                                    <a href="{% url 'core:examen_ejecutar' examen.id %}" class="btn btn-primary">
+                                    <a href="{% url 'core:examen_ejecutar' examen.id %}" class="btn btn-primary w-100">
                                         <i class="bi bi-play-circle me-1"></i>Continuar
                                     </a>
                                 {% endif %}

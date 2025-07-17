@@ -226,16 +226,21 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <span class="me-2">
-                                                    <strong class="text-{% if resultado.porcentaje_acierto >= 80 %}success{% elif resultado.porcentaje_acierto >= 60 %}warning{% else %}danger{% endif %}">
-                                                        {{ resultado.porcentaje_acierto|floatformat:1 }}%
+                                                    <strong class="text-{% if resultado.enhanced_score >= 80 %}success{% elif resultado.enhanced_score >= 60 %}warning{% else %}danger{% endif %}">
+                                                        {{ resultado.enhanced_score|floatformat:1 }}%
                                                     </strong>
                                                 </span>
                                                 <div class="progress flex-grow-1" style="height: 8px;">
-                                                    <div class="progress-bar bg-{% if resultado.porcentaje_acierto >= 80 %}success{% elif resultado.porcentaje_acierto >= 60 %}warning{% else %}danger{% endif %}" 
-                                                         style="width: {{ resultado.porcentaje_acierto }}%"></div>
+                                                    <div class="progress-bar bg-{% if resultado.enhanced_score >= 80 %}success{% elif resultado.enhanced_score >= 60 %}warning{% else %}danger{% endif %}" 
+                                                         style="width: {{ resultado.enhanced_score }}%"></div>
                                                 </div>
                                             </div>
-                                            <small class="text-muted">{{ resultado.preguntas_correctas }}/{{ resultado.puntuacion_maxima }}</small>
+                                            <div class="d-flex justify-content-between">
+                                                <small class="text-muted">Base: {{ resultado.porcentaje_acierto|floatformat:1 }}%</small>
+                                                {% if resultado.activity_stats %}
+                                                    <small class="text-primary">Racha: {{ resultado.activity_stats.current_streak }} días</small>
+                                                {% endif %}
+                                            </div>
                                         </td>
                                         <td>
                                             <strong>{{ resultado.tiempo_promedio_por_pregunta|floatformat:1 }}s</strong>

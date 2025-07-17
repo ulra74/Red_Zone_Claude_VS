@@ -42,6 +42,17 @@ class CustomUser(AbstractUser):
             return self.profile_picture.url
         # Retornar una imagen por defecto basada en el tipo de usuario
         return None
+
+    def get_activity_stats(self):
+        """Obtiene estadísticas de actividad del usuario"""
+        if not self.is_student():
+            return None
+        
+        try:
+            activity, created = UserActivityStats.objects.get_or_create(user=self)
+            return activity
+        except:
+            return None
     
     def get_rango_firefighter(self):
         """Obtiene el rango del bombero según su mejor porcentaje de acierto"""
@@ -104,3 +115,183 @@ class CustomUser(AbstractUser):
             'porcentaje_max': 2,
             'porcentaje_actual': porcentaje
         }
+
+    def get_enhanced_ranking_score(self):
+        """Calcula el puntaje mejorado para el ranking incluyendo actividad y streaks"""
+        if not self.is_student():
+            return 0
+        
+        # Importar aquí para evitar import circular
+        from core.models import ExamenTestResultado
+        
+        # Obtener mejor resultado base
+        mejor_resultado = ExamenTestResultado.objects.filter(
+            examen__estudiante=self,
+            examen__estudiante__user_type='student'
+        ).order_by('-porcentaje_acierto').first()
+        
+        base_score = mejor_resultado.porcentaje_acierto if mejor_resultado else 0
+        
+        # Obtener estadísticas de actividad
+        activity_stats = self.get_activity_stats()
+        if not activity_stats:
+            return base_score
+        
+        # Calcular bonificaciones y penalizaciones
+        streak_bonus = min(activity_stats.current_streak * 2, 20)  # Max 20% bonus
+        consistency_bonus = min(activity_stats.total_exams_completed * 0.5, 15)  # Max 15% bonus
+        
+        # Penalización por inactividad
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        days_inactive = (timezone.now().date() - activity_stats.last_exam_date).days if activity_stats.last_exam_date else 999
+        inactivity_penalty = 0
+        
+        if days_inactive > 7:
+            inactivity_penalty = min(days_inactive * 0.5, 30)  # Max 30% penalty
+        
+        # Calcular puntaje final
+        final_score = base_score + streak_bonus + consistency_bonus - inactivity_penalty
+        return max(0, min(100, final_score))  # Mantener entre 0-100
+
+
+class UserActivityStats(models.Model):
+    """Modelo para rastrear la actividad y streaks de los usuarios"""
+    
+    user = models.OneToOneField(
+        'CustomUser',
+        on_delete=models.CASCADE,
+        related_name='activity_stats',
+        limit_choices_to={'user_type': 'student'}
+    )
+    
+    # Estadísticas de exámenes
+    total_exams_completed = models.PositiveIntegerField(default=0)
+    total_exams_retaken = models.PositiveIntegerField(default=0)
+    best_streak = models.PositiveIntegerField(default=0)
+    current_streak = models.PositiveIntegerField(default=0)
+    
+    # Fechas importantes
+    last_exam_date = models.DateField(null=True, blank=True)
+    streak_start_date = models.DateField(null=True, blank=True)
+    last_activity_date = models.DateField(auto_now=True)
+    
+    # Bonificaciones y penalizaciones
+    streak_bonus_points = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    consistency_bonus_points = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    inactivity_penalty_points = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    
+    # Metadatos
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Estadísticas de Actividad"
+        verbose_name_plural = "Estadísticas de Actividad"
+    
+    def __str__(self):
+        return f"{self.user.username} - Racha: {self.current_streak} días"
+    
+    def update_exam_completed(self, exam_date=None):
+        """Actualiza las estadísticas cuando se completa un examen"""
+        from django.utils import timezone
+        
+        if exam_date is None:
+            exam_date = timezone.now().date()
+        
+        # Actualizar contadores
+        self.total_exams_completed += 1
+        self.last_exam_date = exam_date
+        
+        # Actualizar streak
+        if self.last_exam_date and self.last_exam_date != exam_date:
+            days_diff = (exam_date - self.last_exam_date).days
+            if days_diff <= 1:  # Mismo día o día siguiente
+                if self.current_streak == 0:
+                    self.streak_start_date = exam_date
+                self.current_streak += 1
+                self.best_streak = max(self.best_streak, self.current_streak)
+            else:
+                # Racha rota
+                self.current_streak = 1
+                self.streak_start_date = exam_date
+        elif not self.last_exam_date:
+            # Primer examen
+            self.current_streak = 1
+            self.streak_start_date = exam_date
+        
+        # Calcular bonificaciones
+        self._calculate_bonuses()
+        self.save()
+    
+    def update_exam_retaken(self):
+        """Actualiza las estadísticas cuando se repite un examen"""
+        self.total_exams_retaken += 1
+        self.save()
+    
+    def check_streak_broken(self):
+        """Verifica si la racha se ha roto por inactividad"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        if not self.last_exam_date:
+            return False
+        
+        days_since_last = (timezone.now().date() - self.last_exam_date).days
+        if days_since_last > 1:  # Más de 1 día sin examen
+            self.current_streak = 0
+            self.streak_start_date = None
+            self._calculate_bonuses()
+            self.save()
+            return True
+        return False
+    
+    def _calculate_bonuses(self):
+        """Calcula bonificaciones y penalizaciones"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        # Bonificación por racha
+        self.streak_bonus_points = min(self.current_streak * 2, 20)
+        
+        # Bonificación por consistencia
+        self.consistency_bonus_points = min(self.total_exams_completed * 0.5, 15)
+        
+        # Penalización por inactividad
+        if self.last_exam_date:
+            days_inactive = (timezone.now().date() - self.last_exam_date).days
+            if days_inactive > 7:
+                self.inactivity_penalty_points = min(days_inactive * 0.5, 30)
+            else:
+                self.inactivity_penalty_points = 0
+        else:
+            self.inactivity_penalty_points = 0
+    
+    def get_activity_level(self):
+        """Determina el nivel de actividad del usuario"""
+        if self.current_streak >= 30:
+            return {'level': 'legendary', 'name': 'Legendario', 'color': '#FFD700', 'icon': '🏆'}
+        elif self.current_streak >= 14:
+            return {'level': 'expert', 'name': 'Experto', 'color': '#9932CC', 'icon': '⭐'}
+        elif self.current_streak >= 7:
+            return {'level': 'advanced', 'name': 'Avanzado', 'color': '#FF6347', 'icon': '🔥'}
+        elif self.current_streak >= 3:
+            return {'level': 'active', 'name': 'Activo', 'color': '#32CD32', 'icon': '💪'}
+        elif self.current_streak >= 1:
+            return {'level': 'beginner', 'name': 'Principiante', 'color': '#4169E1', 'icon': '🌟'}
+        else:
+            return {'level': 'inactive', 'name': 'Inactivo', 'color': '#696969', 'icon': '😴'}
+    
+    def get_streak_milestone_message(self):
+        """Obtiene mensaje de felicitación por milestone alcanzado"""
+        milestones = {
+            3: "¡Excelente! Has completado 3 días seguidos. ¡Sigue así! 🔥",
+            7: "¡Increíble! Una semana completa de dedicación. ¡Eres imparable! ⭐",
+            14: "¡Extraordinario! Dos semanas de constancia. ¡Eres un verdadero bombero! 🚒",
+            30: "¡LEGENDARIO! Un mes entero de dedicación. ¡Eres una inspiración! 🏆",
+            60: "¡ÉPICO! Dos meses de constancia absoluta. ¡Eres una leyenda! 👑",
+            90: "¡MÍTICO! Tres meses de perfección. ¡Eres el mejor bombero de la academia! 🌟"
+        }
+        
+        return milestones.get(self.current_streak, None)

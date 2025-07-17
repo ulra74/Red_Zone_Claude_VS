@@ -69,34 +69,45 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             # Información del rango y ranking
             context['rango_info'] = user.get_rango_firefighter()
             
-            # Calcular posición en ranking
+            # Obtener estadísticas de actividad
+            activity_stats = user.get_activity_stats()
+            context['activity_stats'] = activity_stats
+            
+            if activity_stats:
+                context['activity_level'] = activity_stats.get_activity_level()
+                context['streak_milestone'] = activity_stats.get_streak_milestone_message()
+                
+                # Verificar si la racha se rompió
+                if activity_stats.check_streak_broken():
+                    messages.warning(request, 'Tu racha de estudio se ha roto. ¡Realiza un examen hoy para comenzar una nueva!')
+            
+            # Calcular posición en ranking mejorado
             try:
-                from core.models import ExamenTestResultado
-                ranking_resultados = ExamenTestResultado.objects.select_related(
-                    'examen__estudiante'
-                ).filter(
-                    examen__estudiante__user_type='student'
-                ).order_by('-porcentaje_acierto', 'tiempo_total_segundos')
+                estudiantes = CustomUser.objects.filter(user_type='student')
+                ranking_scores = []
+                
+                for estudiante in estudiantes:
+                    score = estudiante.get_enhanced_ranking_score()
+                    if score > 0:  # Solo incluir estudiantes con exámenes
+                        ranking_scores.append((estudiante, score))
+                
+                # Ordenar por puntaje mejorado
+                ranking_scores.sort(key=lambda x: -x[1])
                 
                 # Buscar posición del usuario actual
                 mi_posicion = None
-                total_estudiantes = 0
-                for idx, resultado in enumerate(ranking_resultados):
-                    if resultado.examen.estudiante == user:
+                for idx, (estudiante, score) in enumerate(ranking_scores):
+                    if estudiante == user:
                         mi_posicion = idx + 1
                         break
-                    total_estudiantes += 1
-                
-                if mi_posicion is None:
-                    total_estudiantes = ExamenTestResultado.objects.filter(
-                        examen__estudiante__user_type='student'
-                    ).values('examen__estudiante').distinct().count()
                 
                 context['mi_posicion_ranking'] = mi_posicion
-                context['total_estudiantes_ranking'] = total_estudiantes if mi_posicion else total_estudiantes
-            except:
+                context['total_estudiantes_ranking'] = len(ranking_scores)
+                context['mi_score_mejorado'] = user.get_enhanced_ranking_score()
+            except Exception as e:
                 context['mi_posicion_ranking'] = None
                 context['total_estudiantes_ranking'] = 0
+                context['mi_score_mejorado'] = 0
             
         elif user.is_admin():
             context['total_oposiciones'] = Oposicion.objects.count()
@@ -1254,6 +1265,23 @@ class ExamenTestFinalizarView(LoginRequiredMixin, TemplateView):
                 resultado.preguntas_sin_responder = preguntas_sin_responder
                 resultado.save()
             
+            # Actualizar estadísticas de actividad del estudiante
+            if examen.estudiante.is_student():
+                try:
+                    from accounts.models import UserActivityStats
+                    activity_stats, created = UserActivityStats.objects.get_or_create(
+                        user=examen.estudiante
+                    )
+                    activity_stats.update_exam_completed(examen.fecha_fin.date())
+                    
+                    # Obtener mensaje de milestone si lo hay
+                    milestone_message = activity_stats.get_streak_milestone_message()
+                    if milestone_message:
+                        messages.success(request, milestone_message)
+                except Exception as e:
+                    # Log pero no fallar el examen
+                    pass
+            
             return JsonResponse({
                 'success': True,
                 'redirect_url': reverse_lazy('core:examen_resultado', kwargs={'examen_id': examen.id})
@@ -1293,11 +1321,27 @@ class ExamenTestRankingView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         # Solo incluir exámenes realizados por estudiantes (excluir administradores)
-        return ExamenTestResultado.objects.select_related(
-            'examen__estudiante'
-        ).filter(
-            examen__estudiante__user_type='student'
-        ).order_by('-porcentaje_acierto', 'tiempo_total_segundos')
+        # Obtener todos los estudiantes con sus mejores resultados
+        estudiantes = CustomUser.objects.filter(user_type='student')
+        resultados_con_score = []
+        
+        for estudiante in estudiantes:
+            # Obtener el mejor resultado tradicional
+            mejor_resultado = ExamenTestResultado.objects.filter(
+                examen__estudiante=estudiante
+            ).order_by('-porcentaje_acierto', 'tiempo_total_segundos').first()
+            
+            if mejor_resultado:
+                # Calcular puntaje mejorado
+                enhanced_score = estudiante.get_enhanced_ranking_score()
+                mejor_resultado.enhanced_score = enhanced_score
+                mejor_resultado.activity_stats = estudiante.get_activity_stats()
+                resultados_con_score.append(mejor_resultado)
+        
+        # Ordenar por puntaje mejorado
+        resultados_con_score.sort(key=lambda x: (-x.enhanced_score, x.tiempo_total_segundos))
+        
+        return resultados_con_score
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -1325,3 +1369,58 @@ class ExamenTestRankingView(LoginRequiredMixin, ListView):
             context['mi_posicion'] = None
             
         return context
+
+
+class ExamenTestRetakeView(LoginRequiredMixin, TemplateView):
+    """Vista para repetir un examen ya realizado con preguntas aleatorias"""
+    
+    def post(self, request, *args, **kwargs):
+        """Crear un nuevo examen basado en uno ya completado"""
+        try:
+            examen_original_id = kwargs.get('examen_id')
+            examen_original = get_object_or_404(ExamenTest, id=examen_original_id)
+            
+            # Verificar permisos
+            if examen_original.estudiante != request.user and not request.user.is_admin():
+                messages.error(request, 'No tienes permisos para repetir este examen.')
+                return redirect('core:examen_test_list')
+            
+            # Verificar que el examen esté completado
+            if not examen_original.completado:
+                messages.error(request, 'Solo puedes repetir exámenes que ya hayas completado.')
+                return redirect('core:examen_test_list')
+            
+            # Crear nuevo examen con la misma configuración
+            nuevo_examen = ExamenTest.objects.create(
+                estudiante=request.user,
+                nombre=f"{examen_original.nombre} (Repetición)",
+                tipo=examen_original.tipo,
+                numero_preguntas=examen_original.numero_preguntas,
+                tiempo_por_pregunta=examen_original.tiempo_por_pregunta,
+                tipo_aclaracion=examen_original.tipo_aclaracion,
+                fecha_inicio=timezone.now(),
+                completado=False
+            )
+            
+            # Copiar temas y apartados seleccionados
+            nuevo_examen.temas_seleccionados.set(examen_original.temas_seleccionados.all())
+            nuevo_examen.apartados_seleccionados.set(examen_original.apartados_seleccionados.all())
+            
+            # Actualizar estadísticas de repetición
+            if request.user.is_student():
+                try:
+                    from accounts.models import UserActivityStats
+                    activity_stats, created = UserActivityStats.objects.get_or_create(
+                        user=request.user
+                    )
+                    activity_stats.update_exam_retaken()
+                except Exception as e:
+                    # Log pero no fallar la repetición
+                    pass
+            
+            messages.success(request, 'Examen configurado para repetir con preguntas aleatorias.')
+            return redirect('core:examen_ejecutar', examen_id=nuevo_examen.id)
+            
+        except Exception as e:
+            messages.error(request, f'Error al crear el examen: {str(e)}')
+            return redirect('core:examen_test_list')
