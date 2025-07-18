@@ -663,6 +663,22 @@ class ExamenTest(models.Model):
         
         if self.fecha_fin and self.fecha_fin <= self.fecha_inicio:
             raise ValidationError("La fecha de fin debe ser posterior a la fecha de inicio")
+    
+    def generate_signature(self):
+        """Genera una signature única basada en temas y apartados seleccionados"""
+        import hashlib
+        
+        # Obtener IDs de temas ordenados
+        temas_ids = sorted(list(self.temas_seleccionados.values_list('id', flat=True)))
+        
+        # Obtener IDs de apartados ordenados (si los hay)
+        apartados_ids = sorted(list(self.apartados_seleccionados.values_list('id', flat=True)))
+        
+        # Crear string combinado
+        signature_string = f"temas:{','.join(map(str, temas_ids))}_apartados:{','.join(map(str, apartados_ids))}_tipo:{self.tipo}"
+        
+        # Generar hash
+        return hashlib.md5(signature_string.encode()).hexdigest()
 
 
 class ExamenTestResultado(models.Model):

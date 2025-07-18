@@ -96,6 +96,13 @@
                                                     </div>
                                                     {% endfor %}
                                                 </div>
+                                                {% else %}
+                                                <div class="mt-2" id="no_apartados_{{ tema.id }}" style="display: none;">
+                                                    <small class="text-warning">
+                                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                                        Este tema no tiene apartados con preguntas disponibles.
+                                                    </small>
+                                                </div>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -127,14 +134,25 @@
 function toggleApartados(temaId) {
     const checkbox = document.getElementById(`tema_${temaId}`);
     const apartadosContainer = document.getElementById(`apartados_${temaId}`);
+    const noApartadosContainer = document.getElementById(`no_apartados_${temaId}`);
     
     if (checkbox.checked) {
-        apartadosContainer.style.display = 'block';
+        if (apartadosContainer) {
+            apartadosContainer.style.display = 'block';
+        }
+        if (noApartadosContainer) {
+            noApartadosContainer.style.display = 'block';
+        }
     } else {
-        apartadosContainer.style.display = 'none';
-        // Desmarcar todos los apartados del tema
-        const apartadosCheckboxes = apartadosContainer.querySelectorAll('.apartado-checkbox');
-        apartadosCheckboxes.forEach(cb => cb.checked = false);
+        if (apartadosContainer) {
+            apartadosContainer.style.display = 'none';
+            // Desmarcar todos los apartados del tema
+            const apartadosCheckboxes = apartadosContainer.querySelectorAll('.apartado-checkbox');
+            apartadosCheckboxes.forEach(cb => cb.checked = false);
+        }
+        if (noApartadosContainer) {
+            noApartadosContainer.style.display = 'none';
+        }
     }
 }
 

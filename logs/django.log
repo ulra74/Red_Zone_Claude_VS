@@ -5234,3 +5234,80 @@ Watching for file changes with StatReloader
 Watching for file changes with StatReloader
 /Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
 Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 200 29781
+"GET /dashboard/ranking/reglas/ HTTP/1.1" 200 33869
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 47490
+"GET /dashboard/ HTTP/1.1" 200 29781
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15609
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 27460
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 23455
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/7/ejecutar/ HTTP/1.1" 200 43196
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 24401
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 18671
+"GET /dashboard/examenes-test/7/ejecutar/ HTTP/1.1" 200 42811
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 18671
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 23854
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 24401
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 24382
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 24382
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 18671
+"GET /dashboard/examenes-test/7/ejecutar/ HTTP/1.1" 200 42811
+"POST /dashboard/examenes-test/7/finalizar/ HTTP/1.1" 200 74
+"GET /dashboard/examenes-test/7/resultado/ HTTP/1.1" 200 25264
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 21489
+"POST /dashboard/examenes-test/7/eliminar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 16052
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 17943
+"GET /dashboard/oposiciones/2/ HTTP/1.1" 200 22261
+"GET /dashboard/oposiciones/2/ HTTP/1.1" 200 22261
+"GET /dashboard/oposiciones/2/ HTTP/1.1" 200 22082
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15609
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 24117
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22986
+"GET /dashboard/admin/oposiciones/1/edit/ HTTP/1.1" 200 29768
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15631
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 30229
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 17973
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 200 28511

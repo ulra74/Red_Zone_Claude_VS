@@ -202,11 +202,7 @@
                     
                     <div class="d-grid gap-2">
                         {% if request.user.is_student %}
-                            <a href="#" class="btn btn-primary">
-                                <i class="bi bi-play-circle me-2"></i>
-                                Comenzar Estudio
-                            </a>
-                            <a href="#" class="btn btn-outline-primary">
+                            <a href="{% url 'core:examen_config' %}?oposicion={{ oposicion.pk }}" class="btn btn-primary">
                                 <i class="bi bi-clipboard-check me-2"></i>
                                 Hacer Test
                             </a>

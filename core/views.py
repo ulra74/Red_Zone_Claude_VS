@@ -1011,6 +1011,44 @@ class ExamenTestConfigView(LoginRequiredMixin, TemplateView):
                 messages.error(request, 'Debes seleccionar al menos un tema.')
                 return redirect('core:examen_config')
 
+            # Validar que hay preguntas disponibles antes de crear el examen
+            if request.user.is_admin():
+                temas_validacion = Tema.objects.filter(id__in=temas_ids)
+            else:
+                temas_validacion = Tema.objects.filter(id__in=temas_ids, alumnos_con_acceso=request.user)
+            
+            # Verificar preguntas disponibles
+            if apartados_ids:
+                # Si se seleccionaron apartados específicos
+                apartados_validacion = Apartado.objects.filter(id__in=apartados_ids, tema__in=temas_validacion)
+                preguntas_disponibles = Pregunta.objects.filter(
+                    apartado__in=apartados_validacion,
+                    activa=True
+                )
+            else:
+                # Si no se seleccionaron apartados, usar todos los de los temas seleccionados
+                preguntas_disponibles = Pregunta.objects.filter(
+                    apartado__tema__in=temas_validacion,
+                    activa=True
+                )
+            
+            # Verificar que hay suficientes preguntas
+            num_preguntas_disponibles = preguntas_disponibles.count()
+            if num_preguntas_disponibles == 0:
+                if apartados_ids:
+                    messages.error(request, 'No hay preguntas disponibles para los apartados seleccionados. Selecciona otros apartados o temas.')
+                else:
+                    messages.error(request, 'No hay preguntas disponibles para los temas seleccionados. Los temas seleccionados no tienen apartados con preguntas.')
+                return redirect('core:examen_config')
+            
+            if num_preguntas_disponibles < numero_preguntas:
+                if num_preguntas_disponibles < 10:
+                    messages.error(request, f'Solo hay {num_preguntas_disponibles} preguntas disponibles, pero se necesitan mínimo 10 para crear un examen.')
+                    return redirect('core:examen_config')
+                else:
+                    messages.warning(request, f'Solo hay {num_preguntas_disponibles} preguntas disponibles. El examen se ajustará a {num_preguntas_disponibles} preguntas.')
+                    numero_preguntas = num_preguntas_disponibles
+
             # Generar nombre automáticamente
             if request.user.is_admin():
                 temas = Tema.objects.filter(id__in=temas_ids)
@@ -1246,38 +1284,62 @@ class ExamenTestFinalizarView(LoginRequiredMixin, TemplateView):
             tiempo_total = sum([r.tiempo_empleado_segundos for r in respuestas])
             porcentaje_acierto = (preguntas_correctas / len(respuestas)) * 100 if respuestas else 0
             
-            # Crear o actualizar resultado
-            resultado, created = ExamenTestResultado.objects.get_or_create(
-                examen=examen,
-                defaults={
-                    'estudiante': examen.estudiante,
-                    'nombre_examen': examen.nombre,
-                    'fecha_completado': examen.fecha_fin,
-                    'tipo_examen': examen.tipo,
-                    'puntuacion_total': preguntas_correctas,
-                    'puntuacion_maxima': len(respuestas),
-                    'porcentaje_acierto': porcentaje_acierto,
-                    'tiempo_total_segundos': tiempo_total,
-                    'preguntas_correctas': preguntas_correctas,
-                    'preguntas_incorrectas': preguntas_incorrectas,
-                    'preguntas_sin_responder': preguntas_sin_responder
-                }
-            )
+            # Generar signature del examen
+            examen_signature = examen.generate_signature()
             
-            # Si el resultado ya existía, actualizarlo
-            if not created:
-                resultado.estudiante = examen.estudiante
-                resultado.nombre_examen = examen.nombre
-                resultado.fecha_completado = examen.fecha_fin
-                resultado.tipo_examen = examen.tipo
-                resultado.puntuacion_total = preguntas_correctas
-                resultado.puntuacion_maxima = len(respuestas)
-                resultado.porcentaje_acierto = porcentaje_acierto
-                resultado.tiempo_total_segundos = tiempo_total
-                resultado.preguntas_correctas = preguntas_correctas
-                resultado.preguntas_incorrectas = preguntas_incorrectas
-                resultado.preguntas_sin_responder = preguntas_sin_responder
-                resultado.save()
+            # Verificar si ya existe un resultado con la misma signature (examen repetido)
+            resultado_existente = ExamenTestResultado.objects.filter(
+                estudiante=examen.estudiante,
+                examen_signature=examen_signature
+            ).first()
+            
+            # Variable para saber si fue repetición
+            es_repeticion = resultado_existente is not None
+            
+            if resultado_existente:
+                # SIEMPRE actualizar el resultado existente (examen repetido)
+                puntuacion_anterior = float(resultado_existente.porcentaje_acierto)
+                
+                resultado_existente.examen = examen
+                resultado_existente.nombre_examen = examen.nombre
+                resultado_existente.fecha_completado = examen.fecha_fin
+                resultado_existente.tipo_examen = examen.tipo
+                resultado_existente.puntuacion_total = preguntas_correctas
+                resultado_existente.puntuacion_maxima = len(respuestas)
+                resultado_existente.porcentaje_acierto = porcentaje_acierto
+                resultado_existente.tiempo_total_segundos = tiempo_total
+                resultado_existente.preguntas_correctas = preguntas_correctas
+                resultado_existente.preguntas_incorrectas = preguntas_incorrectas
+                resultado_existente.preguntas_sin_responder = preguntas_sin_responder
+                resultado_existente.save()
+                resultado = resultado_existente
+                
+                # Mostrar mensaje apropiado según si mejoró o no
+                if porcentaje_acierto > puntuacion_anterior:
+                    messages.success(request, f'¡Nuevo récord! Has mejorado tu puntuación de {puntuacion_anterior:.1f}% a {porcentaje_acierto:.1f}%.')
+                elif porcentaje_acierto < puntuacion_anterior:
+                    messages.info(request, f'Examen completado. Tu puntuación ha bajado de {puntuacion_anterior:.1f}% a {porcentaje_acierto:.1f}%.')
+                else:
+                    messages.info(request, f'Examen completado. Has mantenido tu puntuación de {porcentaje_acierto:.1f}%.')
+            else:
+                # Crear nuevo resultado
+                resultado = ExamenTestResultado.objects.create(
+                    examen=examen,
+                    estudiante=examen.estudiante,
+                    nombre_examen=examen.nombre,
+                    fecha_completado=examen.fecha_fin,
+                    tipo_examen=examen.tipo,
+                    puntuacion_total=preguntas_correctas,
+                    puntuacion_maxima=len(respuestas),
+                    porcentaje_acierto=porcentaje_acierto,
+                    tiempo_total_segundos=tiempo_total,
+                    preguntas_correctas=preguntas_correctas,
+                    preguntas_incorrectas=preguntas_incorrectas,
+                    preguntas_sin_responder=preguntas_sin_responder,
+                    examen_signature=examen_signature
+                )
+            
+            # (El código de actualización ahora se maneja arriba)
             
             # Actualizar estadísticas de actividad del estudiante
             if examen.estudiante.is_student():
@@ -1286,6 +1348,12 @@ class ExamenTestFinalizarView(LoginRequiredMixin, TemplateView):
                     activity_stats, created = UserActivityStats.objects.get_or_create(
                         user=examen.estudiante
                     )
+                    
+                    # Si es examen repetido, marcar como retaken
+                    if es_repeticion:
+                        activity_stats.update_exam_retaken()
+                    
+                    # Siempre actualizar como examen completado para mantener streaks
                     activity_stats.update_exam_completed(examen.fecha_fin.date())
                     
                     # Obtener mensaje de milestone si lo hay
