@@ -10,9 +10,18 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-*@hcv9g+qw(a*f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
-# Railway configuration
-RAILWAY_STATIC_URL = os.environ.get('RAILWAY_STATIC_URL', '')
-ALLOWED_HOSTS = ['*'] if os.environ.get('RAILWAY_ENVIRONMENT_NAME') else os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Production hosts configuration
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'red-zone-claude-vs.onrender.com',  # Render domain
+    '.onrender.com',  # All Render subdomains
+    '.railway.app',   # Railway domains (por si acaso)
+]
+
+# Allow all hosts in development or if RENDER is detected
+if DEBUG or os.environ.get('RENDER'):
+    ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
