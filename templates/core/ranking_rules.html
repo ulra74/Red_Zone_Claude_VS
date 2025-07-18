@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+
+{% block title %}Reglas del Ranking - Red Zone Academy{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="bi bi-trophy me-2"></i>
+                        Reglas del Ranking
+                    </h2>
+                    <p class="mb-0 mt-2">Comprende cómo funciona el sistema de puntuación y cómo mejorar tu posición</p>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Puntuación Base -->
+                    <div class="mb-5">
+                        <h3 class="text-primary mb-3">
+                            <i class="bi bi-target me-2"></i>
+                            Puntuación Base
+                        </h3>
+                        <div class="alert alert-info">
+                            <strong>📊 Fundamento:</strong> Tu puntuación base se calcula con el <strong>mejor resultado</strong> que hayas obtenido en cualquier examen.
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>Porcentaje de acierto:</strong> Se toma tu mejor examen como puntuación base (0-100%)
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Importante:</strong> Solo cuenta tu mejor resultado, no el promedio
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Bonificaciones -->
+                    <div class="mb-5">
+                        <h3 class="text-success mb-3">
+                            <i class="bi bi-arrow-up-circle me-2"></i>
+                            Bonificaciones
+                        </h3>
+                        
+                        <!-- Racha de Días -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title text-success">
+                                    <i class="bi bi-calendar-check me-2"></i>
+                                    Racha de Días Consecutivos
+                                </h5>
+                                <p class="card-text">Mantén una racha de días haciendo exámenes para obtener bonificaciones.</p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Cálculo:</strong> +2% por cada día consecutivo
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Máximo:</strong> +20% (10 días consecutivos)
+                                    </div>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Consistencia -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title text-success">
+                                    <i class="bi bi-graph-up me-2"></i>
+                                    Consistencia y Experiencia
+                                </h5>
+                                <p class="card-text">Cuantos más exámenes completes, mayor será tu bonificación.</p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Cálculo:</strong> +0.5% por cada examen completado
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Máximo:</strong> +15% (30 exámenes)
+                                    </div>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-info" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Velocidad de Respuesta -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title text-success">
+                                    <i class="bi bi-lightning me-2"></i>
+                                    Velocidad de Respuesta
+                                </h5>
+                                <p class="card-text">Responde rápidamente para obtener bonificaciones adicionales.</p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Umbral:</strong> Menos de 30 segundos por pregunta
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Máximo:</strong> +10% (respuestas muy rápidas)
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning mt-2">
+                                    <small><i class="bi bi-clock me-1"></i> <strong>Consejo:</strong> Responde rápido pero con precisión. La velocidad no debe comprometer la calidad.</small>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-warning" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Penalizaciones -->
+                    <div class="mb-5">
+                        <h3 class="text-danger mb-3">
+                            <i class="bi bi-arrow-down-circle me-2"></i>
+                            Penalizaciones
+                        </h3>
+                        
+                        <div class="card border-danger">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Inactividad
+                                </h5>
+                                <p class="card-text">Si no realizas exámenes durante varios días, tu puntuación se verá afectada.</p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Inicio:</strong> Después de 7 días sin exámenes
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Máximo:</strong> -30% (penalización máxima)
+                                    </div>
+                                </div>
+                                <div class="alert alert-danger mt-2">
+                                    <small><i class="bi bi-calendar-x me-1"></i> <strong>Advertencia:</strong> La penalización aumenta 0.5% por cada día adicional de inactividad.</small>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar bg-danger" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Niveles de Actividad -->
+                    <div class="mb-5">
+                        <h3 class="text-warning mb-3">
+                            <i class="bi bi-award me-2"></i>
+                            Niveles de Actividad
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="mb-0">🆕</h1>
+                                        <h6 class="card-title">Nuevo</h6>
+                                        <p class="small text-muted">Nunca ha realizado exámenes</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="mb-0">🎯</h1>
+                                        <h6 class="card-title">Casual</h6>
+                                        <p class="small text-muted">Ha realizado exámenes pero sin racha</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="mb-0">🌟</h1>
+                                        <h6 class="card-title">Principiante</h6>
+                                        <p class="small text-muted">Racha de 1+ días</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="mb-0">💪</h1>
+                                        <h6 class="card-title">Activo</h6>
+                                        <p class="small text-muted">Racha de 3+ días</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="mb-0">🔥</h1>
+                                        <h6 class="card-title">Avanzado</h6>
+                                        <p class="small text-muted">Racha de 7+ días</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="mb-0">⭐</h1>
+                                        <h6 class="card-title">Experto</h6>
+                                        <p class="small text-muted">Racha de 14+ días</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="mb-0">🏆</h1>
+                                        <h6 class="card-title">Legendario</h6>
+                                        <p class="small text-muted">Racha de 30+ días</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h1 class="mb-0">😴</h1>
+                                        <h6 class="card-title">Inactivo</h6>
+                                        <p class="small text-muted">Más de 7 días sin exámenes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consejos para Mejorar -->
+                    <div class="mb-4">
+                        <h3 class="text-info mb-3">
+                            <i class="bi bi-lightbulb me-2"></i>
+                            Consejos para Mejorar tu Ranking
+                        </h3>
+                        
+                        <div class="accordion" id="tipsAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#tip1">
+                                        <i class="bi bi-1-circle me-2"></i>
+                                        Mantén una Racha Consistente
+                                    </button>
+                                </h2>
+                                <div id="tip1" class="accordion-collapse collapse show" data-bs-parent="#tipsAccordion">
+                                    <div class="accordion-body">
+                                        <strong>Haz al menos un examen cada día.</strong> Incluso un examen corto mantendrá tu racha activa y te dará bonificaciones importantes.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip2">
+                                        <i class="bi bi-2-circle me-2"></i>
+                                        Practica para Mejorar tu Mejor Resultado
+                                    </button>
+                                </h2>
+                                <div id="tip2" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
+                                    <div class="accordion-body">
+                                        <strong>Concéntrate en superar tu mejor puntuación.</strong> Solo cuenta tu mejor resultado, así que sigue intentando mejorar.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip3">
+                                        <i class="bi bi-3-circle me-2"></i>
+                                        Equilibra Velocidad y Precisión
+                                    </button>
+                                </h2>
+                                <div id="tip3" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
+                                    <div class="accordion-body">
+                                        <strong>Responde rápido pero con cuidado.</strong> Menos de 30 segundos por pregunta te dará bonificaciones, pero no sacrifiques la precisión.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tip4">
+                                        <i class="bi bi-4-circle me-2"></i>
+                                        Evita Largos Períodos de Inactividad
+                                    </button>
+                                </h2>
+                                <div id="tip4" class="accordion-collapse collapse" data-bs-parent="#tipsAccordion">
+                                    <div class="accordion-body">
+                                        <strong>No dejes pasar más de 7 días sin hacer exámenes.</strong> Las penalizaciones por inactividad pueden afectar significativamente tu puntuación.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fórmula de Cálculo -->
+                    <div class="mb-4">
+                        <h3 class="text-secondary mb-3">
+                            <i class="bi bi-calculator me-2"></i>
+                            Fórmula de Cálculo
+                        </h3>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="text-center mb-3">Puntuación Final</h5>
+                                <div class="text-center">
+                                    <code class="fs-5">
+                                        Puntuación Base + Bonificación de Racha + Bonificación de Consistencia + Bonificación de Velocidad - Penalización de Inactividad
+                                    </code>
+                                </div>
+                                <hr>
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <strong>Base:</strong><br>
+                                        <span class="text-primary">0-100%</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Racha:</strong><br>
+                                        <span class="text-success">+0% a +20%</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Consistencia:</strong><br>
+                                        <span class="text-info">+0% a +15%</span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Velocidad:</strong><br>
+                                        <span class="text-warning">+0% a +10%</span>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <strong>Inactividad:</strong><br>
+                                    <span class="text-danger">-0% a -30%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acciones -->
+                    <div class="text-center">
+                        <a href="{% url 'core:dashboard' %}" class="btn btn-primary me-2">
+                            <i class="bi bi-house me-2"></i>
+                            Volver al Dashboard
+                        </a>
+                        <a href="{% url 'core:examen_ranking' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-trophy me-2"></i>
+                            Ver Ranking
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

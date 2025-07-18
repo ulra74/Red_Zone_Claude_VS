@@ -5176,3 +5176,61 @@ Watching for file changes with StatReloader
 "GET /dashboard/ranking/ HTTP/1.1" 200 25599
 "GET /dashboard/examenes-test/ HTTP/1.1" 200 37610
 "GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 30798
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/6/ejecutar/ HTTP/1.1" 200 49622
+"POST /dashboard/examenes-test/6/responder/ HTTP/1.1" 200 140
+"POST /dashboard/examenes-test/6/responder/ HTTP/1.1" 200 140
+"POST /dashboard/examenes-test/6/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/6/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/6/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/6/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/6/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/6/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/6/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/6/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/6/finalizar/ HTTP/1.1" 200 74
+"GET /dashboard/examenes-test/6/resultado/ HTTP/1.1" 200 70619
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 30798
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 44686
+"GET /dashboard/examenes-test/4/ejecutar/ HTTP/1.1" 200 52906
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 343
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 378
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 331
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 337
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 378
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 362
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 350
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 324
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 314
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 324
+"POST /dashboard/examenes-test/4/finalizar/ HTTP/1.1" 200 74
+"GET /dashboard/examenes-test/4/resultado/ HTTP/1.1" 200 85598
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 47505
+"GET /auth/profile/ HTTP/1.1" 200 21818
+"GET /dashboard/ HTTP/1.1" 200 29506
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 200 29510
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/urls.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 200 29784
+"GET /dashboard/ranking/reglas/ HTTP/1.1" 200 33569
+"GET /dashboard/ HTTP/1.1" 200 29784
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 47505
+"GET /dashboard/ HTTP/1.1" 200 29784
+"GET /dashboard/ranking/reglas/ HTTP/1.1" 200 33569
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader

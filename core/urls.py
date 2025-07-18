@@ -81,4 +81,7 @@ urlpatterns = [
     path('temas/<int:tema_id>/archivos/subir/', SubirArchivoTemaView.as_view(), name='subir_archivo_tema'),
     path('archivos/tema/<int:archivo_id>/descargar/', descargar_archivo_tema, name='descargar_archivo_tema'),
     path('archivos/tema/<int:pk>/eliminar/', EliminarArchivoTemaView.as_view(), name='eliminar_archivo_tema'),
+    
+    # Reglas del ranking
+    path('ranking/reglas/', views.RankingRulesView.as_view(), name='ranking_rules'),
 ]

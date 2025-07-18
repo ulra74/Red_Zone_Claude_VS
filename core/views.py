@@ -1492,3 +1492,13 @@ class ExamenTestDeleteView(LoginRequiredMixin, TemplateView):
         except Exception as e:
             messages.error(request, f'Error al eliminar el examen: {str(e)}')
             return redirect('core:examen_test_list')
+
+
+class RankingRulesView(LoginRequiredMixin, TemplateView):
+    """Vista para mostrar las reglas del ranking"""
+    template_name = 'core/ranking_rules.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Reglas del Ranking'
+        return context

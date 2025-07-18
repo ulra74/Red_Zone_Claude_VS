@@ -123,13 +123,17 @@ class CustomUser(AbstractUser):
         
         # Importar aquí para evitar import circular
         from core.models import ExamenTestResultado
+        from django.db.models import Avg
         
-        # Obtener mejor resultado base (incluye resultados sin examen)
-        mejor_resultado = ExamenTestResultado.objects.filter(
-            estudiante=self
-        ).order_by('-porcentaje_acierto').first()
+        # Obtener puntuación base como la MEDIA de todos los exámenes
+        resultados = ExamenTestResultado.objects.filter(estudiante=self)
         
-        base_score = float(mejor_resultado.porcentaje_acierto) if mejor_resultado else 0.0
+        if not resultados.exists():
+            return 0.0
+        
+        # Calcular media de todos los exámenes
+        media_resultado = resultados.aggregate(media=Avg('porcentaje_acierto'))['media']
+        base_score = float(media_resultado) if media_resultado else 0.0
         
         # Obtener estadísticas de actividad
         activity_stats = self.get_activity_stats()
@@ -139,6 +143,19 @@ class CustomUser(AbstractUser):
         # Calcular bonificaciones y penalizaciones
         streak_bonus = min(activity_stats.current_streak * 2.0, 20.0)  # Max 20% bonus
         consistency_bonus = min(activity_stats.total_exams_completed * 0.5, 15.0)  # Max 15% bonus
+        
+        # Bonificación por tiempo de respuesta rápido (usando la media de todos los exámenes)
+        speed_bonus = 0.0
+        if resultados.exists():
+            # Calcular tiempo promedio por pregunta de TODOS los exámenes
+            total_tiempo = sum(r.tiempo_total_segundos for r in resultados)
+            total_preguntas = sum(r.preguntas_correctas + r.preguntas_incorrectas + r.preguntas_sin_responder for r in resultados)
+            
+            if total_preguntas > 0 and total_tiempo > 0:
+                tiempo_promedio_por_pregunta = total_tiempo / total_preguntas
+                # Bonificación si responde en menos de 30 segundos por pregunta
+                if tiempo_promedio_por_pregunta < 30:
+                    speed_bonus = min((30 - tiempo_promedio_por_pregunta) * 0.3, 10.0)  # Max 10% bonus
         
         # Penalización por inactividad
         from django.utils import timezone
@@ -151,7 +168,7 @@ class CustomUser(AbstractUser):
             inactivity_penalty = min(days_inactive * 0.5, 30.0)  # Max 30% penalty
         
         # Calcular puntaje final
-        final_score = base_score + streak_bonus + consistency_bonus - inactivity_penalty
+        final_score = base_score + streak_bonus + consistency_bonus + speed_bonus - inactivity_penalty
         return max(0, min(100, final_score))  # Mantener entre 0-100
 
 
@@ -238,7 +255,8 @@ class UserActivityStats(models.Model):
             return False
         
         days_since_last = (timezone.now().date() - self.last_exam_date).days
-        if days_since_last > 1:  # Más de 1 día sin examen
+        # Cambiar a 3 días para romper la racha (más razonable)
+        if days_since_last > 3:
             self.current_streak = 0
             self.streak_start_date = None
             self._calculate_bonuses()
@@ -269,6 +287,19 @@ class UserActivityStats(models.Model):
     
     def get_activity_level(self):
         """Determina el nivel de actividad del usuario"""
+        from django.utils import timezone
+        
+        # Verificar si el usuario ha hecho exámenes recientemente
+        if self.last_exam_date:
+            days_since_last = (timezone.now().date() - self.last_exam_date).days
+            # Solo marcar como inactivo si no ha hecho exámenes en más de 7 días
+            if days_since_last > 7:
+                return {'level': 'inactive', 'name': 'Inactivo', 'color': '#696969', 'icon': '😴'}
+        elif self.total_exams_completed == 0:
+            # Usuario nuevo que nunca ha hecho exámenes
+            return {'level': 'newcomer', 'name': 'Nuevo', 'color': '#87CEEB', 'icon': '🆕'}
+        
+        # Lógica basada en racha actual
         if self.current_streak >= 30:
             return {'level': 'legendary', 'name': 'Legendario', 'color': '#FFD700', 'icon': '🏆'}
         elif self.current_streak >= 14:
@@ -280,7 +311,8 @@ class UserActivityStats(models.Model):
         elif self.current_streak >= 1:
             return {'level': 'beginner', 'name': 'Principiante', 'color': '#4169E1', 'icon': '🌟'}
         else:
-            return {'level': 'inactive', 'name': 'Inactivo', 'color': '#696969', 'icon': '😴'}
+            # Usuario que ha hecho exámenes pero no tiene racha activa
+            return {'level': 'casual', 'name': 'Casual', 'color': '#FFA500', 'icon': '🎯'}
     
     def get_streak_milestone_message(self):
         """Obtiene mensaje de felicitación por milestone alcanzado"""

@@ -696,6 +696,13 @@ class ExamenTestResultado(models.Model):
         default='normal'
     )
     
+    # Campo para identificar exámenes del mismo tipo (mismos temas/apartados)
+    examen_signature = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text="Hash de los temas y apartados seleccionados para identificar exámenes similares"
+    )
+    
     puntuacion_total = models.PositiveIntegerField(
         help_text="Puntuación total obtenida"
     )
