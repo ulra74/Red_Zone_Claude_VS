@@ -34,6 +34,7 @@ urlpatterns = [
     path('examenes-test/<int:examen_id>/finalizar/', views.ExamenTestFinalizarView.as_view(), name='examen_finalizar'),
     path('examenes-test/<int:examen_id>/resultado/', views.ExamenTestResultadoView.as_view(), name='examen_resultado'),
     path('examenes-test/<int:examen_id>/repetir/', views.ExamenTestRetakeView.as_view(), name='examen_repetir'),
+    path('examenes-test/<int:examen_id>/eliminar/', views.ExamenTestDeleteView.as_view(), name='examen_eliminar'),
     path('ranking/', views.ExamenTestRankingView.as_view(), name='examen_ranking'),
     
     # Admin URLs - Oposiciones

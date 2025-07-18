@@ -4935,3 +4935,244 @@ Watching for file changes with StatReloader
 "GET /auth/login/ HTTP/1.1" 200 15631
 "POST /auth/login/ HTTP/1.1" 302 0
 "GET /dashboard/ HTTP/1.1" 200 25975
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 200 25505
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 26997
+"GET /dashboard/temas/ HTTP/1.1" 200 58899
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 30338
+"GET /auth/profile/ HTTP/1.1" 200 21000
+"GET /auth/profile/edit/ HTTP/1.1" 200 22839
+"GET /auth/profile/edit/ HTTP/1.1" 200 22839
+"GET /auth/profile/ HTTP/1.1" 200 21000
+"GET /auth/password-change/ HTTP/1.1" 200 20640
+"GET /auth/password-change/ HTTP/1.1" 200 20680
+"GET /auth/password-change/ HTTP/1.1" 200 20763
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 30338
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/urls.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/migrations/0001_initial.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/examenes-test/ HTTP/1.1" 302 0
+"GET /auth/login/?next=/dashboard/examenes-test/ HTTP/1.1" 200 15161
+"POST /auth/login/?next=/dashboard/examenes-test/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 15996
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 15905
+"GET /dashboard/ HTTP/1.1" 200 20419
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 200 23647
+"GET / HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 23647
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15631
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 24117
+"GET /dashboard/admin/oposiciones/create/ HTTP/1.1" 200 22477
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 23069
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22986
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22986
+"GET /dashboard/ HTTP/1.1" 200 23647
+"GET /dashboard/admin/users/create/ HTTP/1.1" 200 24180
+"POST /dashboard/admin/users/create/ HTTP/1.1" 302 0
+"GET /dashboard/admin/users/ HTTP/1.1" 200 20734
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22986
+"GET /dashboard/admin/oposiciones/1/edit/ HTTP/1.1" 200 24255
+"GET /dashboard/ HTTP/1.1" 200 23647
+"GET /dashboard/admin/users/create/ HTTP/1.1" 200 24180
+"POST /dashboard/admin/users/create/ HTTP/1.1" 302 0
+"GET /dashboard/admin/users/ HTTP/1.1" 200 25986
+"GET /dashboard/admin/users/create/ HTTP/1.1" 200 24180
+"POST /dashboard/admin/users/create/ HTTP/1.1" 302 0
+"GET /dashboard/admin/users/ HTTP/1.1" 200 31239
+"GET /dashboard/ HTTP/1.1" 200 23647
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22986
+"GET /dashboard/admin/oposiciones/1/edit/ HTTP/1.1" 200 26989
+"POST /dashboard/admin/oposiciones/1/edit/ HTTP/1.1" 302 0
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 23528
+"GET /dashboard/admin/oposiciones/2/edit/ HTTP/1.1" 200 26935
+"POST /dashboard/admin/oposiciones/2/edit/ HTTP/1.1" 302 0
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 23528
+"GET /dashboard/admin/oposiciones/1/edit/ HTTP/1.1" 200 26997
+"POST /dashboard/admin/oposiciones/1/edit/ HTTP/1.1" 302 0
+"GET /dashboard/admin/oposiciones/ HTTP/1.1" 200 23528
+"GET /dashboard/temas/ HTTP/1.1" 200 33558
+"GET /dashboard/admin/temas/1/edit/ HTTP/1.1" 200 32878
+"POST /dashboard/admin/temas/1/edit/ HTTP/1.1" 302 0
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 32000
+"GET /dashboard/admin/temas/2/edit/ HTTP/1.1" 200 32860
+"POST /dashboard/admin/temas/2/edit/ HTTP/1.1" 302 0
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 32001
+"GET /dashboard/admin/temas/3/edit/ HTTP/1.1" 200 32845
+"POST /dashboard/admin/temas/3/edit/ HTTP/1.1" 302 0
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 32002
+"GET /dashboard/admin/temas/2/edit/ HTTP/1.1" 200 32868
+"POST /dashboard/admin/temas/2/edit/ HTTP/1.1" 302 0
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 32001
+"GET /dashboard/admin/temas/4/edit/ HTTP/1.1" 200 32856
+"POST /dashboard/admin/temas/4/edit/ HTTP/1.1" 302 0
+"GET /dashboard/admin/temas/ HTTP/1.1" 200 32003
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15631
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 29991
+"GET /dashboard/temas/1/ HTTP/1.1" 200 20017
+"GET /dashboard/temas/1/ HTTP/1.1" 200 20017
+"GET /dashboard/temas/1/ HTTP/1.1" 200 20017
+"GET /dashboard/temas/1/ HTTP/1.1" 200 20017
+"GET /dashboard/temas/1/ HTTP/1.1" 200 20017
+"GET /dashboard/temas/1/ HTTP/1.1" 200 20017
+"GET /dashboard/temas/1/ HTTP/1.1" 200 20017
+"GET /dashboard/ HTTP/1.1" 200 29539
+"GET /dashboard/temas/1/ HTTP/1.1" 200 20017
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /dashboard/temas/1/ HTTP/1.1" 200 20020
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 15504
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 30165
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 30685
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 15504
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 30798
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/1/ejecutar/ HTTP/1.1" 200 47262
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 84
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 87
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/1/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/1/finalizar/ HTTP/1.1" 200 74
+"GET /dashboard/examenes-test/1/resultado/ HTTP/1.1" 200 111977
+Internal Server Error: /dashboard/ranking/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/contrib/auth/mixins.py", line 73, in dispatch
+    return super().dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/views/generic/base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/views/generic/list.py", line 154, in get
+    self.object_list = self.get_queryset()
+                       ~~~~~~~~~~~~~~~~~^^
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py", line 1348, in get_queryset
+    enhanced_score = estudiante.get_enhanced_ranking_score()
+  File "/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py", line 154, in get_enhanced_ranking_score
+    final_score = base_score + streak_bonus + consistency_bonus - inactivity_penalty
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+TypeError: unsupported operand type(s) for +: 'decimal.Decimal' and 'float'
+"GET /dashboard/ranking/ HTTP/1.1" 500 91664
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/ranking/ HTTP/1.1" 200 28250
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 21966
+"POST /dashboard/examenes-test/1/repetir/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/2/ejecutar/ HTTP/1.1" 200 47581
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"GET /dashboard/examenes-test/2/ejecutar/ HTTP/1.1" 200 47668
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 85
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /dashboard/examenes-test/2/ejecutar/ HTTP/1.1" 200 50797
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 26488
+"POST /dashboard/examenes-test/1/repetir/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/3/ejecutar/ HTTP/1.1" 200 54689
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 31005
+"POST /dashboard/examenes-test/1/eliminar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 24220
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 30798
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/4/ejecutar/ HTTP/1.1" 200 46841
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 140
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/4/responder/ HTTP/1.1" 200 110
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 27714
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 30798
+"POST /dashboard/examenes-test/configurar/ HTTP/1.1" 302 0
+"GET /dashboard/examenes-test/5/ejecutar/ HTTP/1.1" 200 46975
+"POST /dashboard/examenes-test/5/responder/ HTTP/1.1" 200 140
+"POST /dashboard/examenes-test/5/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/5/responder/ HTTP/1.1" 200 140
+"POST /dashboard/examenes-test/5/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/5/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/5/responder/ HTTP/1.1" 200 140
+"POST /dashboard/examenes-test/5/responder/ HTTP/1.1" 200 140
+"POST /dashboard/examenes-test/5/responder/ HTTP/1.1" 200 139
+"POST /dashboard/examenes-test/5/responder/ HTTP/1.1" 200 138
+"POST /dashboard/examenes-test/5/finalizar/ HTTP/1.1" 200 74
+"GET /dashboard/examenes-test/5/resultado/ HTTP/1.1" 200 66373
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 34789
+"GET /dashboard/examenes-test/2/ejecutar/ HTTP/1.1" 200 53413
+"GET /dashboard/examenes-test/2/ejecutar/ HTTP/1.1" 200 54829
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 85
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 84
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/2/responder/ HTTP/1.1" 200 86
+"POST /dashboard/examenes-test/2/finalizar/ HTTP/1.1" 200 74
+"GET /dashboard/examenes-test/2/resultado/ HTTP/1.1" 200 116377
+"GET /dashboard/ranking/ HTTP/1.1" 200 25599
+"GET /dashboard/examenes-test/ HTTP/1.1" 200 37610
+"GET /dashboard/examenes-test/configurar/ HTTP/1.1" 200 30798

@@ -670,8 +670,30 @@ class ExamenTestResultado(models.Model):
     
     examen = models.OneToOneField(
         ExamenTest,
+        on_delete=models.SET_NULL,
+        related_name='resultado',
+        null=True,
+        blank=True
+    )
+    
+    # Campos para conservar información del examen eliminado
+    estudiante = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
-        related_name='resultado'
+        limit_choices_to={'user_type': 'student'},
+        related_name='resultados_examenes'
+    )
+    nombre_examen = models.CharField(
+        max_length=200,
+        help_text="Nombre del examen (conservado para el ranking)"
+    )
+    fecha_completado = models.DateTimeField(
+        help_text="Fecha cuando se completó el examen"
+    )
+    tipo_examen = models.CharField(
+        max_length=20,
+        choices=[('normal', 'Normal'), ('examen', 'Examen')],
+        default='normal'
     )
     
     puntuacion_total = models.PositiveIntegerField(
@@ -713,7 +735,7 @@ class ExamenTestResultado(models.Model):
         verbose_name_plural = "Resultados de Exámenes Test"
     
     def __str__(self):
-        return f"{self.examen.estudiante.username} - {self.examen.nombre} - {self.porcentaje_acierto}%"
+        return f"{self.estudiante.username} - {self.nombre_examen} - {self.porcentaje_acierto}%"
     
     @property
     def tiempo_total_minutos(self):
@@ -723,9 +745,10 @@ class ExamenTestResultado(models.Model):
     @property
     def tiempo_promedio_por_pregunta(self):
         """Tiempo promedio por pregunta en segundos"""
-        if self.examen.preguntas_respondidas == 0:
+        total_preguntas = self.preguntas_correctas + self.preguntas_incorrectas + self.preguntas_sin_responder
+        if total_preguntas == 0:
             return 0
-        return self.tiempo_total_segundos / self.examen.preguntas_respondidas
+        return self.tiempo_total_segundos / total_preguntas
     
     @property
     def calificacion_texto(self):
@@ -740,6 +763,11 @@ class ExamenTestResultado(models.Model):
             return "Regular"
         else:
             return "Insuficiente"
+    
+    def get_tipo_examen_display(self):
+        """Obtiene el nombre legible del tipo de examen"""
+        tipo_choices = dict(self._meta.get_field('tipo_examen').choices)
+        return tipo_choices.get(self.tipo_examen, self.tipo_examen)
 
 
 class RespuestaExamenTest(models.Model):
@@ -784,6 +812,11 @@ class RespuestaExamenTest(models.Model):
         help_text="Si la pregunta se respondió por timeout"
     )
     
+    penalizada_por_pausa = models.BooleanField(
+        default=False,
+        help_text="Si la pregunta fue marcada como incorrecta por pausar el examen"
+    )
+    
     respondida_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -795,7 +828,8 @@ class RespuestaExamenTest(models.Model):
     def __str__(self):
         estado = "✓" if self.es_correcta else "✗"
         timeout_text = " (TIMEOUT)" if self.timeout else ""
-        return f"{estado} {self.pregunta.enunciado[:50]}...{timeout_text}"
+        pausa_text = " (PAUSA)" if self.penalizada_por_pausa else ""
+        return f"{estado} {self.pregunta.enunciado[:50]}...{timeout_text}{pausa_text}"
     
     def save(self, *args, **kwargs):
         """Actualizar estadísticas de la pregunta al guardar"""

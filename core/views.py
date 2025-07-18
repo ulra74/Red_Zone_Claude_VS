@@ -994,9 +994,13 @@ class ExamenTestConfigView(LoginRequiredMixin, TemplateView):
             tipo = request.POST.get('tipo')
             numero_preguntas = int(request.POST.get('numero_preguntas', 10))
             tiempo_por_pregunta = int(request.POST.get('tiempo_por_pregunta', 0))
-            tipo_aclaracion = request.POST.get('tipo_aclaracion')
+            tipo_aclaracion = request.POST.get('tipo_aclaracion', 'inmediata')  # Valor por defecto
             temas_ids = request.POST.getlist('temas')
             apartados_ids = request.POST.getlist('apartados')
+            
+            # Validar tipo_aclaracion
+            if not tipo_aclaracion or tipo_aclaracion not in ['inmediata', 'final']:
+                tipo_aclaracion = 'final' if tipo == 'examen' else 'inmediata'
 
             # Validaciones
             if numero_preguntas < 10:
@@ -1166,6 +1170,7 @@ class ExamenTestRespuestaView(LoginRequiredMixin, TemplateView):
             tiempo_empleado = int(request.POST.get('tiempo_empleado', 0))
             orden_pregunta = int(request.POST.get('orden_pregunta', 1))
             timeout = request.POST.get('timeout', 'false') == 'true'
+            penalizada_por_pausa = request.POST.get('penalizada_por_pausa', 'false') == 'true'
             
             pregunta = get_object_or_404(Pregunta, id=pregunta_id)
             respuesta_seleccionada = None
@@ -1184,7 +1189,8 @@ class ExamenTestRespuestaView(LoginRequiredMixin, TemplateView):
                     'es_correcta': es_correcta,
                     'tiempo_empleado_segundos': tiempo_empleado,
                     'orden_pregunta': orden_pregunta,
-                    'timeout': timeout
+                    'timeout': timeout,
+                    'penalizada_por_pausa': penalizada_por_pausa
                 }
             )
             
@@ -1244,6 +1250,10 @@ class ExamenTestFinalizarView(LoginRequiredMixin, TemplateView):
             resultado, created = ExamenTestResultado.objects.get_or_create(
                 examen=examen,
                 defaults={
+                    'estudiante': examen.estudiante,
+                    'nombre_examen': examen.nombre,
+                    'fecha_completado': examen.fecha_fin,
+                    'tipo_examen': examen.tipo,
                     'puntuacion_total': preguntas_correctas,
                     'puntuacion_maxima': len(respuestas),
                     'porcentaje_acierto': porcentaje_acierto,
@@ -1256,6 +1266,10 @@ class ExamenTestFinalizarView(LoginRequiredMixin, TemplateView):
             
             # Si el resultado ya existía, actualizarlo
             if not created:
+                resultado.estudiante = examen.estudiante
+                resultado.nombre_examen = examen.nombre
+                resultado.fecha_completado = examen.fecha_fin
+                resultado.tipo_examen = examen.tipo
                 resultado.puntuacion_total = preguntas_correctas
                 resultado.puntuacion_maxima = len(respuestas)
                 resultado.porcentaje_acierto = porcentaje_acierto
@@ -1326,9 +1340,9 @@ class ExamenTestRankingView(LoginRequiredMixin, ListView):
         resultados_con_score = []
         
         for estudiante in estudiantes:
-            # Obtener el mejor resultado tradicional
+            # Obtener el mejor resultado tradicional (incluye resultados sin examen)
             mejor_resultado = ExamenTestResultado.objects.filter(
-                examen__estudiante=estudiante
+                estudiante=estudiante
             ).order_by('-porcentaje_acierto', 'tiempo_total_segundos').first()
             
             if mejor_resultado:
@@ -1423,4 +1437,58 @@ class ExamenTestRetakeView(LoginRequiredMixin, TemplateView):
             
         except Exception as e:
             messages.error(request, f'Error al crear el examen: {str(e)}')
+            return redirect('core:examen_test_list')
+
+
+class ExamenTestDeleteView(LoginRequiredMixin, TemplateView):
+    """Vista para eliminar un examen manteniendo los resultados en el ranking"""
+    
+    def post(self, request, *args, **kwargs):
+        """Eliminar examen pero conservar resultados para el ranking"""
+        try:
+            examen_id = kwargs.get('examen_id')
+            examen = get_object_or_404(ExamenTest, id=examen_id)
+            
+            # Verificar permisos
+            if examen.estudiante != request.user and not request.user.is_admin():
+                messages.error(request, 'No tienes permisos para eliminar este examen.')
+                return redirect('core:examen_test_list')
+            
+            # Verificar que el examen esté completado
+            if not examen.completado:
+                messages.error(request, 'Solo puedes eliminar exámenes completados.')
+                return redirect('core:examen_test_list')
+            
+            # Verificar que tenga resultados
+            if not hasattr(examen, 'resultado') or not examen.resultado:
+                messages.error(request, 'Este examen no tiene resultados para conservar.')
+                return redirect('core:examen_test_list')
+            
+            # Actualizar el resultado para que sea independiente del examen
+            resultado = examen.resultado
+            if not resultado.estudiante:  # Si no tiene estudiante asignado
+                resultado.estudiante = examen.estudiante
+            if not resultado.nombre_examen:  # Si no tiene nombre guardado
+                resultado.nombre_examen = examen.nombre
+            if not resultado.fecha_completado:  # Si no tiene fecha guardada
+                resultado.fecha_completado = examen.fecha_fin
+            if not resultado.tipo_examen:  # Si no tiene tipo guardado
+                resultado.tipo_examen = examen.tipo
+            
+            # Guardar cambios en resultado antes de eliminar examen
+            resultado.save()
+            
+            # Eliminar el examen (los resultados se conservan)
+            nombre_examen = examen.nombre
+            examen.delete()
+            
+            messages.success(
+                request, 
+                f'Examen "{nombre_examen}" eliminado exitosamente. '
+                f'Los resultados se han conservado en el ranking.'
+            )
+            return redirect('core:examen_test_list')
+            
+        except Exception as e:
+            messages.error(request, f'Error al eliminar el examen: {str(e)}')
             return redirect('core:examen_test_list')

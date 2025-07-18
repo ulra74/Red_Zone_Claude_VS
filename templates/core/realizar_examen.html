@@ -332,10 +332,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Prevenir que el usuario abandone la página accidentalmente
-    window.addEventListener('beforeunload', function(e) {
+    // Función para prevenir salida accidental
+    function beforeUnloadHandler(e) {
         e.preventDefault();
         e.returnValue = '';
-    });
+    }
+    
+    window.addEventListener('beforeunload', beforeUnloadHandler);
 });
 
 function showQuestion(questionNumber) {
@@ -547,7 +550,7 @@ function confirmFinishExam() {
     .then(data => {
         if (data.success) {
             // Remover el listener de beforeunload
-            window.removeEventListener('beforeunload', function() {});
+            window.removeEventListener('beforeunload', beforeUnloadHandler);
             
             // Redireccionar a resultados
             window.location.href = data.redirect_url;

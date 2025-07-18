@@ -148,15 +148,30 @@ document.getElementById('examConfigForm').addEventListener('submit', function(e)
     }
 });
 
-// Manejar el tipo de examen
-document.getElementById('tipo').addEventListener('change', function() {
+// Función para manejar el tipo de examen
+function handleTipoExamen() {
+    const tipo = document.getElementById('tipo');
     const tipoAclaracion = document.getElementById('tipo_aclaracion');
-    if (this.value === 'examen') {
+    
+    if (tipo.value === 'examen') {
         tipoAclaracion.value = 'final';
-        tipoAclaracion.disabled = true;
+        tipoAclaracion.style.backgroundColor = '#f8f9fa';
+        tipoAclaracion.style.cursor = 'not-allowed';
+        tipoAclaracion.setAttribute('readonly', true);
+        // Mantener el campo habilitado para que se envíe en el formulario
+        tipoAclaracion.disabled = false;
     } else {
+        tipoAclaracion.style.backgroundColor = '';
+        tipoAclaracion.style.cursor = '';
+        tipoAclaracion.removeAttribute('readonly');
         tipoAclaracion.disabled = false;
     }
-});
+}
+
+// Manejar el tipo de examen
+document.getElementById('tipo').addEventListener('change', handleTipoExamen);
+
+// Inicializar el estado al cargar la página
+document.addEventListener('DOMContentLoaded', handleTipoExamen);
 </script>
 {% endblock %}

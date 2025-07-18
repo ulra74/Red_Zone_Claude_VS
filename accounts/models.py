@@ -124,13 +124,12 @@ class CustomUser(AbstractUser):
         # Importar aquí para evitar import circular
         from core.models import ExamenTestResultado
         
-        # Obtener mejor resultado base
+        # Obtener mejor resultado base (incluye resultados sin examen)
         mejor_resultado = ExamenTestResultado.objects.filter(
-            examen__estudiante=self,
-            examen__estudiante__user_type='student'
+            estudiante=self
         ).order_by('-porcentaje_acierto').first()
         
-        base_score = mejor_resultado.porcentaje_acierto if mejor_resultado else 0
+        base_score = float(mejor_resultado.porcentaje_acierto) if mejor_resultado else 0.0
         
         # Obtener estadísticas de actividad
         activity_stats = self.get_activity_stats()
@@ -138,18 +137,18 @@ class CustomUser(AbstractUser):
             return base_score
         
         # Calcular bonificaciones y penalizaciones
-        streak_bonus = min(activity_stats.current_streak * 2, 20)  # Max 20% bonus
-        consistency_bonus = min(activity_stats.total_exams_completed * 0.5, 15)  # Max 15% bonus
+        streak_bonus = min(activity_stats.current_streak * 2.0, 20.0)  # Max 20% bonus
+        consistency_bonus = min(activity_stats.total_exams_completed * 0.5, 15.0)  # Max 15% bonus
         
         # Penalización por inactividad
         from django.utils import timezone
         from datetime import timedelta
         
         days_inactive = (timezone.now().date() - activity_stats.last_exam_date).days if activity_stats.last_exam_date else 999
-        inactivity_penalty = 0
+        inactivity_penalty = 0.0
         
         if days_inactive > 7:
-            inactivity_penalty = min(days_inactive * 0.5, 30)  # Max 30% penalty
+            inactivity_penalty = min(days_inactive * 0.5, 30.0)  # Max 30% penalty
         
         # Calcular puntaje final
         final_score = base_score + streak_bonus + consistency_bonus - inactivity_penalty

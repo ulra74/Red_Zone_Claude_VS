@@ -56,7 +56,7 @@
                                     </div>
                                     <div class="col-md-3">
                                         <strong>Examen:</strong><br>
-                                        <span class="small">{{ mi_mejor_resultado.examen.nombre|truncatewords:3 }}</span>
+                                        <span class="small">{{ mi_mejor_resultado.nombre_examen|truncatewords:3 }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -86,8 +86,8 @@
                                 <div class="card {% if forloop.counter == 1 %}border-warning{% elif forloop.counter == 2 %}border-secondary{% else %}border-success{% endif %}">
                                     <div class="card-body">
                                         <div class="mb-3">
-                                            {% if resultado.examen.estudiante.profile_picture %}
-                                                <img src="{{ resultado.examen.estudiante.profile_picture.url }}" alt="Foto de perfil" 
+                                            {% if resultado.estudiante.profile_picture %}
+                                                <img src="{{ resultado.estudiante.profile_picture.url }}" alt="Foto de perfil" 
                                                      class="rounded-circle border border-3 {% if forloop.counter == 1 %}border-warning{% elif forloop.counter == 2 %}border-secondary{% else %}border-success{% endif %}" 
                                                      style="width: 80px; height: 80px; object-fit: cover;">
                                             {% else %}
@@ -100,8 +100,8 @@
                                                 {% endif %}
                                             {% endif %}
                                         </div>
-                                        <h5 class="card-title">{{ resultado.examen.estudiante.get_full_name|default:resultado.examen.estudiante.username }}</h5>
-                                        {% with rango=resultado.examen.estudiante.get_rango_firefighter %}
+                                        <h5 class="card-title">{{ resultado.estudiante.get_full_name|default:resultado.estudiante.username }}</h5>
+                                        {% with rango=resultado.estudiante.get_rango_firefighter %}
                                             {% if rango %}
                                                 <div class="mb-2">
                                                     <span class="badge text-white" style="background-color: {{ rango.color }}; font-size: 0.75rem;">
@@ -162,7 +162,7 @@
                                 </thead>
                                 <tbody>
                                     {% for resultado in resultados %}
-                                    <tr {% if resultado.examen.estudiante == request.user %}class="table-primary"{% endif %}>
+                                    <tr {% if resultado.estudiante == request.user %}class="table-primary"{% endif %}>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <span class="me-2">
@@ -181,8 +181,8 @@
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                {% if resultado.examen.estudiante.profile_picture %}
-                                                    <img src="{{ resultado.examen.estudiante.profile_picture.url }}" alt="Foto de perfil" 
+                                                {% if resultado.estudiante.profile_picture %}
+                                                    <img src="{{ resultado.estudiante.profile_picture.url }}" alt="Foto de perfil" 
                                                          class="rounded-circle me-2" 
                                                          style="width: 40px; height: 40px; object-fit: cover;">
                                                 {% else %}
@@ -192,15 +192,15 @@
                                                     </div>
                                                 {% endif %}
                                                 <div>
-                                                    <strong>{{ resultado.examen.estudiante.get_full_name|default:resultado.examen.estudiante.username }}</strong>
-                                                    {% if resultado.examen.estudiante == request.user %}
+                                                    <strong>{{ resultado.estudiante.get_full_name|default:resultado.estudiante.username }}</strong>
+                                                    {% if resultado.estudiante == request.user %}
                                                         <span class="badge bg-primary ms-2">Tú</span>
                                                     {% endif %}
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
-                                            {% with rango=resultado.examen.estudiante.get_rango_firefighter %}
+                                            {% with rango=resultado.estudiante.get_rango_firefighter %}
                                                 {% if rango %}
                                                     <div class="badge text-white" style="background-color: {{ rango.color }}; font-size: 0.7rem;">
                                                         <span style="font-size: 1em;">{{ rango.icono }}</span>
@@ -216,10 +216,10 @@
                                         </td>
                                         <td>
                                             <div>
-                                                <span class="text-muted">{{ resultado.examen.nombre|truncatewords:4 }}</span>
+                                                <span class="text-muted">{{ resultado.nombre_examen|truncatewords:4 }}</span>
                                                 <br>
-                                                <small class="badge bg-{% if resultado.examen.tipo == 'examen' %}danger{% else %}primary{% endif %}">
-                                                    {{ resultado.examen.get_tipo_display }}
+                                                <small class="badge bg-{% if resultado.tipo_examen == 'examen' %}danger{% else %}primary{% endif %}">
+                                                    {{ resultado.get_tipo_examen_display }}
                                                 </small>
                                             </div>
                                         </td>

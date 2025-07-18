@@ -3,39 +3,116 @@
 {% block extra_css %}
 <style>
     .exam-container {
-        padding-top: 2rem;
+        padding: 2rem 1rem;
         min-height: calc(100vh - 120px);
     }
     
-    .exam-sidebar {
-        position: relative;
-        top: 0;
+    .exam-progress-section {
+        margin-bottom: 2rem;
     }
     
-    .exam-sidebar .card {
-        margin-top: 1rem;
+    .exam-progress-section .card {
+        border: 1px solid #dee2e6;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .exam-progress-section .card-body {
+        padding: 1.5rem;
     }
     
     .exam-main-content {
         position: relative;
-        top: 0;
     }
     
     .exam-main-content .card {
-        margin-top: 1rem;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
     
-    /* Asegurar separación del navbar */
-    @media (min-width: 768px) {
-        .exam-sidebar .card.sticky-top {
-            top: 100px;
+    .exam-main-content .card-body {
+        padding: 2rem;
+    }
+    
+    .exam-main-content .card-footer {
+        padding: 1.5rem 2rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 767px) {
+        .exam-container {
+            padding: 1rem 0.5rem;
+        }
+        
+        .exam-progress-section {
+            margin-bottom: 1rem;
+        }
+        
+        .exam-progress-section .card-body {
+            padding: 1rem;
+        }
+        
+        .exam-progress-section .col-md-4,
+        .exam-progress-section .col-md-3,
+        .exam-progress-section .col-md-2 {
+            margin-bottom: 1rem;
+        }
+        
+        .exam-progress-section .row {
+            text-align: center;
+        }
+        
+        .exam-progress-section .d-grid {
+            display: flex !important;
+            flex-direction: row;
+            gap: 0.5rem;
+        }
+        
+        .exam-progress-section .d-grid .btn {
+            flex: 1;
+        }
+        
+        .exam-main-content .card-body {
+            padding: 1.5rem;
+        }
+        
+        .exam-main-content .card-footer {
+            padding: 1rem 1.5rem;
         }
     }
     
-    @media (max-width: 767px) {
-        .exam-sidebar .card.sticky-top {
-            position: relative;
-            top: 0;
+    /* Tablet adjustments */
+    @media (min-width: 768px) and (max-width: 991px) {
+        .exam-container {
+            padding: 2rem 1rem;
+        }
+        
+        .exam-progress-section .card-body {
+            padding: 1.25rem;
+        }
+        
+        .exam-main-content .card-body {
+            padding: 1.75rem;
+        }
+        
+        .exam-main-content .card-footer {
+            padding: 1.25rem 1.75rem;
+        }
+    }
+    
+    /* Desktop adjustments */
+    @media (min-width: 992px) {
+        .exam-container {
+            padding: 2rem 2rem;
+        }
+        
+        .exam-main-content .card-body {
+            padding: 2.5rem;
+        }
+        
+        .exam-main-content .card-footer {
+            padding: 1.5rem 2.5rem;
         }
     }
 </style>
@@ -44,97 +121,100 @@
 {% block content %}
 {% csrf_token %}
 <div class="container-fluid exam-container">
-    <div class="row">
-        <!-- Sidebar con progreso -->
-        <div class="col-md-3 exam-sidebar">
-            <div class="card sticky-top">
-                <div class="card-header">
-                    <h6 class="mb-0">
-                        <i class="bi bi-list-check me-2"></i>
-                        Progreso del Examen
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <small class="text-muted">Pregunta actual</small>
-                        <div class="progress mb-2" style="height: 10px;">
-                            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-                        </div>
-                        <div class="d-flex justify-content-between small">
-                            <span id="currentQuestion">1</span>
-                            <span>/</span>
-                            <span id="totalQuestions">{{ total_preguntas }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <small class="text-muted">Tiempo restante</small>
-                        <div class="h5 mb-0" id="timeDisplay">
-                            {% if examen.tiempo_por_pregunta > 0 %}
-                                {{ examen.tiempo_por_pregunta }}s
-                            {% else %}
-                                Sin límite
-                            {% endif %}
+    <!-- Sección de progreso en la parte superior -->
+    <div class="exam-progress-section">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-check me-2"></i>
+                    {{ examen.nombre }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Progreso y navegación -->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <small class="text-muted">Pregunta actual</small>
+                            <div class="progress mb-2" style="height: 12px;">
+                                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="badge bg-primary">Pregunta <span id="currentQuestion">1</span></span>
+                                <span class="small text-muted">de <span id="totalQuestions">{{ total_preguntas }}</span></span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <small class="text-muted">Información del examen</small>
-                        <ul class="list-unstyled small mt-2">
-                            <li><strong>Tipo:</strong> {{ examen.get_tipo_display }}</li>
-                            <li><strong>Aclaraciones:</strong> {{ examen.get_tipo_aclaracion_display }}</li>
-                            <li><strong>Temas:</strong> {{ examen.temas_seleccionados.count }}</li>
-                        </ul>
+                    <!-- Tiempo restante -->
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <small class="text-muted">Tiempo restante</small>
+                            <div class="h4 mb-0 text-primary" id="timeDisplay">
+                                {% if examen.tiempo_por_pregunta > 0 %}
+                                    {{ examen.tiempo_por_pregunta }}s
+                                {% else %}
+                                    Sin límite
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Información del examen -->
+                    <div class="col-md-3">
+                        <div class="mb-3">
+                            <small class="text-muted">Información del examen</small>
+                            <ul class="list-unstyled small mt-1">
+                                <li><strong>Tipo:</strong> {{ examen.get_tipo_display }}</li>
+                                <li><strong>Aclaraciones:</strong> {{ examen.get_tipo_aclaracion_display }}</li>
+                                <li><strong>Temas:</strong> {{ examen.temas_seleccionados.count }}</li>
+                            </ul>
+                        </div>
                     </div>
                     
                     <!-- Botones de control -->
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-outline-warning btn-sm" onclick="pauseExam()">
-                            <i class="bi bi-pause me-1"></i>Pausar
-                        </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="finishExam()">
-                            <i class="bi bi-flag me-1"></i>Finalizar
-                        </button>
+                    <div class="col-md-2">
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="pauseExam()" title="ADVERTENCIA: Pausar marcará la pregunta actual como incorrecta">
+                                <i class="bi bi-pause me-1"></i>Pausar
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="finishExam()">
+                                <i class="bi bi-flag me-1"></i>Finalizar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Contenido principal -->
-        <div class="col-md-9 exam-main-content">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">{{ examen.nombre }}</h5>
-                    <div>
-                        <span class="badge bg-primary">Pregunta <span id="questionNumber">1</span></span>
+    </div>
+    
+    <!-- Contenido principal (preguntas) -->
+    <div class="exam-main-content">
+        <div class="card">
+            <div class="card-body" id="questionContainer">
+                <!-- Las preguntas se cargarán aquí dinámicamente -->
+                {% if not preguntas %}
+                    <div class="alert alert-warning">
+                        <h5>No hay preguntas disponibles</h5>
+                        <p>Este examen no tiene preguntas disponibles.</p>
+                        <a href="{% url 'core:examen_config' %}" class="btn btn-primary">Configurar Nuevo Examen</a>
                     </div>
-                </div>
-                
-                <div class="card-body" id="questionContainer">
-                    <!-- Las preguntas se cargarán aquí dinámicamente -->
-                    {% if not preguntas %}
-                        <div class="alert alert-warning">
-                            <h5>No hay preguntas disponibles</h5>
-                            <p>Este examen no tiene preguntas disponibles.</p>
-                            <a href="{% url 'core:examen_config' %}" class="btn btn-primary">Configurar Nuevo Examen</a>
-                        </div>
-                    {% else %}
-                        <div class="text-center">
-                            <i class="bi bi-hourglass-split fs-1 text-muted"></i>
-                            <p class="mt-3">Cargando pregunta...</p>
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
-                            <i class="bi bi-arrow-left me-2"></i>Anterior
-                        </button>
-                        <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
-                            Siguiente<i class="bi bi-arrow-right ms-2"></i>
-                        </button>
+                {% else %}
+                    <div class="text-center">
+                        <i class="bi bi-hourglass-split fs-1 text-muted"></i>
+                        <p class="mt-3">Cargando pregunta...</p>
                     </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
+                        <i class="bi bi-arrow-left me-2"></i>Anterior
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+                        Siguiente<i class="bi bi-arrow-right ms-2"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -156,7 +236,7 @@
                 <div id="aclaracionContent"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="continueToNextQuestion()">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="continueToNextQuestion()" id="aclaracionContinueBtn">
                     Continuar
                 </button>
             </div>
@@ -183,6 +263,62 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-danger" onclick="confirmFinishExam()">
                     <i class="bi bi-flag me-2"></i>Finalizar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de penalización por pausa -->
+<div class="modal fade" id="pausePenaltyModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Penalización por Pausa
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="bi bi-pause-circle text-warning" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3 text-warning">Examen Pausado</h4>
+                    <div class="alert alert-danger">
+                        <i class="bi bi-x-circle me-2"></i>
+                        <strong>Pregunta penalizada:</strong> La pregunta actual ha sido marcada como incorrecta.
+                    </div>
+                    <p class="text-muted mb-0">El examen está pausado. Pulsa "Continuar" para avanzar a la siguiente pregunta.</p>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary" onclick="continuePause()">
+                    <i class="bi bi-arrow-right me-2"></i>Continuar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de información post-pausa -->
+<div class="modal fade" id="pauseInfoModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Examen Pausado
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="bi bi-pause-circle text-info" style="font-size: 3rem;"></i>
+                    <h6 class="mt-3">Examen pausado correctamente</h6>
+                    <p class="text-muted mb-0">La pregunta anterior fue marcada como incorrecta. Continúa con la siguiente pregunta.</p>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary" onclick="continuePause()">
+                    <i class="bi bi-play me-2"></i>Continuar
                 </button>
             </div>
         </div>
@@ -292,26 +428,26 @@ function loadQuestion(index) {
     
     let html = `
         <div class="mb-4">
-            <h4 class="mb-3">Pregunta ${index + 1}</h4>
-            <div class="question-text p-3 bg-light rounded">
+            <h4 class="mb-4">Pregunta ${index + 1}</h4>
+            <div class="question-text p-4 bg-light rounded mb-4">
                 ${decodeHtmlEntities(question.enunciado)}
             </div>
         </div>
         
         <div class="answers-container">
-            <h6 class="mb-3">Selecciona una respuesta:</h6>
+            <h6 class="mb-4">Selecciona una respuesta:</h6>
     `;
     
     if (question.respuestas && question.respuestas.length > 0) {
         question.respuestas.forEach((respuesta, i) => {
             const isSelected = answers[question.id] === respuesta.id;
             html += `
-                <div class="form-check mb-3">
+                <div class="form-check mb-4">
                     <input class="form-check-input" type="radio" name="respuesta" 
                            id="respuesta_${respuesta.id}" value="${respuesta.id}" 
                            ${isSelected ? 'checked' : ''} 
                            onchange="selectAnswer(${question.id}, ${respuesta.id})">
-                    <label class="form-check-label" for="respuesta_${respuesta.id}">
+                    <label class="form-check-label ps-2" for="respuesta_${respuesta.id}">
                         ${decodeHtmlEntities(respuesta.texto)}
                     </label>
                 </div>
@@ -324,7 +460,6 @@ function loadQuestion(index) {
     html += '</div>';
     
     document.getElementById('questionContainer').innerHTML = html;
-    document.getElementById('questionNumber').textContent = index + 1;
     document.getElementById('currentQuestion').textContent = index + 1;
     
     // Reset timer for this question
@@ -366,7 +501,7 @@ function updateNavigationButtons() {
     
     if (currentQuestionIndex === questionData.length - 1) {
         nextBtn.innerHTML = '<i class="bi bi-flag me-2"></i>Finalizar';
-        nextBtn.onclick = finishExam;
+        nextBtn.onclick = handleLastQuestion; // Usar función especial para última pregunta
     } else {
         nextBtn.innerHTML = 'Siguiente<i class="bi bi-arrow-right ms-2"></i>';
         nextBtn.onclick = nextQuestion;
@@ -486,6 +621,17 @@ function showAclaracion(data) {
     }
     
     document.getElementById('aclaracionContent').innerHTML = content;
+    
+    // Cambiar el texto del botón si es la última pregunta
+    const continueBtn = document.getElementById('aclaracionContinueBtn');
+    if (currentQuestionIndex === questionData.length - 1) {
+        continueBtn.innerHTML = '<i class="bi bi-flag me-2"></i>Finalizar Examen';
+        continueBtn.className = 'btn btn-success';
+    } else {
+        continueBtn.innerHTML = 'Continuar';
+        continueBtn.className = 'btn btn-primary';
+    }
+    
     new bootstrap.Modal(document.getElementById('aclaracionModal')).show();
 }
 
@@ -499,6 +645,7 @@ function continueToNextQuestion() {
             startTimer();
         }
     } else {
+        // Es la última pregunta, finalizar examen
         finishExam();
     }
 }
@@ -534,6 +681,26 @@ function nextQuestion() {
     continueToNextQuestion();
 }
 
+// Manejar la última pregunta con aclaración
+function handleLastQuestion() {
+    const currentQuestion = questionData[currentQuestionIndex];
+    const selectedAnswer = answers[currentQuestion.id];
+    
+    if (selectedAnswer) {
+        clearInterval(timer);
+        sendAnswer(currentQuestion.id, selectedAnswer);
+        
+        if (examConfig.tipoAclaracion === 'inmediata') {
+            // La aclaración se mostrará en el callback de sendAnswer
+            // y después se finalizará el examen
+            return;
+        }
+    }
+    
+    // Si no hay aclaración inmediata, finalizar directamente
+    finishExam();
+}
+
 // Finalizar examen
 function finishExam() {
     clearInterval(timer);
@@ -544,6 +711,9 @@ function finishExam() {
 
 // Confirmar finalización del examen
 function confirmFinishExam() {
+    // Desactivar el evento beforeunload para evitar la advertencia de Chrome
+    window.removeEventListener('beforeunload', beforeUnloadHandler);
+    
     const formData = new FormData();
     formData.append('csrfmiddlewaretoken', csrfToken);
     
@@ -565,25 +735,109 @@ function confirmFinishExam() {
     });
 }
 
-// Pausar examen
+// Pausar examen - PENALIZACIÓN INMEDIATA + PAUSA REAL
 function pauseExam() {
+    console.log('Intento de pausa detectado - aplicando penalización inmediata');
+    
+    // DETENER EL TIMER INMEDIATAMENTE
     if (timer) {
         clearInterval(timer);
         timer = null;
-        document.getElementById('timeDisplay').textContent = 'PAUSADO';
-        alert('Examen pausado. Presiona OK para continuar.');
+    }
+    
+    // APLICAR PENALIZACIÓN INMEDIATAMENTE sin preguntar
+    markCurrentQuestionAsIncorrect();
+    
+    // Actualizar display de tiempo
+    document.getElementById('timeDisplay').textContent = 'PAUSADO';
+    
+    // Mostrar modal de penalización que requiere acción manual
+    const penaltyModal = new bootstrap.Modal(document.getElementById('pausePenaltyModal'));
+    penaltyModal.show();
+    
+    // NO auto-cerrar - el usuario debe pulsar continuar manualmente
+    console.log('Examen pausado - pregunta penalizada');
+}
+
+// Continuar tras penalización (botón manual)
+function continuePause() {
+    // Cerrar modal de penalización
+    const penaltyModal = bootstrap.Modal.getInstance(document.getElementById('pausePenaltyModal'));
+    if (penaltyModal) {
+        penaltyModal.hide();
+    }
+    
+    // Avanzar a la siguiente pregunta AHORA
+    if (currentQuestionIndex < questionData.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+        updateProgress();
+        
+        // Reiniciar timer para la nueva pregunta
         if (examConfig.tiempoPorPregunta > 0) {
             startTimer();
         }
+    } else {
+        // Si era la última pregunta, finalizar el examen
+        confirmFinishExam();
     }
 }
 
-// Prevenir salida accidental de la página
-window.addEventListener('beforeunload', function(e) {
+// Función para marcar la pregunta actual como incorrecta
+function markCurrentQuestionAsIncorrect() {
+    const currentQuestion = questionData[currentQuestionIndex];
+    
+    // Desmarcar cualquier respuesta seleccionada visualmente
+    const selectedInputs = document.querySelectorAll('input[name="respuesta"]:checked');
+    selectedInputs.forEach(input => input.checked = false);
+    
+    // Marcar una respuesta incorrecta (la primera que no sea la correcta)
+    const incorrectOption = currentQuestion.respuestas.find(r => !r.es_correcta);
+    if (incorrectOption) {
+        // Simular que se seleccionó una respuesta incorrecta
+        answers[currentQuestion.id] = incorrectOption.id;
+        
+        // Enviar la respuesta al servidor marcando como penalización por pausa
+        sendAnswerWithPenalty(currentQuestion.id, incorrectOption.id);
+    }
+    
+    console.log('Pregunta marcada como incorrecta por pausa:', currentQuestion.id);
+}
+
+// Función especial para enviar respuesta con penalización por pausa
+function sendAnswerWithPenalty(questionId, answerId) {
+    const formData = new FormData();
+    formData.append('csrfmiddlewaretoken', csrfToken);
+    formData.append('pregunta_id', questionId);
+    formData.append('respuesta_id', answerId);
+    formData.append('tiempo_empleado', 0); // Tiempo 0 por penalización
+    formData.append('orden_pregunta', currentQuestionIndex + 1);
+    formData.append('timeout', 'false');
+    formData.append('penalizada_por_pausa', 'true'); // Marcador especial
+    
+    // Enviar inmediatamente sin esperar respuesta para evitar delays
+    fetch(`/dashboard/examenes-test/${examConfig.id}/responder/`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Respuesta penalizada enviada:', data);
+    })
+    .catch(error => {
+        console.error('Error enviando respuesta penalizada:', error);
+    });
+}
+
+// Función para prevenir salida accidental de la página
+function beforeUnloadHandler(e) {
     if (currentQuestionIndex < questionData.length) {
         e.preventDefault();
         e.returnValue = '';
     }
-});
+}
+
+// Prevenir salida accidental de la página
+window.addEventListener('beforeunload', beforeUnloadHandler);
 </script>
 {% endblock %}
