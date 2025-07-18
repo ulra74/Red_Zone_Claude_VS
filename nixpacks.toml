@@ -5,7 +5,9 @@ nixPkgs = ['python310', 'python310Packages.pip']
 cmds = ['pip install -r requirements.txt']
 
 [phases.build]
-cmds = ['python manage.py collectstatic --noinput --settings=red_zone_academy.settings_production']
+cmds = [
+    'python manage.py collectstatic --noinput --clear --settings=red_zone_academy.settings_production'
+]
 
 [start]
 cmd = 'python -m gunicorn red_zone_academy.wsgi:application --bind 0.0.0.0:$PORT'
