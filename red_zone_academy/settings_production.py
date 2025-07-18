@@ -10,7 +10,9 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-*@hcv9g+qw(a*f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Railway configuration
+RAILWAY_STATIC_URL = os.environ.get('RAILWAY_STATIC_URL', '')
+ALLOWED_HOSTS = ['*'] if os.environ.get('RAILWAY_ENVIRONMENT_NAME') else os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
