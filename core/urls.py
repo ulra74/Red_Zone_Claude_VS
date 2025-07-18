@@ -8,6 +8,11 @@ from .views_files import (
     descargar_archivo_oposicion, descargar_archivo_tema,
     EliminarArchivoOposicionView, EliminarArchivoTemaView
 )
+from .views_notificaciones import (
+    EnviarNotificacionView, NotificacionesOposicionView, NotificacionDetailView,
+    MisNotificacionesView, marcar_notificacion_leida, obtener_notificaciones_no_leidas,
+    alternar_notificacion_activa
+)
 
 app_name = 'core'
 
@@ -81,6 +86,15 @@ urlpatterns = [
     path('temas/<int:tema_id>/archivos/subir/', SubirArchivoTemaView.as_view(), name='subir_archivo_tema'),
     path('archivos/tema/<int:archivo_id>/descargar/', descargar_archivo_tema, name='descargar_archivo_tema'),
     path('archivos/tema/<int:pk>/eliminar/', EliminarArchivoTemaView.as_view(), name='eliminar_archivo_tema'),
+    
+    # Sistema de Notificaciones
+    path('oposiciones/<int:oposicion_id>/notificaciones/enviar/', EnviarNotificacionView.as_view(), name='enviar_notificacion'),
+    path('oposiciones/<int:oposicion_id>/notificaciones/', NotificacionesOposicionView.as_view(), name='notificaciones_oposicion'),
+    path('notificaciones/<int:pk>/', NotificacionDetailView.as_view(), name='notificacion_detail'),
+    path('mis-notificaciones/', MisNotificacionesView.as_view(), name='mis_notificaciones'),
+    path('notificaciones/<int:notificacion_id>/marcar-leida/', marcar_notificacion_leida, name='marcar_notificacion_leida'),
+    path('notificaciones/no-leidas/', obtener_notificaciones_no_leidas, name='obtener_notificaciones_no_leidas'),
+    path('notificaciones/<int:notificacion_id>/toggle-active/', alternar_notificacion_activa, name='alternar_notificacion_activa'),
     
     # Reglas del ranking
     path('ranking/reglas/', views.RankingRulesView.as_view(), name='ranking_rules'),

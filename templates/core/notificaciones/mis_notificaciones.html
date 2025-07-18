@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header text-center seamless mb-4">
+        <h1 class="text-white mb-3">
+            <i class="bi bi-bell me-2"></i>{{ title }}
+        </h1>
+        {% if no_leidas > 0 %}
+        <p class="text-white-50 mb-0">
+            <span class="badge bg-danger fs-6">{{ no_leidas }}</span>
+            notificacion{{ no_leidas|pluralize }}es sin leer
+        </p>
+        {% else %}
+        <p class="text-white-50 mb-0">
+            Todas las notificaciones están al día
+        </p>
+        {% endif %}
+    </div>
+
+    <div class="main-content">
+        {% if notificaciones %}
+            <div class="row">
+                {% for notificacion in notificaciones %}
+                <div class="col-12 mb-3">
+                    <div class="card notification-card {% if not notificacion.leida_por_usuario %}border-primary{% endif %} {% if notificacion.es_urgente %}border-danger border-2{% endif %}" 
+                         data-notification-id="{{ notificacion.id }}">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start">
+                                <!-- Icono según tipo -->
+                                <div class="notification-icon me-3">
+                                    {% if notificacion.es_urgente %}
+                                        <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+                                    {% elif notificacion.tipo == 'important' %}
+                                        <i class="bi bi-exclamation-circle-fill text-warning fs-4"></i>
+                                    {% elif notificacion.tipo == 'exam' %}
+                                        <i class="bi bi-clipboard-check-fill text-success fs-4"></i>
+                                    {% elif notificacion.tipo == 'file' %}
+                                        <i class="bi bi-file-earmark-fill text-info fs-4"></i>
+                                    {% else %}
+                                        <i class="bi bi-bell-fill text-primary fs-4"></i>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Contenido -->
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="mb-0 {% if not notificacion.leida_por_usuario %}fw-bold{% endif %}">
+                                            {{ notificacion.titulo }}
+                                            {% if notificacion.es_urgente %}
+                                                <span class="badge bg-danger ms-2">URGENTE</span>
+                                            {% elif notificacion.tipo == 'important' %}
+                                                <span class="badge bg-warning ms-2">IMPORTANTE</span>
+                                            {% endif %}
+                                        </h5>
+                                        
+                                        {% if not notificacion.leida_por_usuario %}
+                                            <span class="badge bg-primary">Nueva</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <p class="mb-2 {% if not notificacion.leida_por_usuario %}fw-semibold{% endif %}">
+                                        {{ notificacion.mensaje }}
+                                    </p>
+                                    
+                                    <!-- Información adicional -->
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="bi bi-person me-1"></i>{{ notificacion.enviado_por.get_full_name|default:notificacion.enviado_por.username }}
+                                            • <i class="bi bi-building me-1"></i>{{ notificacion.oposicion.nombre }}
+                                            • <i class="bi bi-clock me-1"></i>{{ notificacion.fecha_creacion|timesince }} atrás
+                                        </small>
+                                        
+                                        <div class="notification-actions">
+                                            {% if notificacion.enlace_url %}
+                                                <a href="{{ notificacion.enlace_url }}" target="_blank" class="btn btn-outline-primary btn-sm me-2">
+                                                    <i class="bi bi-link-45deg me-1"></i>
+                                                    {{ notificacion.enlace_texto|default:"Ver más" }}
+                                                </a>
+                                            {% endif %}
+                                            
+                                            {% if not notificacion.leida_por_usuario %}
+                                                <button class="btn btn-primary btn-sm mark-read-btn" 
+                                                        data-notification-id="{{ notificacion.id }}">
+                                                    <i class="bi bi-check me-1"></i>
+                                                    Marcar como leída
+                                                </button>
+                                            {% else %}
+                                                <small class="text-success">
+                                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                                    Leída
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Navegación de notificaciones">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">&laquo; Primera</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+            
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-bell-slash text-muted" style="font-size: 4rem;"></i>
+                <h4 class="mt-3 text-muted">No hay notificaciones</h4>
+                <p class="text-muted">Cuando tengas notificaciones aparecerán aquí.</p>
+                <a href="{% url 'core:dashboard' %}" class="btn btn-primary">
+                    <i class="bi bi-house me-2"></i>
+                    Volver al Dashboard
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.notification-card {
+    transition: all 0.3s ease;
+}
+
+.notification-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.notification-card.border-primary {
+    border-left: 4px solid var(--bs-primary) !important;
+}
+
+.notification-card.border-danger {
+    border-left: 4px solid var(--bs-danger) !important;
+}
+
+.notification-icon {
+    min-width: 48px;
+    text-align: center;
+}
+
+.mark-read-btn {
+    transition: all 0.3s ease;
+}
+
+.mark-read-btn:hover {
+    transform: scale(1.05);
+}
+
+.notification-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .notification-actions {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.25rem;
+    }
+    
+    .notification-actions .btn {
+        font-size: 0.875rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejar botones de "marcar como leída"
+    document.querySelectorAll('.mark-read-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const notificationId = this.dataset.notificationId;
+            const card = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            
+            // Deshabilitar botón temporalmente
+            this.disabled = true;
+            this.innerHTML = '<i class="bi bi-clock me-1"></i>Marcando...';
+            
+            // Hacer petición AJAX
+            fetch(`/dashboard/notificaciones/${notificationId}/marcar-leida/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar UI
+                    card.classList.remove('border-primary');
+                    this.outerHTML = '<small class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Leída</small>';
+                    
+                    // Actualizar contador si existe
+                    updateNotificationCount();
+                    
+                    // Mostrar mensaje de éxito
+                    showToast('Notificación marcada como leída', 'success');
+                } else {
+                    throw new Error(data.error || 'Error desconocido');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.disabled = false;
+                this.innerHTML = '<i class="bi bi-check me-1"></i>Marcar como leída';
+                showToast('Error al marcar la notificación', 'error');
+            });
+        });
+    });
+    
+    // Función para obtener cookie CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Función para actualizar contador de notificaciones
+    function updateNotificationCount() {
+        const countElement = document.querySelector('.notification-count');
+        if (countElement) {
+            let currentCount = parseInt(countElement.textContent) || 0;
+            currentCount = Math.max(0, currentCount - 1);
+            countElement.textContent = currentCount;
+            
+            if (currentCount === 0) {
+                countElement.style.display = 'none';
+            }
+        }
+    }
+    
+    // Función para mostrar mensajes toast
+    function showToast(message, type = 'info') {
+        // Crear toast dinámicamente
+        const toastId = 'toast-' + Date.now();
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        `;
+        
+        // Añadir al container de toasts (si existe) o al body
+        let toastContainer = document.querySelector('.toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+            document.body.appendChild(toastContainer);
+        }
+        
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+        
+        // Mostrar toast
+        const toastElement = document.getElementById(toastId);
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+        
+        // Eliminar después de que se oculte
+        toastElement.addEventListener('hidden.bs.toast', () => {
+            toastElement.remove();
+        });
+    }
+});
+</script>
+{% endblock %}

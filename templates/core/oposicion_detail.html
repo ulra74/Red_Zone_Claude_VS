@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container">
     <!-- Page Header -->
-    <div class="page-header text-center mb-4">
+    <div class="page-header text-center seamless mb-4">
         <h1 class="text-white mb-3">
             <i class="bi bi-fire me-2"></i>{{ oposicion.nombre }}
         </h1>
@@ -209,6 +209,14 @@
                         {% endif %}
                         
                         {% if request.user.is_admin %}
+                            <a href="{% url 'core:enviar_notificacion' oposicion.pk %}" class="btn btn-primary">
+                                <i class="bi bi-send me-2"></i>
+                                Enviar Notificación
+                            </a>
+                            <a href="{% url 'core:notificaciones_oposicion' oposicion.pk %}" class="btn btn-outline-primary">
+                                <i class="bi bi-bell me-2"></i>
+                                Ver Notificaciones
+                            </a>
                             <a href="{% url 'core:admin_oposicion_update' oposicion.pk %}" class="btn btn-warning">
                                 <i class="bi bi-pencil me-2"></i>
                                 Editar Oposición

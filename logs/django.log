@@ -5311,3 +5311,83 @@ Watching for file changes with StatReloader
 "GET /dashboard/ HTTP/1.1" 200 30229
 "GET /dashboard/oposiciones/ HTTP/1.1" 200 17973
 "GET /dashboard/oposiciones/1/ HTTP/1.1" 200 28511
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 200 28511
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15609
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 24117
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22986
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 200 26902
+"GET /dashboard/oposiciones/1/archivos/subir/ HTTP/1.1" 200 29615
+"POST /dashboard/oposiciones/1/archivos/subir/ HTTP/1.1" 302 0
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 200 28416
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 22986
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 200 27930
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15631
+"POST /auth/login/ HTTP/1.1" 200 15683
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 30229
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 17973
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 200 29539
+"GET /dashboard/archivos/oposicion/1/descargar/ HTTP/1.1" 200 205712
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 200 29548
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/models.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/urls.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/urls.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views_notificaciones.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views_notificaciones.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /dashboard/ HTTP/1.1" 200 31786
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 19978
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 200 31553
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/mis-notificaciones/ HTTP/1.1" 200 22015
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15658
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 24187
+"GET /dashboard/oposiciones/ HTTP/1.1" 200 23056
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 200 28530
+"GET /dashboard/oposiciones/1/notificaciones/enviar/ HTTP/1.1" 200 27184
+"POST /dashboard/oposiciones/1/notificaciones/enviar/ HTTP/1.1" 302 0
+"GET /dashboard/oposiciones/1/ HTTP/1.1" 200 29059
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15680
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 32234
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/mis-notificaciones/ HTTP/1.1" 200 24851
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"POST /dashboard/notificaciones/1/marcar-leida/ HTTP/1.1" 200 87
+"GET /dashboard/mis-notificaciones/ HTTP/1.1" 200 24542
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/ HTTP/1.1" 200 31786
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 15658
+"POST /auth/login/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 29425
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29

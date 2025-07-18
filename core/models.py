@@ -885,11 +885,194 @@ from .models_preparacion_fisica import (
     SesionEntrenamiento, EjercicioSesion, RegistroMarcas
 )
 
+# ============================================================================
+# MODELOS DEL SISTEMA DE NOTIFICACIONES
+# ============================================================================
+
+class TipoNotificacion(models.TextChoices):
+    """Tipos de notificaciones"""
+    INFORMACION = 'info', 'Información'
+    IMPORTANTE = 'important', 'Importante'
+    URGENTE = 'urgent', 'Urgente'
+    EXAMEN = 'exam', 'Examen'
+    ARCHIVO = 'file', 'Nuevo Archivo'
+    GENERAL = 'general', 'General'
+
+
+class Notificacion(models.Model):
+    """Notificaciones del sistema"""
+    
+    # Emisor y receptor
+    enviado_por = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notificaciones_enviadas',
+        limit_choices_to={'user_type': 'admin'},
+        help_text="Administrador que envía la notificación"
+    )
+    
+    # Ámbito de la notificación
+    oposicion = models.ForeignKey(
+        Oposicion,
+        on_delete=models.CASCADE,
+        related_name='notificaciones',
+        help_text="Oposición a cuyos estudiantes se envía la notificación"
+    )
+    
+    # Contenido
+    titulo = models.CharField(
+        max_length=200,
+        help_text="Título de la notificación"
+    )
+    
+    mensaje = models.TextField(
+        help_text="Contenido del mensaje"
+    )
+    
+    tipo = models.CharField(
+        max_length=20,
+        choices=TipoNotificacion.choices,
+        default=TipoNotificacion.INFORMACION,
+        help_text="Tipo de notificación"
+    )
+    
+    # Configuración
+    es_urgente = models.BooleanField(
+        default=False,
+        help_text="Notificación urgente (aparece destacada)"
+    )
+    
+    requiere_confirmacion = models.BooleanField(
+        default=False,
+        help_text="Requiere que el estudiante confirme haber leído"
+    )
+    
+    enlace_url = models.URLField(
+        blank=True,
+        help_text="URL opcional para más información"
+    )
+    
+    enlace_texto = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Texto para el enlace"
+    )
+    
+    # Metadatos
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_expiracion = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text="Fecha después de la cual la notificación no se muestra"
+    )
+    
+    activa = models.BooleanField(
+        default=True,
+        help_text="Si la notificación está activa"
+    )
+    
+    class Meta:
+        ordering = ['-fecha_creacion']
+        verbose_name = "Notificación"
+        verbose_name_plural = "Notificaciones"
+    
+    def __str__(self):
+        return f"{self.titulo} - {self.oposicion.nombre}"
+    
+    @property
+    def estudiantes_objetivo(self):
+        """Obtiene los estudiantes que deben recibir esta notificación"""
+        return self.oposicion.alumnos_con_acceso.filter(user_type='student')
+    
+    @property
+    def total_destinatarios(self):
+        """Número total de destinatarios"""
+        return self.estudiantes_objetivo.count()
+    
+    @property
+    def total_leidas(self):
+        """Número de notificaciones leídas"""
+        return self.lecturas.count()
+    
+    @property
+    def porcentaje_lectura(self):
+        """Porcentaje de lectura"""
+        if self.total_destinatarios == 0:
+            return 0
+        return (self.total_leidas / self.total_destinatarios) * 100
+    
+    @property
+    def esta_expirada(self):
+        """Verifica si la notificación ha expirado"""
+        if not self.fecha_expiracion:
+            return False
+        from django.utils import timezone
+        return timezone.now() > self.fecha_expiracion
+    
+    def marcar_como_leida(self, usuario):
+        """Marca la notificación como leída por un usuario"""
+        from django.utils import timezone
+        lectura, created = LecturaNotificacion.objects.get_or_create(
+            notificacion=self,
+            usuario=usuario,
+            defaults={'fecha_lectura': timezone.now()}
+        )
+        return created
+    
+    def es_visible_para(self, usuario):
+        """Verifica si la notificación es visible para un usuario"""
+        if not self.activa or self.esta_expirada:
+            return False
+        
+        if usuario.is_admin():
+            return True
+            
+        if usuario.is_student():
+            return usuario in self.estudiantes_objetivo
+            
+        return False
+
+
+class LecturaNotificacion(models.Model):
+    """Registro de lecturas de notificaciones"""
+    
+    notificacion = models.ForeignKey(
+        Notificacion,
+        on_delete=models.CASCADE,
+        related_name='lecturas'
+    )
+    
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='notificaciones_leidas'
+    )
+    
+    fecha_lectura = models.DateTimeField(auto_now_add=True)
+    
+    confirmada = models.BooleanField(
+        default=False,
+        help_text="Si el usuario confirmó haber leído (para notificaciones importantes)"
+    )
+    
+    class Meta:
+        unique_together = ['notificacion', 'usuario']
+        ordering = ['-fecha_lectura']
+        verbose_name = "Lectura de Notificación"
+        verbose_name_plural = "Lecturas de Notificaciones"
+    
+    def __str__(self):
+        return f"{self.usuario.username} - {self.notificacion.titulo}"
+
+
 # Hacer que todos los modelos estén disponibles en este módulo
 __all__ = [
     # Modelos base
     'Oposicion', 'Tema', 'TemaOposicion', 'TipoArchivo', 'ArchivoOposicion', 'ArchivoTema', 
     'DescargaArchivo', 'ProgresoEstudiante',
+    
+    # Modelos de notificaciones
+    'TipoNotificacion', 'Notificacion', 'LecturaNotificacion',
     
     # Modelos de evaluaciones
     'TipoEvaluacion', 'DificultadPregunta', 'Categoria', 'BancoPregunta', 

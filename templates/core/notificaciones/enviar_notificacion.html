@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header text-center seamless mb-4">
+        <h1 class="text-white mb-3">
+            <i class="bi bi-send me-2"></i>{{ title }}
+        </h1>
+        <p class="text-white-50 mb-0">
+            <i class="bi bi-people me-2"></i>
+            Enviar mensaje a {{ estudiantes_count }} estudiantes
+        </p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-envelope me-2"></i>
+                        Nueva Notificación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Información de la Oposición -->
+                    <div class="alert alert-info mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                            <div>
+                                <h6 class="mb-1">Enviando notificación a:</h6>
+                                <strong>{{ oposicion.nombre }}</strong>
+                                <small class="d-block text-muted">
+                                    {{ estudiantes_count }} estudiante{{ estudiantes_count|pluralize }} recibirá{{ estudiantes_count|pluralize:"n" }} esta notificación
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <h6><i class="bi bi-exclamation-triangle-fill me-2"></i>Errores en el formulario:</h6>
+                            <ul class="mb-0">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field|capfirst }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Información Principal -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">
+                                    <i class="bi bi-chat-text me-2"></i>
+                                    Información Principal
+                                </h6>
+                            </div>
+                            
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label fw-semibold">
+                                    <i class="bi bi-card-heading me-2"></i>Título de la Notificación
+                                </label>
+                                {{ form.titulo }}
+                                {% if form.titulo.errors %}
+                                    <div class="text-danger small mt-1">{{ form.titulo.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">{{ form.titulo.help_text }}</div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.mensaje.id_for_label }}" class="form-label fw-semibold">
+                                    <i class="bi bi-chat-quote me-2"></i>Mensaje
+                                </label>
+                                {{ form.mensaje }}
+                                {% if form.mensaje.errors %}
+                                    <div class="text-danger small mt-1">{{ form.mensaje.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">{{ form.mensaje.help_text }}</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo.id_for_label }}" class="form-label fw-semibold">
+                                    <i class="bi bi-tag me-2"></i>Tipo de Notificación
+                                </label>
+                                {{ form.tipo }}
+                                {% if form.tipo.errors %}
+                                    <div class="text-danger small mt-1">{{ form.tipo.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">{{ form.tipo.help_text }}</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.fecha_expiracion.id_for_label }}" class="form-label fw-semibold">
+                                    <i class="bi bi-calendar-x me-2"></i>Fecha de Expiración
+                                </label>
+                                {{ form.fecha_expiracion }}
+                                {% if form.fecha_expiracion.errors %}
+                                    <div class="text-danger small mt-1">{{ form.fecha_expiracion.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">{{ form.fecha_expiracion.help_text }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Configuración Avanzada -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">
+                                    <i class="bi bi-gear me-2"></i>
+                                    Configuración Avanzada
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    {{ form.es_urgente }}
+                                    <label class="form-check-label fw-semibold" for="{{ form.es_urgente.id_for_label }}">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>Notificación Urgente
+                                    </label>
+                                    {% if form.es_urgente.errors %}
+                                        <div class="text-danger small mt-1">{{ form.es_urgente.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.es_urgente.help_text }}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    {{ form.requiere_confirmacion }}
+                                    <label class="form-check-label fw-semibold" for="{{ form.requiere_confirmacion.id_for_label }}">
+                                        <i class="bi bi-check-circle me-2"></i>Requiere Confirmación
+                                    </label>
+                                    {% if form.requiere_confirmacion.errors %}
+                                        <div class="text-danger small mt-1">{{ form.requiere_confirmacion.errors.0 }}</div>
+                                    {% endif %}
+                                    <div class="form-text">{{ form.requiere_confirmacion.help_text }}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.enlace_url.id_for_label }}" class="form-label fw-semibold">
+                                    <i class="bi bi-link me-2"></i>Enlace Adicional
+                                </label>
+                                {{ form.enlace_url }}
+                                {% if form.enlace_url.errors %}
+                                    <div class="text-danger small mt-1">{{ form.enlace_url.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">{{ form.enlace_url.help_text }}</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.enlace_texto.id_for_label }}" class="form-label fw-semibold">
+                                    <i class="bi bi-cursor-text me-2"></i>Texto del Enlace
+                                </label>
+                                {{ form.enlace_texto }}
+                                {% if form.enlace_texto.errors %}
+                                    <div class="text-danger small mt-1">{{ form.enlace_texto.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">{{ form.enlace_texto.help_text }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Previsualización -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3">
+                                    <i class="bi bi-eye me-2"></i>
+                                    Previsualización
+                                </h6>
+                                <div class="card bg-light" id="preview">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-start">
+                                            <i class="bi bi-bell-fill text-primary me-3 fs-4" id="preview-icon"></i>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1" id="preview-titulo">Título de la notificación</h6>
+                                                <p class="mb-2 text-muted" id="preview-mensaje">Mensaje de la notificación</p>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-person me-1"></i>{{ request.user.get_full_name|default:request.user.username }}
+                                                    • <i class="bi bi-clock me-1"></i>Ahora
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'core:oposicion_detail' oposicion.pk %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-x-circle me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-send me-2"></i>
+                                        Enviar Notificación
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tituloInput = document.getElementById('{{ form.titulo.id_for_label }}');
+    const mensajeInput = document.getElementById('{{ form.mensaje.id_for_label }}');
+    const tipoSelect = document.getElementById('{{ form.tipo.id_for_label }}');
+    const urgentCheck = document.getElementById('{{ form.es_urgente.id_for_label }}');
+    
+    const previewTitulo = document.getElementById('preview-titulo');
+    const previewMensaje = document.getElementById('preview-mensaje');
+    const previewIcon = document.getElementById('preview-icon');
+    
+    function updatePreview() {
+        // Actualizar título
+        previewTitulo.textContent = tituloInput.value || 'Título de la notificación';
+        
+        // Actualizar mensaje
+        previewMensaje.textContent = mensajeInput.value || 'Mensaje de la notificación';
+        
+        // Actualizar icono y color según el tipo
+        const tipo = tipoSelect.value;
+        const esUrgente = urgentCheck.checked;
+        
+        let iconClass = 'bi bi-bell-fill';
+        let colorClass = 'text-primary';
+        
+        if (esUrgente) {
+            iconClass = 'bi bi-exclamation-triangle-fill';
+            colorClass = 'text-danger';
+        } else {
+            switch(tipo) {
+                case 'important':
+                    iconClass = 'bi bi-exclamation-circle-fill';
+                    colorClass = 'text-warning';
+                    break;
+                case 'urgent':
+                    iconClass = 'bi bi-exclamation-triangle-fill';
+                    colorClass = 'text-danger';
+                    break;
+                case 'exam':
+                    iconClass = 'bi bi-clipboard-check-fill';
+                    colorClass = 'text-success';
+                    break;
+                case 'file':
+                    iconClass = 'bi bi-file-earmark-fill';
+                    colorClass = 'text-info';
+                    break;
+                default:
+                    iconClass = 'bi bi-bell-fill';
+                    colorClass = 'text-primary';
+            }
+        }
+        
+        previewIcon.className = iconClass + ' ' + colorClass + ' me-3 fs-4';
+    }
+    
+    // Actualizar preview en tiempo real
+    tituloInput.addEventListener('input', updatePreview);
+    mensajeInput.addEventListener('input', updatePreview);
+    tipoSelect.addEventListener('change', updatePreview);
+    urgentCheck.addEventListener('change', updatePreview);
+    
+    // Inicializar preview
+    updatePreview();
+});
+</script>
+{% endblock %}
