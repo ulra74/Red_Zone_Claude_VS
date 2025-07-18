@@ -1,0 +1,22 @@
+# Core Django requirements
+Django==5.0.14
+asgiref==3.9.1
+sqlparse==0.5.3
+
+# Image processing
+Pillow==11.3.0
+
+# Configuration management
+python-decouple==3.8
+
+# Production requirements
+gunicorn==21.2.0
+psycopg2-binary==2.9.9
+whitenoise==6.6.0
+
+# Security and monitoring (optional but recommended)
+django-extensions==3.2.3
+django-debug-toolbar==4.2.0
+
+# For better error reporting in production
+sentry-sdk[django]==1.38.0
