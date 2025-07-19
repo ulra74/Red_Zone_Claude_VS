@@ -5630,3 +5630,14 @@ Watching for file changes with StatReloader
 "GET /dashboard/ HTTP/1.1" 200 25250
 Not Found: /.well-known/appspecific/com.chrome.devtools.json
 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /dashboard/ HTTP/1.1" 200 25249
+"GET /static/img/logo_largo.jpg HTTP/1.1" 200 64129
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"GET /dashboard/ HTTP/1.1" 200 25249
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/logo_largo.jpg HTTP/1.1" 200 64129
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920

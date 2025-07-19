@@ -69,12 +69,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'red_zone_academy.wsgi.application'
 
-# Database - usar SQLite para empezar simple
+# Database - usar PostgreSQL en producción con DATABASE_URL automática de Render
+import dj_database_url
+
+# Configuración automática para Render PostgreSQL
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR}/db.sqlite3',  # Fallback para desarrollo
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # Password validation
