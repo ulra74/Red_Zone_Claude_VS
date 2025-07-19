@@ -299,6 +299,10 @@
         @media (max-width: 768px) {
             body {
                 background-attachment: scroll;
+                min-height: 100vh;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
             }
             
             .page-header {
@@ -309,6 +313,34 @@
                 padding: 2rem;
                 margin: 1rem;
             }
+            
+            /* Fix navbar spacing on mobile */
+            .navbar .container {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+            
+            .navbar-brand {
+                margin-right: 0.5rem !important;
+            }
+            
+            .navbar-toggler {
+                margin-left: auto;
+                margin-right: 0.25rem;
+            }
+        }
+        
+        /* Footer que llena hasta abajo */
+        .footer {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            position: relative;
+            margin-top: auto;
         }
     </style>
     
@@ -331,12 +363,12 @@
                 </a>
             {% endif %}
             
+            {% if user.is_authenticated %}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             
             <div class="collapse navbar-collapse" id="navbarNav">
-                {% if user.is_authenticated %}
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'core:dashboard' %}">
@@ -385,8 +417,8 @@
                         </ul>
                     </li>
                 </ul>
-                {% endif %}
             </div>
+            {% endif %}
         </div>
     </nav>
 

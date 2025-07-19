@@ -264,7 +264,10 @@ class OposicionCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['alumnos_con_acceso'].queryset = CustomUser.objects.filter(user_type='student')
+        # Filtrar solo estudiantes y ordenar por nombre
+        self.fields['alumnos_con_acceso'].queryset = CustomUser.objects.filter(
+            user_type='student'
+        ).order_by('first_name', 'last_name', 'username')
         self.fields['fecha_convocatoria'].help_text = "Fecha de la convocatoria oficial"
 
 
@@ -287,7 +290,10 @@ class OposicionUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['alumnos_con_acceso'].queryset = CustomUser.objects.filter(user_type='student')
+        # Filtrar solo estudiantes y ordenar por nombre
+        self.fields['alumnos_con_acceso'].queryset = CustomUser.objects.filter(
+            user_type='student'
+        ).order_by('first_name', 'last_name', 'username')
         self.fields['fecha_convocatoria'].help_text = "La fecha de convocatoria no puede modificarse una vez creada"
         self.fields['fecha_convocatoria'].disabled = True
 
@@ -306,8 +312,11 @@ class TemaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['alumnos_con_acceso'].queryset = CustomUser.objects.filter(user_type='student')
-        self.fields['oposiciones'].queryset = Oposicion.objects.all()
+        # Filtrar solo estudiantes y ordenar por nombre
+        self.fields['alumnos_con_acceso'].queryset = CustomUser.objects.filter(
+            user_type='student'
+        ).order_by('first_name', 'last_name', 'username')
+        self.fields['oposiciones'].queryset = Oposicion.objects.all().order_by('nombre')
 
 
 # Formulario para gestionar temas en una oposición específica

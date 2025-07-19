@@ -28,7 +28,18 @@ class CustomUser(AbstractUser):
     )
     
     def __str__(self):
+        # Mostrar nombre completo si está disponible, sino username
+        full_name = self.get_full_name()
+        if full_name.strip():
+            return f"{full_name} ({self.username})"
         return f"{self.username} ({self.get_user_type_display()})"
+    
+    def get_display_name(self):
+        """Método para obtener el nombre de visualización en formularios"""
+        full_name = self.get_full_name()
+        if full_name.strip():
+            return full_name
+        return self.username
     
     def is_admin(self):
         return self.user_type == 'admin'

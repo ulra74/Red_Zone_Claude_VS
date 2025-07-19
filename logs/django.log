@@ -5504,3 +5504,123 @@ Watching for file changes with StatReloader
 "GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
 "GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
 "GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /dashboard/notificaciones/no-leidas/ HTTP/1.1" 200 29
+"GET /auth/logout/ HTTP/1.1" 302 0
+"GET / HTTP/1.1" 302 0
+"GET /auth/login/ HTTP/1.1" 200 16820
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /auth/login/ HTTP/1.1" 200 16372
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"GET /auth/login/ HTTP/1.1" 200 17828
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"GET /dashboard/ HTTP/1.1" 302 0
+"GET /auth/login/?next=/dashboard/ HTTP/1.1" 200 17828
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
+"GET /static/img/logo_rz.png HTTP/1.1" 200 332692
+"GET /static/img/fondo.jpeg HTTP/1.1" 200 158920
+"POST /auth/login/?next=/dashboard/ HTTP/1.1" 302 0
+"GET /dashboard/ HTTP/1.1" 200 25209
+"GET /dashboard/temas/ HTTP/1.1" 200 36429
+"GET /dashboard/temas/1/ HTTP/1.1" 200 21058
+"GET /dashboard/temas/ HTTP/1.1" 200 36429
+"GET /dashboard/admin/temas/1/edit/ HTTP/1.1" 200 36737
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/accounts/models.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+/Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader

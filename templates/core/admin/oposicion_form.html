@@ -134,7 +134,13 @@
                                                                 </div>
                                                                 <div>
                                                                     <div class="fw-semibold">{{ choice.choice_label }}</div>
-                                                                    <small class="text-muted">Usuario activo</small>
+                                                                    <small class="text-muted">
+                                                                        {% if choice.choice_value.instance.get_full_name %}
+                                                                            @{{ choice.choice_value.instance.username }}
+                                                                        {% else %}
+                                                                            Usuario: {{ choice.choice_value.instance.username }}
+                                                                        {% endif %}
+                                                                    </small>
                                                                 </div>
                                                             </div>
                                                         </label>
