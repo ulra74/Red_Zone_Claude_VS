@@ -5624,3 +5624,9 @@ Watching for file changes with StatReloader
 /Users/raulmartinezmartinez/Documents/Proyectos/RedZone_Claude/red_zone_academy/core/views.py changed, reloading.
 Watching for file changes with StatReloader
 Watching for file changes with StatReloader
+"GET /dashboard/admin/temas/1/edit/ HTTP/1.1" 200 38194
+"GET /dashboard/admin/temas/1/edit/ HTTP/1.1" 200 38705
+"GET /static/img/logo_largo.jpeg HTTP/1.1" 200 64129
+"GET /dashboard/ HTTP/1.1" 200 25250
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+"GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 2794
