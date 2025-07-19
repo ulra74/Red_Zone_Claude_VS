@@ -6,9 +6,7 @@ cmds = ['pip install -r requirements.txt']
 
 [phases.build]
 cmds = [
-    'ls -la static/img/',
-    'python manage.py collectstatic --noinput --clear --settings=red_zone_academy.settings_production',
-    'ls -la staticfiles/img/'
+    'python manage.py collectstatic --noinput --clear --settings=red_zone_academy.settings_production'
 ]
 
 [start]
