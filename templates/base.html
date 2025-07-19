@@ -54,10 +54,15 @@
 }
         
         .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             display: flex;
             align-items: center;
             text-decoration: none;
-            padding: 0.5rem 0;
         }
         
         .navbar-brand-logo {
@@ -374,11 +379,13 @@
             {% load static %}
             {% if user.is_authenticated %}
                 <a class="navbar-brand" href="{% url 'core:dashboard' %}">
-                    <img src="{% static 'img/logo_largo.jpeg' %}" alt="Red Zone Academy" class="navbar-brand-logo-horizontal">
+                    <img src="{% static 'img/logo_rz.png' %}" alt="Red Zone Academy" class="navbar-brand-logo">
+                    Red Zone Academy
                 </a>
             {% else %}
                 <a class="navbar-brand" href="#">
-                    <img src="{% static 'img/logo_largo.jpeg' %}" alt="Red Zone Academy" class="navbar-brand-logo-horizontal">
+                    <img src="{% static 'img/logo_rz.png' %}" alt="Red Zone Academy" class="navbar-brand-logo">
+                    Red Zone Academy
                 </a>
             {% endif %}
             
